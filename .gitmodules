@@ -4,3 +4,6 @@
 [submodule "OrganoidAgent"]
 	path = OrganoidAgent
 	url = git@github.com:lachlanchen/OrganoidAgent.git
+[submodule "AutoAppDev"]
+	path = AutoAppDev
+	url = git@github.com:lachlanchen/AutoAppDev.git
