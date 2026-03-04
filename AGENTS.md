@@ -18,6 +18,13 @@ No software build pipeline is defined. Use these utility commands:
 - `pdftotext references/DEO+part+thesis.pdf - | less`: extract thesis text for verification.
 - `cd data-docs/tex-artifacts && xelatex -interaction=nonstopmode DEO_Experiment_Clarification_Form.tex`: rebuild interactive PDF form.
 
+## Environment Setup
+- Default Python environment for this repository: `organoid`.
+- Expected interpreter path: `/home/lachlan/miniconda3/envs/organoid/bin/python`.
+- Quick check:
+- `conda activate organoid`
+- `which python`
+
 ## Coding Style & Naming Conventions
 For documentation/scripts added later:
 
