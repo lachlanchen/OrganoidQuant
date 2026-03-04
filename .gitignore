@@ -1,0 +1,15 @@
+# Raw experiment data
+DEO/
+*.tif
+
+# Local/system
+.DS_Store
+Thumbs.db
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk

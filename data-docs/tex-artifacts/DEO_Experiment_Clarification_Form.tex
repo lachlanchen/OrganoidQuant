@@ -1,0 +1,138 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{array}
+\hypersetup{colorlinks=false,pdfborder={0 0 0},pdftitle={DEO Experiment Clarification Form}}
+\renewcommand{\arraystretch}{1.25}
+
+\newcommand{\sectiontitle}[1]{\vspace{0.6em}\noindent{\Large\bfseries\color{blue!60!black} #1}\vspace{0.4em}\\}
+\newcommand{\txt}[2]{\TextField[name=#1,width=#2,bordercolor={0.7 0.7 0.7},backgroundcolor={0.98 0.98 0.98}]{} }
+\newcommand{\txtml}[3]{\TextField[multiline=true,name=#1,width=#2,height=#3,bordercolor={0.7 0.7 0.7},backgroundcolor={0.98 0.98 0.98}]{} }
+
+\begin{document}
+\begin{Form}
+
+\begin{center}
+{\LARGE\bfseries DEO Experiment Clarification Form}\\[2mm]
+{\large Interactive fillable PDF for labmate confirmation}
+\end{center}
+
+\noindent\textbf{Purpose:} confirm experiment mapping, concentration/condition logic, day indexing, and transfer-stage data (A/B).\\
+\textbf{Instruction:} fill only what is certain; use notes for uncertain items.
+
+\vspace{0.5em}
+\begin{tabular}{|p{3.0cm}|p{5.0cm}|p{2.5cm}|p{5.0cm}|}
+\hline
+Filled by & \txt{metaFilledBy}{4.8cm} & Date & \txt{metaDate}{4.8cm} \\
+\hline
+Contact & \txt{metaContact}{4.8cm} & Version & \txt{metaVersion}{4.8cm} \\
+\hline
+\end{tabular}
+
+\sectiontitle{1) Major Experiment Mapping (3 majors)}
+\begin{longtable}{|p{3.6cm}|p{3.6cm}|p{2.5cm}|p{2.0cm}|p{3.9cm}|}
+\hline
+Summary Figure & Raw Folder & Theme & Confirm & Notes \\
+\hline
+Alginate summary TIFF & App65 DEO+Alginate & Alginate concentration & \CheckBox[name=mapAlgOk,width=0.42cm,height=0.42cm]{} & \txtml{mapAlgNote}{3.7cm}{1.2cm} \\
+\hline
+Y-27632 summary TIFF & App80 DEO & Y-27632 concentration & \CheckBox[name=mapYOk,width=0.42cm,height=0.42cm]{} & \txtml{mapYNote}{3.7cm}{1.2cm} \\
+\hline
+DEO density summary TIFF & DEO App81 P8 & DEO density & \CheckBox[name=mapDensityOk,width=0.42cm,height=0.42cm]{} & \txtml{mapDensityNote}{3.7cm}{1.2cm} \\
+\hline
+\end{longtable}
+
+\sectiontitle{2) Condition Setup}
+\begin{longtable}{|p{2.4cm}|p{3.0cm}|p{2.2cm}|p{2.6cm}|p{2.1cm}|p{2.8cm}|}
+\hline
+Experiment & Group label & Concentration & Add Alginate? & Magnification & Notes \\
+\hline
+App65 & \txt{a65g1}{2.8cm} & \txt{a65c1}{2.0cm} & \txt{a65a1}{2.4cm} & \txt{a65m1}{1.9cm} & \txt{a65n1}{2.6cm} \\
+\hline
+App65 & \txt{a65g2}{2.8cm} & \txt{a65c2}{2.0cm} & \txt{a65a2}{2.4cm} & \txt{a65m2}{1.9cm} & \txt{a65n2}{2.6cm} \\
+\hline
+App80 & \txt{a80g1}{2.8cm} & \txt{a80c1}{2.0cm} & \txt{a80a1}{2.4cm} & \txt{a80m1}{1.9cm} & \txt{a80n1}{2.6cm} \\
+\hline
+App80 & \txt{a80g2}{2.8cm} & \txt{a80c2}{2.0cm} & \txt{a80a2}{2.4cm} & \txt{a80m2}{1.9cm} & \txt{a80n2}{2.6cm} \\
+\hline
+App81 & \txt{a81g1}{2.8cm} & \txt{a81c1}{2.0cm} & \txt{a81a1}{2.4cm} & \txt{a81m1}{1.9cm} & \txt{a81n1}{2.6cm} \\
+\hline
+App81 & \txt{a81g2}{2.8cm} & \txt{a81c2}{2.0cm} & \txt{a81a2}{2.4cm} & \txt{a81m2}{1.9cm} & \txt{a81n2}{2.6cm} \\
+\hline
+\end{longtable}
+
+\sectiontitle{3) Day Logic and Growth Tracking}
+\noindent\textbf{Define Day0 first.}
+
+\vspace{0.3em}
+\begin{tabular}{|p{3.2cm}|p{4.0cm}|p{4.0cm}|p{4.0cm}|}
+\hline
+Day0 date (YYYY-MM-DD) & App65 & App80 & App81 \\
+\hline
+Entry & \txt{day0App65}{3.8cm} & \txt{day0App80}{3.8cm} & \txt{day0App81}{3.8cm} \\
+\hline
+\end{tabular}
+
+\vspace{0.5em}
+\begin{longtable}{|p{2.0cm}|p{2.2cm}|p{1.8cm}|p{2.7cm}|p{2.0cm}|p{4.2cm}|}
+\hline
+Experiment & Actual date & Day no. & Condition(s) & Image count & Growth note \\
+\hline
+\txt{d1e}{1.8cm} & \txt{d1dt}{2.0cm} & \txt{d1day}{1.6cm} & \txt{d1cond}{2.5cm} & \txt{d1n}{1.8cm} & \txtml{d1note}{4.0cm}{1.0cm} \\
+\hline
+\txt{d2e}{1.8cm} & \txt{d2dt}{2.0cm} & \txt{d2day}{1.6cm} & \txt{d2cond}{2.5cm} & \txt{d2n}{1.8cm} & \txtml{d2note}{4.0cm}{1.0cm} \\
+\hline
+\txt{d3e}{1.8cm} & \txt{d3dt}{2.0cm} & \txt{d3day}{1.6cm} & \txt{d3cond}{2.5cm} & \txt{d3n}{1.8cm} & \txtml{d3note}{4.0cm}{1.0cm} \\
+\hline
+\txt{d4e}{1.8cm} & \txt{d4dt}{2.0cm} & \txt{d4day}{1.6cm} & \txt{d4cond}{2.5cm} & \txt{d4n}{1.8cm} & \txtml{d4note}{4.0cm}{1.0cm} \\
+\hline
+\txt{d5e}{1.8cm} & \txt{d5dt}{2.0cm} & \txt{d5day}{1.6cm} & \txt{d5cond}{2.5cm} & \txt{d5n}{1.8cm} & \txtml{d5note}{4.0cm}{1.0cm} \\
+\hline
+\txt{d6e}{1.8cm} & \txt{d6dt}{2.0cm} & \txt{d6day}{1.6cm} & \txt{d6cond}{2.5cm} & \txt{d6n}{1.8cm} & \txtml{d6note}{4.0cm}{1.0cm} \\
+\hline
+\txt{d7e}{1.8cm} & \txt{d7dt}{2.0cm} & \txt{d7day}{1.6cm} & \txt{d7cond}{2.5cm} & \txt{d7n}{1.8cm} & \txtml{d7note}{4.0cm}{1.0cm} \\
+\hline
+\txt{d8e}{1.8cm} & \txt{d8dt}{2.0cm} & \txt{d8day}{1.6cm} & \txt{d8cond}{2.5cm} & \txt{d8n}{1.8cm} & \txtml{d8note}{4.0cm}{1.0cm} \\
+\hline
+\end{longtable}
+
+\newpage
+\sectiontitle{4) Transfer Stage (A and B currently in transfer)}
+\noindent Please clarify whether transfer data A/B should be included in final summary.
+
+\vspace{0.4em}
+\begin{tabular}{|p{1.8cm}|p{3.0cm}|p{2.6cm}|p{2.8cm}|p{2.8cm}|p{2.8cm}|}
+\hline
+Set & Folder/path & Date range & Include in final? & Related major exp & Notes \\
+\hline
+A & \txt{taPath}{2.8cm} & \txt{taDate}{2.4cm} & \CheckBox[name=taYes,width=0.42cm,height=0.42cm]{} Yes \quad \CheckBox[name=taNo,width=0.42cm,height=0.42cm]{} No & \txt{taMajor}{2.6cm} & \txtml{taNote}{2.6cm}{1.2cm} \\
+\hline
+B & \txt{tbPath}{2.8cm} & \txt{tbDate}{2.4cm} & \CheckBox[name=tbYes,width=0.42cm,height=0.42cm]{} Yes \quad \CheckBox[name=tbNo,width=0.42cm,height=0.42cm]{} No & \txt{tbMajor}{2.6cm} & \txtml{tbNote}{2.6cm}{1.2cm} \\
+\hline
+\end{tabular}
+
+\vspace{0.6em}
+\noindent\textbf{Large transfer notes area:}\\[0.2em]
+\txtml{transferNotesLarge}{\linewidth}{5.0cm}
+
+\sectiontitle{5) Detailed Figure Traceback}
+\begin{longtable}{|p{4.1cm}|p{2.8cm}|p{2.4cm}|p{2.6cm}|p{3.4cm}|}
+\hline
+Detailed figure & Parent experiment & Exact day & Exact condition & Selection rule \\
+\hline
+Alginate D7 and D13 TIFF & \txt{fig1Parent}{2.6cm} & \txt{fig1Day}{2.2cm} & \txt{fig1Cond}{2.4cm} & \txtml{fig1Rule}{3.2cm}{1.2cm} \\
+\hline
+Y-27632 Day 6 10x TIFF & \txt{fig2Parent}{2.6cm} & \txt{fig2Day}{2.2cm} & \txt{fig2Cond}{2.4cm} & \txtml{fig2Rule}{3.2cm}{1.2cm} \\
+\hline
+\end{longtable}
+
+\sectiontitle{6) Free Notes}
+\txtml{freeNotes}{\linewidth}{6.2cm}
+
+\vfill
+\noindent\textit{Return the filled PDF and I will convert it into a finalized logic map plus machine-readable table.}
+
+\end{Form}
+\end{document}
