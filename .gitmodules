@@ -1,0 +1,6 @@
+[submodule "aigi2vector"]
+	path = aigi2vector
+	url = git@github.com:lachlanchen/aigi2vector.git
+[submodule "OrganoidAgent"]
+	path = OrganoidAgent
+	url = git@github.com:lachlanchen/OrganoidAgent.git
