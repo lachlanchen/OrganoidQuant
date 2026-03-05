@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DEO Droplet Level Quantification",
+  "type": "object",
+  "required": ["source_tif", "source_png", "image_level", "droplets"],
+  "properties": {
+    "source_tif": { "type": "string" },
+    "source_png": { "type": "string" },
+    "image_level": {
+      "type": "object",
+      "required": ["droplet_count_clear", "droplet_count_including_partials", "analyst_note"],
+      "properties": {
+        "droplet_count_clear": { "type": "integer", "minimum": 0 },
+        "droplet_count_including_partials": { "type": "integer", "minimum": 0 },
+        "analyst_note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "droplets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["droplet_id", "organoid_count_estimated", "fusion_level_0_to_5", "quant_note", "confidence"],
+        "properties": {
+          "droplet_id": { "type": "integer", "minimum": 1 },
+          "organoid_count_estimated": { "type": "integer", "minimum": 0 },
+          "fusion_level_0_to_5": { "type": "number", "minimum": 0, "maximum": 5 },
+          "quant_note": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

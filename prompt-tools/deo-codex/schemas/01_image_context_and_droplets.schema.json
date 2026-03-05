@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DEO Image Context and Droplet Annotation",
+  "type": "object",
+  "required": [
+    "source_tif",
+    "source_png",
+    "experiment_id",
+    "concentration_label",
+    "concentration_value_uM",
+    "date_label",
+    "magnification_token",
+    "sample_token",
+    "image_summary",
+    "droplets"
+  ],
+  "properties": {
+    "source_tif": { "type": "string" },
+    "source_png": { "type": "string" },
+    "experiment_id": { "type": "string" },
+    "concentration_label": { "type": "string" },
+    "concentration_value_uM": { "type": ["number", "null"] },
+    "date_label": { "type": "string" },
+    "magnification_token": { "type": "string" },
+    "sample_token": { "type": "string" },
+    "image_summary": {
+      "type": "object",
+      "required": ["droplet_count_clear", "droplet_count_including_partials", "note"],
+      "properties": {
+        "droplet_count_clear": { "type": "integer", "minimum": 0 },
+        "droplet_count_including_partials": { "type": "integer", "minimum": 0 },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "droplets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "droplet_id",
+          "center_x_px",
+          "center_y_px",
+          "radius_px",
+          "is_partial",
+          "confidence",
+          "initial_organoid_count_estimate",
+          "initial_fusion_level_0_to_5",
+          "note"
+        ],
+        "properties": {
+          "droplet_id": { "type": "integer", "minimum": 1 },
+          "center_x_px": { "type": "number" },
+          "center_y_px": { "type": "number" },
+          "radius_px": { "type": "number", "exclusiveMinimum": 1 },
+          "is_partial": { "type": "boolean" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "initial_organoid_count_estimate": { "type": "integer", "minimum": 0 },
+          "initial_fusion_level_0_to_5": { "type": "number", "minimum": 0, "maximum": 5 },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
