@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+app80_root="${1:-$repo_root/DEO/App80 DEO}"
+cellpose_mode="${DEO_CELLPOSE_MODE:-off}"
+
+if [[ ! -d "$app80_root" ]]; then
+  echo "App80 folder not found: $app80_root"
+  exit 1
+fi
+
+log_dir="$repo_root/data-docs/logs"
+mkdir -p "$log_dir"
+ts="$(date +%Y%m%d_%H%M%S)"
+log_file="$log_dir/app80_batch_${ts}.log"
+
+mapfile -d '' tifs < <(find "$app80_root" -type f -name '*.tif' -print0 | sort -z)
+if [[ "${#tifs[@]}" -eq 0 ]]; then
+  echo "No TIFF files found under: $app80_root"
+  exit 1
+fi
+
+echo "Batch start: $(date -Is)" | tee -a "$log_file"
+echo "App80 root: $app80_root" | tee -a "$log_file"
+echo "TIFF count: ${#tifs[@]}" | tee -a "$log_file"
+echo "DEO_CELLPOSE_MODE=$cellpose_mode" | tee -a "$log_file"
+echo | tee -a "$log_file"
+
+idx=0
+for tif in "${tifs[@]}"; do
+  idx=$((idx + 1))
+  echo "[$idx/${#tifs[@]}] START $tif" | tee -a "$log_file"
+  DEO_CELLPOSE_MODE="$cellpose_mode" "$repo_root/prompt-tools/deo-codex/scripts/run_single_image_test.sh" "$tif" 2>&1 | tee -a "$log_file"
+  echo "[$idx/${#tifs[@]}] DONE  $tif" | tee -a "$log_file"
+  echo | tee -a "$log_file"
+done
+
+echo "Batch end: $(date -Is)" | tee -a "$log_file"
+echo "Log: $log_file" | tee -a "$log_file"
+

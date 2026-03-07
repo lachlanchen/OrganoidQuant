@@ -25,6 +25,9 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest_out.parent.mkdir(parents=True, exist_ok=True)
 
+    for old_seg in out_dir.glob('droplet_*.png'):
+        old_seg.unlink()
+
     ann = json.loads(ann_path.read_text(encoding='utf-8'))
     droplets = sorted(ann.get('droplets', []), key=lambda d: d['droplet_id'])
 
@@ -58,7 +61,10 @@ def main() -> None:
         rgba = Image.new('RGBA', (cw, ch), (0, 0, 0, 0))
         rgba.paste(crop, (0, 0), mask)
 
-        seg_name = f'droplet_{did:03d}.png'
+        is_partial = bool(d.get('is_partial', False))
+        completeness = bool(d.get('completeness', not is_partial))
+        suffix = 'complete' if completeness and not is_partial else 'partial'
+        seg_name = f'droplet_{did:03d}_{suffix}.png'
         seg_path = out_dir / seg_name
         rgba.save(seg_path)
 
@@ -72,7 +78,11 @@ def main() -> None:
             'center_x_px': cx,
             'center_y_px': cy,
             'radius_px': r,
-            'is_partial': bool(d.get('is_partial', False)),
+            'is_partial': is_partial,
+            'completeness': completeness,
+            'segment_suffix': suffix,
+            'visible_fraction_0_to_1': float(d.get('visible_fraction_0_to_1', 0.0)),
+            'position_label': d.get('position_label', ''),
             'initial_organoid_count_estimate': int(d.get('initial_organoid_count_estimate', 0)),
             'initial_fusion_level_0_to_5': float(d.get('initial_fusion_level_0_to_5', 0)),
             'confidence': float(d.get('confidence', 0)),
