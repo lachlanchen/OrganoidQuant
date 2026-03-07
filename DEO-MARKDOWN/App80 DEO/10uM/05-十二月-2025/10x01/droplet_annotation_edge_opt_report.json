@@ -1,0 +1,52 @@
+{
+  "source_annotation": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x01/droplet_annotation.json",
+  "output_annotation": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x01/droplet_annotation.json",
+  "optimized_count": 3,
+  "changes": [
+    {
+      "droplet_id": 1,
+      "old": {
+        "cx": 1406.43,
+        "cy": 1006.27,
+        "r": 593.56,
+        "score": 2.233878873123063
+      },
+      "new": {
+        "cx": 1406.43,
+        "cy": 1018.27,
+        "r": 607.56,
+        "score": 2.7807414962185755
+      }
+    },
+    {
+      "droplet_id": 2,
+      "old": {
+        "cx": 2588.2,
+        "cy": 224.55,
+        "r": 247.43,
+        "score": 1.7582325228226228
+      },
+      "new": {
+        "cx": 2574.2,
+        "cy": 230.55,
+        "r": 251.43,
+        "score": 2.2220386011817315
+      }
+    },
+    {
+      "droplet_id": 3,
+      "old": {
+        "cx": 2605.0,
+        "cy": 2145.0,
+        "r": 255.0,
+        "score": 0.6243628424396167
+      },
+      "new": {
+        "cx": 2599.0,
+        "cy": 2157.0,
+        "r": 243.0,
+        "score": 0.8594005842294012
+      }
+    }
+  ]
+}

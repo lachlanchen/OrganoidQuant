@@ -1,0 +1,25 @@
+{
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-PNG/App80 DEO/10uM/05-十二月-2025/10x00.png",
+  "annotation_json": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x00/droplet_annotation.json",
+  "segment_count": 1,
+  "segments": [
+    {
+      "droplet_id": 1,
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x00/droplet_001.png",
+      "bbox_x0": 542,
+      "bbox_y0": 163,
+      "bbox_x1": 2256,
+      "bbox_y1": 1877,
+      "center_x_px": 1399.0,
+      "center_y_px": 1020.0,
+      "radius_px": 857.0,
+      "is_partial": false,
+      "completeness": true,
+      "position_label": "center",
+      "initial_organoid_count_estimate": 120,
+      "initial_fusion_level_0_to_5": 4.3,
+      "confidence": 0.95,
+      "note": "Primary DEO droplet boundary is visible as a continuous circular rim; substantial internal aggregation/fusion with several large fused organoid masses."
+    }
+  ]
+}

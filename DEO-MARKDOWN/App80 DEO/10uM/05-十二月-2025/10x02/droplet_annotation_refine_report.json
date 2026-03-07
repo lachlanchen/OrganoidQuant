@@ -1,0 +1,10 @@
+{
+  "source_annotation": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x02/droplet_annotation_raw.json",
+  "output_annotation": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x02/droplet_annotation.json",
+  "image_width": 2880,
+  "image_height": 2048,
+  "input_droplet_count": 2,
+  "output_droplet_count": 2,
+  "removed_duplicates": [],
+  "scaled_from_preview_frame": false
+}

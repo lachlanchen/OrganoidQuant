@@ -1,0 +1,43 @@
+{
+  "source_tif": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/4x02.tif",
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-PNG/App80 DEO/10uM/05-十二月-2025/4x02.png",
+  "experiment_id": "App80 DEO",
+  "concentration_label": "10uM",
+  "concentration_value_uM": 10,
+  "date_label": "05-十二月-2025",
+  "magnification_token": "4x",
+  "sample_token": "02",
+  "image_summary": {
+    "droplet_count_clear": 2,
+    "droplet_count_including_partials": 2,
+    "note": "Two clearly bounded droplets are visible (left and right), both sufficiently complete for analysis. No unique edge-partial droplet was confidently identified."
+  },
+  "droplets": [
+    {
+      "droplet_id": 1,
+      "center_x_px": 768.0,
+      "center_y_px": 947.0,
+      "radius_px": 257.0,
+      "is_partial": false,
+      "completeness": true,
+      "position_label": "mid-left",
+      "confidence": 0.95,
+      "initial_organoid_count_estimate": 80,
+      "initial_fusion_level_0_to_5": 3.5,
+      "note": "Well-defined circular boundary with multiple internal organoid-like bodies and several dark fused clusters."
+    },
+    {
+      "droplet_id": 2,
+      "center_x_px": 1935.0,
+      "center_y_px": 1310.0,
+      "radius_px": 278.0,
+      "is_partial": false,
+      "completeness": true,
+      "position_label": "mid-right",
+      "confidence": 0.97,
+      "initial_organoid_count_estimate": 90,
+      "initial_fusion_level_0_to_5": 3.0,
+      "note": "Well-defined circular boundary; dense interior with many small organoid-like structures and one dominant fused central cluster."
+    }
+  ]
+}

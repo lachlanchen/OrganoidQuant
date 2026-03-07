@@ -1,0 +1,82 @@
+{
+  "source_annotation": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/4x01/droplet_annotation.json",
+  "output_annotation": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/4x01/droplet_annotation.json",
+  "optimized_count": 5,
+  "changes": [
+    {
+      "droplet_id": 1,
+      "old": {
+        "cx": 542.5,
+        "cy": 740.9,
+        "r": 291.6,
+        "score": 5.035019473897086
+      },
+      "new": {
+        "cx": 524.5,
+        "cy": 756.9,
+        "r": 273.6,
+        "score": 7.192690390679571
+      }
+    },
+    {
+      "droplet_id": 2,
+      "old": {
+        "cx": 2279.6,
+        "cy": 945.9,
+        "r": 290.5,
+        "score": 3.7591022007995183
+      },
+      "new": {
+        "cx": 2271.6,
+        "cy": 955.9,
+        "r": 278.5,
+        "score": 5.054837030172348
+      }
+    },
+    {
+      "droplet_id": 3,
+      "old": {
+        "cx": 1637.2,
+        "cy": 1557.3,
+        "r": 264.6,
+        "score": 6.629220352901353
+      },
+      "new": {
+        "cx": 1655.2,
+        "cy": 1577.3,
+        "r": 244.60000000000002,
+        "score": 8.048420078555743
+      }
+    },
+    {
+      "droplet_id": 4,
+      "old": {
+        "cx": 2220.3,
+        "cy": 234.5,
+        "r": 437.7,
+        "score": 1.0269782134914787
+      },
+      "new": {
+        "cx": 2208.3,
+        "cy": 246.5,
+        "r": 447.7,
+        "score": 1.3459194595211244
+      }
+    },
+    {
+      "droplet_id": 5,
+      "old": {
+        "cx": 206.6,
+        "cy": 49.7,
+        "r": 120.5,
+        "score": 1.0276628520609676
+      },
+      "new": {
+        "cx": 199.6,
+        "cy": 50.7,
+        "r": 118.5,
+        "score": 1.3719542605073556
+      }
+    }
+  ]
+}

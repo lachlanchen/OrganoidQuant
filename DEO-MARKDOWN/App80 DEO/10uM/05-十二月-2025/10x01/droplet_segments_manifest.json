@@ -1,0 +1,61 @@
+{
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-PNG/App80 DEO/10uM/05-十二月-2025/10x01.png",
+  "annotation_json": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x01/droplet_annotation.json",
+  "segment_count": 3,
+  "segments": [
+    {
+      "droplet_id": 1,
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x01/droplet_001.png",
+      "bbox_x0": 799,
+      "bbox_y0": 411,
+      "bbox_x1": 2014,
+      "bbox_y1": 1626,
+      "center_x_px": 1406.43,
+      "center_y_px": 1018.27,
+      "radius_px": 607.56,
+      "is_partial": false,
+      "completeness": true,
+      "position_label": "center",
+      "initial_organoid_count_estimate": 55,
+      "initial_fusion_level_0_to_5": 4.0,
+      "confidence": 0.97,
+      "note": "Primary full droplet; boundary is largely complete and internal organoid/clump content is dense with multiple fused regions."
+    },
+    {
+      "droplet_id": 2,
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x01/droplet_002.png",
+      "bbox_x0": 2323,
+      "bbox_y0": 0,
+      "bbox_x1": 2826,
+      "bbox_y1": 482,
+      "center_x_px": 2574.2,
+      "center_y_px": 230.55,
+      "radius_px": 251.43,
+      "is_partial": true,
+      "completeness": false,
+      "position_label": "top-right",
+      "initial_organoid_count_estimate": 8,
+      "initial_fusion_level_0_to_5": 3.0,
+      "confidence": 0.88,
+      "note": "Distinct partial droplet entering from top-right; interpretable arc with visible internal material but limited field coverage."
+    },
+    {
+      "droplet_id": 3,
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x01/droplet_003.png",
+      "bbox_x0": 2356,
+      "bbox_y0": 1914,
+      "bbox_x1": 2842,
+      "bbox_y1": 2048,
+      "center_x_px": 2599.0,
+      "center_y_px": 2157.0,
+      "radius_px": 243.0,
+      "is_partial": true,
+      "completeness": false,
+      "position_label": "edge-bottom",
+      "initial_organoid_count_estimate": 5,
+      "initial_fusion_level_0_to_5": 3.0,
+      "confidence": 0.62,
+      "note": "Large droplet arc at bottom-right edge; center lies outside frame, so organoid/fusion estimates are low-confidence."
+    }
+  ]
+}

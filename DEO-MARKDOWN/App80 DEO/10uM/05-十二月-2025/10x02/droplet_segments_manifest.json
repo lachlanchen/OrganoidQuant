@@ -1,0 +1,43 @@
+{
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-PNG/App80 DEO/10uM/05-十二月-2025/10x02.png",
+  "annotation_json": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x02/droplet_annotation.json",
+  "segment_count": 2,
+  "segments": [
+    {
+      "droplet_id": 1,
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x02/droplet_001.png",
+      "bbox_x0": 488,
+      "bbox_y0": 165,
+      "bbox_x1": 2224,
+      "bbox_y1": 1901,
+      "center_x_px": 1356.0,
+      "center_y_px": 1033.0,
+      "radius_px": 868.0,
+      "is_partial": true,
+      "completeness": false,
+      "position_label": "center",
+      "initial_organoid_count_estimate": 35,
+      "initial_fusion_level_0_to_5": 4.2,
+      "confidence": 0.87,
+      "note": "Primary DEO droplet; boundary arc is clear on left/right with top and bottom clipped. Contains many organoid structures and several fused clusters."
+    },
+    {
+      "droplet_id": 2,
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x02/droplet_002.png",
+      "bbox_x0": 2706,
+      "bbox_y0": 93,
+      "bbox_x1": 2868,
+      "bbox_y1": 255,
+      "center_x_px": 2787.0,
+      "center_y_px": 174.0,
+      "radius_px": 81.0,
+      "is_partial": true,
+      "completeness": false,
+      "position_label": "edge-right",
+      "initial_organoid_count_estimate": 2,
+      "initial_fusion_level_0_to_5": 1.0,
+      "confidence": 0.58,
+      "note": "Small partial droplet segment at top-right image edge; only a portion is visible, kept as a unique non-duplicate edge droplet."
+    }
+  ]
+}

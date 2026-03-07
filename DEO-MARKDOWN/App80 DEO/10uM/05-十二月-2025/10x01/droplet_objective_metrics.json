@@ -1,0 +1,1373 @@
+{
+  "segment_manifest_json": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-MARKDOWN/App80 DEO/10uM/05-十二月-2025/10x01/droplet_segments_manifest.json",
+  "droplets": [
+    {
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x01/droplet_001.png",
+      "pixel_count_mask": 1159217,
+      "gray_mean": 108.86051177978516,
+      "gray_std": 28.786476135253906,
+      "gradient_mean": 2.5736823081970215,
+      "gradient_p90": 4.6091508865356445,
+      "edge_density_p75": 0.24999978433718623,
+      "dark_mass_norm": 0.047751862555742264,
+      "dark_centroid_x_px": 614.8168501966782,
+      "dark_centroid_y_px": 695.5866327239502,
+      "dark_component_count": 161,
+      "largest_dark_component_area_px": 61747.0,
+      "fusion_score_objective_0_to_5": 0.3574414750876064,
+      "organoid_candidates_objective": [
+        {
+          "area_px": 106.0,
+          "centroid_x_px": 560.877358490566,
+          "centroid_y_px": 9.160377358490566,
+          "equivalent_radius_px": 5.808687281605183
+        },
+        {
+          "area_px": 5161.0,
+          "centroid_x_px": 436.6735128850998,
+          "centroid_y_px": 90.896531679907,
+          "equivalent_radius_px": 40.531436226644416
+        },
+        {
+          "area_px": 22.0,
+          "centroid_x_px": 756.6818181818181,
+          "centroid_y_px": 19.681818181818183,
+          "equivalent_radius_px": 2.6462837142006137
+        },
+        {
+          "area_px": 137.0,
+          "centroid_x_px": 432.2700729927007,
+          "centroid_y_px": 33.86131386861314,
+          "equivalent_radius_px": 6.6036697681803656
+        },
+        {
+          "area_px": 14.0,
+          "centroid_x_px": 762.7142857142857,
+          "centroid_y_px": 25.785714285714285,
+          "equivalent_radius_px": 2.111004122822376
+        },
+        {
+          "area_px": 39062.0,
+          "centroid_x_px": 595.4956991449491,
+          "centroid_y_px": 200.5309251958425,
+          "equivalent_radius_px": 111.50704360761804
+        },
+        {
+          "area_px": 35.0,
+          "centroid_x_px": 472.8,
+          "centroid_y_px": 34.25714285714286,
+          "equivalent_radius_px": 3.3377905890622728
+        },
+        {
+          "area_px": 232.0,
+          "centroid_x_px": 397.41379310344826,
+          "centroid_y_px": 46.12068965517241,
+          "equivalent_radius_px": 8.593479713983122
+        },
+        {
+          "area_px": 68.0,
+          "centroid_x_px": 444.47058823529414,
+          "centroid_y_px": 42.76470588235294,
+          "equivalent_radius_px": 4.652426491681278
+        },
+        {
+          "area_px": 112.0,
+          "centroid_x_px": 369.00892857142856,
+          "centroid_y_px": 57.07142857142857,
+          "equivalent_radius_px": 5.970821321441846
+        },
+        {
+          "area_px": 256.0,
+          "centroid_x_px": 565.41015625,
+          "centroid_y_px": 63.2890625,
+          "equivalent_radius_px": 9.0270333367641
+        },
+        {
+          "area_px": 339.0,
+          "centroid_x_px": 742.9498525073747,
+          "centroid_y_px": 80.77581120943952,
+          "equivalent_radius_px": 10.387831891992912
+        },
+        {
+          "area_px": 14.0,
+          "centroid_x_px": 333.35714285714283,
+          "centroid_y_px": 114.71428571428571,
+          "equivalent_radius_px": 2.111004122822376
+        },
+        {
+          "area_px": 1521.0,
+          "centroid_x_px": 323.77712031558184,
+          "centroid_y_px": 153.2965154503616,
+          "equivalent_radius_px": 22.003393758362495
+        },
+        {
+          "area_px": 100.0,
+          "centroid_x_px": 760.66,
+          "centroid_y_px": 146.4,
+          "equivalent_radius_px": 5.641895835477563
+        },
+        {
+          "area_px": 400.0,
+          "centroid_x_px": 447.88,
+          "centroid_y_px": 286.65,
+          "equivalent_radius_px": 11.283791670955125
+        },
+        {
+          "area_px": 563.0,
+          "centroid_x_px": 134.94671403197157,
+          "centroid_y_px": 288.8259325044405,
+          "equivalent_radius_px": 13.38687663054658
+        },
+        {
+          "area_px": 115.0,
+          "centroid_x_px": 770.9478260869565,
+          "centroid_y_px": 290.74782608695654,
+          "equivalent_radius_px": 6.050259243299904
+        },
+        {
+          "area_px": 460.0,
+          "centroid_x_px": 333.03478260869565,
+          "centroid_y_px": 303.3195652173913,
+          "equivalent_radius_px": 12.100518486599809
+        },
+        {
+          "area_px": 32.0,
+          "centroid_x_px": 792.53125,
+          "centroid_y_px": 311.8125,
+          "equivalent_radius_px": 3.1915382432114616
+        },
+        {
+          "area_px": 229.0,
+          "centroid_x_px": 770.1397379912664,
+          "centroid_y_px": 319.93886462882097,
+          "equivalent_radius_px": 8.537737635702333
+        },
+        {
+          "area_px": 2922.0,
+          "centroid_x_px": 875.2392197125257,
+          "centroid_y_px": 366.68275154004107,
+          "equivalent_radius_px": 30.497565270510307
+        },
+        {
+          "area_px": 19.0,
+          "centroid_x_px": 850.6842105263158,
+          "centroid_y_px": 315.7368421052632,
+          "equivalent_radius_px": 2.4592453796829674
+        },
+        {
+          "area_px": 195.0,
+          "centroid_x_px": 449.44615384615383,
+          "centroid_y_px": 321.55897435897435,
+          "equivalent_radius_px": 7.878478774854901
+        },
+        {
+          "area_px": 174.0,
+          "centroid_x_px": 895.6724137931035,
+          "centroid_y_px": 322.7183908045977,
+          "equivalent_radius_px": 7.442171739215616
+        },
+        {
+          "area_px": 32.0,
+          "centroid_x_px": 750.03125,
+          "centroid_y_px": 326.0,
+          "equivalent_radius_px": 3.1915382432114616
+        },
+        {
+          "area_px": 620.0,
+          "centroid_x_px": 409.51290322580644,
+          "centroid_y_px": 343.05,
+          "equivalent_radius_px": 14.048207338801282
+        },
+        {
+          "area_px": 52.0,
+          "centroid_x_px": 468.65384615384613,
+          "centroid_y_px": 331.0,
+          "equivalent_radius_px": 4.068428945128219
+        },
+        {
+          "area_px": 16973.0,
+          "centroid_x_px": 650.9920461910092,
+          "centroid_y_px": 449.7052966476168,
+          "equivalent_radius_px": 73.50288224415067
+        },
+        {
+          "area_px": 26.0,
+          "centroid_x_px": 896.6538461538462,
+          "centroid_y_px": 338.2692307692308,
+          "equivalent_radius_px": 2.876813695875796
+        },
+        {
+          "area_px": 1686.0,
+          "centroid_x_px": 595.4329774614472,
+          "centroid_y_px": 369.1927639383155,
+          "equivalent_radius_px": 23.16614918595387
+        },
+        {
+          "area_px": 24.0,
+          "centroid_x_px": 885.7916666666666,
+          "centroid_y_px": 345.875,
+          "equivalent_radius_px": 2.763953195770684
+        },
+        {
+          "area_px": 19.0,
+          "centroid_x_px": 898.5263157894736,
+          "centroid_y_px": 350.7368421052632,
+          "equivalent_radius_px": 2.4592453796829674
+        },
+        {
+          "area_px": 140.0,
+          "centroid_x_px": 484.54285714285714,
+          "centroid_y_px": 359.4357142857143,
+          "equivalent_radius_px": 6.6755811781245455
+        },
+        {
+          "area_px": 81.0,
+          "centroid_x_px": 215.0,
+          "centroid_y_px": 366.55555555555554,
+          "equivalent_radius_px": 5.077706251929807
+        },
+        {
+          "area_px": 61.0,
+          "centroid_x_px": 445.7049180327869,
+          "centroid_y_px": 369.11475409836066,
+          "equivalent_radius_px": 4.406461512053774
+        },
+        {
+          "area_px": 50.0,
+          "centroid_x_px": 913.3,
+          "centroid_y_px": 368.56,
+          "equivalent_radius_px": 3.989422804014327
+        },
+        {
+          "area_px": 67.0,
+          "centroid_x_px": 230.8955223880597,
+          "centroid_y_px": 374.9850746268657,
+          "equivalent_radius_px": 4.61809077155419
+        },
+        {
+          "area_px": 133.0,
+          "centroid_x_px": 944.6165413533835,
+          "centroid_y_px": 380.3233082706767,
+          "equivalent_radius_px": 6.506551687525748
+        },
+        {
+          "area_px": 99.0,
+          "centroid_x_px": 321.45454545454544,
+          "centroid_y_px": 383.0808080808081,
+          "equivalent_radius_px": 5.613615477764332
+        },
+        {
+          "area_px": 231.0,
+          "centroid_x_px": 159.13419913419912,
+          "centroid_y_px": 397.46320346320346,
+          "equivalent_radius_px": 8.574939283076915
+        },
+        {
+          "area_px": 149.0,
+          "centroid_x_px": 641.7986577181208,
+          "centroid_y_px": 391.7315436241611,
+          "equivalent_radius_px": 6.886811529393324
+        },
+        {
+          "area_px": 259.0,
+          "centroid_x_px": 1155.3127413127413,
+          "centroid_y_px": 395.6872586872587,
+          "equivalent_radius_px": 9.079772052293041
+        },
+        {
+          "area_px": 20.0,
+          "centroid_x_px": 228.3,
+          "centroid_y_px": 391.0,
+          "equivalent_radius_px": 2.5231325220201604
+        },
+        {
+          "area_px": 164.0,
+          "centroid_x_px": 271.719512195122,
+          "centroid_y_px": 397.280487804878,
+          "equivalent_radius_px": 7.225151993843567
+        },
+        {
+          "area_px": 1119.0,
+          "centroid_x_px": 318.53976764968724,
+          "centroid_y_px": 411.68900804289547,
+          "equivalent_radius_px": 18.8729638011538
+        },
+        {
+          "area_px": 14.0,
+          "centroid_x_px": 784.3571428571429,
+          "centroid_y_px": 392.85714285714283,
+          "equivalent_radius_px": 2.111004122822376
+        },
+        {
+          "area_px": 953.0,
+          "centroid_x_px": 73.43651626442812,
+          "centroid_y_px": 417.52885624344174,
+          "equivalent_radius_px": 17.416926294072457
+        },
+        {
+          "area_px": 23.0,
+          "centroid_x_px": 552.304347826087,
+          "centroid_y_px": 402.5652173913044,
+          "equivalent_radius_px": 2.7057581899030048
+        },
+        {
+          "area_px": 59.0,
+          "centroid_x_px": 385.77966101694915,
+          "centroid_y_px": 406.1186440677966,
+          "equivalent_radius_px": 4.3336224206596095
+        },
+        {
+          "area_px": 125.0,
+          "centroid_x_px": 434.168,
+          "centroid_y_px": 411.928,
+          "equivalent_radius_px": 6.3078313050504
+        },
+        {
+          "area_px": 91.0,
+          "centroid_x_px": 205.4065934065934,
+          "centroid_y_px": 413.75824175824175,
+          "equivalent_radius_px": 5.382025607773058
+        },
+        {
+          "area_px": 120.0,
+          "centroid_x_px": 961.1666666666666,
+          "centroid_y_px": 422.175,
+          "equivalent_radius_px": 6.180387232371033
+        },
+        {
+          "area_px": 72.0,
+          "centroid_x_px": 164.30555555555554,
+          "centroid_y_px": 434.8333333333333,
+          "equivalent_radius_px": 4.787307364817192
+        },
+        {
+          "area_px": 38.0,
+          "centroid_x_px": 411.4736842105263,
+          "centroid_y_px": 436.7105263157895,
+          "equivalent_radius_px": 3.477898169151024
+        },
+        {
+          "area_px": 431.0,
+          "centroid_x_px": 910.3317865429234,
+          "centroid_y_px": 459.00696055684455,
+          "equivalent_radius_px": 11.71288013023329
+        },
+        {
+          "area_px": 20.0,
+          "centroid_x_px": 339.4,
+          "centroid_y_px": 449.6,
+          "equivalent_radius_px": 2.5231325220201604
+        },
+        {
+          "area_px": 126.0,
+          "centroid_x_px": 315.1507936507937,
+          "centroid_y_px": 474.55555555555554,
+          "equivalent_radius_px": 6.333012368467128
+        },
+        {
+          "area_px": 92.0,
+          "centroid_x_px": 874.8804347826087,
+          "centroid_y_px": 471.5217391304348,
+          "equivalent_radius_px": 5.4115163798060095
+        },
+        {
+          "area_px": 21.0,
+          "centroid_x_px": 934.5238095238095,
+          "centroid_y_px": 475.95238095238096,
+          "equivalent_radius_px": 2.5854414729132054
+        },
+        {
+          "area_px": 12674.0,
+          "centroid_x_px": 212.50473410130977,
+          "centroid_y_px": 557.5102572195045,
+          "equivalent_radius_px": 63.515820844049266
+        },
+        {
+          "area_px": 60.0,
+          "centroid_x_px": 387.3333333333333,
+          "centroid_y_px": 492.75,
+          "equivalent_radius_px": 4.370193722368317
+        },
+        {
+          "area_px": 18.0,
+          "centroid_x_px": 406.44444444444446,
+          "centroid_y_px": 491.3333333333333,
+          "equivalent_radius_px": 2.393653682408596
+        },
+        {
+          "area_px": 380.0,
+          "centroid_x_px": 462.7736842105263,
+          "centroid_y_px": 502.88947368421054,
+          "equivalent_radius_px": 10.998079684646791
+        },
+        {
+          "area_px": 89.0,
+          "centroid_x_px": 732.1011235955057,
+          "centroid_y_px": 496.35955056179773,
+          "equivalent_radius_px": 5.322553886092406
+        },
+        {
+          "area_px": 123.0,
+          "centroid_x_px": 370.9349593495935,
+          "centroid_y_px": 498.6422764227642,
+          "equivalent_radius_px": 6.257165172872317
+        },
+        {
+          "area_px": 32.0,
+          "centroid_x_px": 158.25,
+          "centroid_y_px": 501.53125,
+          "equivalent_radius_px": 3.1915382432114616
+        },
+        {
+          "area_px": 645.0,
+          "centroid_x_px": 988.6077519379845,
+          "centroid_y_px": 514.862015503876,
+          "equivalent_radius_px": 14.32863833686038
+        },
+        {
+          "area_px": 237.0,
+          "centroid_x_px": 1048.8101265822784,
+          "centroid_y_px": 508.69198312236284,
+          "equivalent_radius_px": 8.685588237163813
+        },
+        {
+          "area_px": 137.0,
+          "centroid_x_px": 885.5839416058394,
+          "centroid_y_px": 511.17518248175185,
+          "equivalent_radius_px": 6.6036697681803656
+        },
+        {
+          "area_px": 15.0,
+          "centroid_x_px": 308.0,
+          "centroid_y_px": 516.4,
+          "equivalent_radius_px": 2.1850968611841584
+        },
+        {
+          "area_px": 78.0,
+          "centroid_x_px": 771.3974358974359,
+          "centroid_y_px": 522.8461538461538,
+          "equivalent_radius_px": 4.982787485166879
+        },
+        {
+          "area_px": 36.0,
+          "centroid_x_px": 1022.5,
+          "centroid_y_px": 527.0,
+          "equivalent_radius_px": 3.385137501286538
+        },
+        {
+          "area_px": 2728.0,
+          "centroid_x_px": 490.44024926686217,
+          "centroid_y_px": 582.5190615835777,
+          "equivalent_radius_px": 29.467768315727287
+        },
+        {
+          "area_px": 139.0,
+          "centroid_x_px": 1023.2877697841726,
+          "centroid_y_px": 548.0503597122303,
+          "equivalent_radius_px": 6.651697090182843
+        },
+        {
+          "area_px": 61.0,
+          "centroid_x_px": 776.4262295081967,
+          "centroid_y_px": 541.0,
+          "equivalent_radius_px": 4.406461512053774
+        },
+        {
+          "area_px": 190.0,
+          "centroid_x_px": 1054.2736842105264,
+          "centroid_y_px": 548.9736842105264,
+          "equivalent_radius_px": 7.776816725043752
+        },
+        {
+          "area_px": 113.0,
+          "centroid_x_px": 1099.203539823009,
+          "centroid_y_px": 554.0796460176991,
+          "equivalent_radius_px": 5.997417539138688
+        },
+        {
+          "area_px": 122.0,
+          "centroid_x_px": 840.4508196721312,
+          "centroid_y_px": 563.4590163934427,
+          "equivalent_radius_px": 6.231677632421503
+        },
+        {
+          "area_px": 1771.0,
+          "centroid_x_px": 762.2303783173348,
+          "centroid_y_px": 594.0581592320723,
+          "equivalent_radius_px": 23.742931757293437
+        },
+        {
+          "area_px": 15.0,
+          "centroid_x_px": 21.2,
+          "centroid_y_px": 563.6666666666666,
+          "equivalent_radius_px": 2.1850968611841584
+        },
+        {
+          "area_px": 995.0,
+          "centroid_x_px": 1116.1798994974874,
+          "centroid_y_px": 584.5879396984925,
+          "equivalent_radius_px": 17.796582164923457
+        },
+        {
+          "area_px": 27.0,
+          "centroid_x_px": 1013.9629629629629,
+          "centroid_y_px": 569.5185185185185,
+          "equivalent_radius_px": 2.9316150714175193
+        },
+        {
+          "area_px": 492.0,
+          "centroid_x_px": 920.0650406504066,
+          "centroid_y_px": 587.3882113821138,
+          "equivalent_radius_px": 12.514330345744634
+        },
+        {
+          "area_px": 524.0,
+          "centroid_x_px": 1028.425572519084,
+          "centroid_y_px": 587.1068702290077,
+          "equivalent_radius_px": 12.914889870235298
+        },
+        {
+          "area_px": 82.0,
+          "centroid_x_px": 32.84146341463415,
+          "centroid_y_px": 579.8170731707318,
+          "equivalent_radius_px": 5.108953969950291
+        },
+        {
+          "area_px": 97.0,
+          "centroid_x_px": 1173.6907216494844,
+          "centroid_y_px": 582.9072164948453,
+          "equivalent_radius_px": 5.556622981616415
+        },
+        {
+          "area_px": 74.0,
+          "centroid_x_px": 876.9864864864865,
+          "centroid_y_px": 595.9324324324324,
+          "equivalent_radius_px": 4.853342309955121
+        },
+        {
+          "area_px": 20.0,
+          "centroid_x_px": 1084.35,
+          "centroid_y_px": 596.15,
+          "equivalent_radius_px": 2.5231325220201604
+        },
+        {
+          "area_px": 22.0,
+          "centroid_x_px": 381.54545454545456,
+          "centroid_y_px": 598.2272727272727,
+          "equivalent_radius_px": 2.6462837142006137
+        },
+        {
+          "area_px": 465.0,
+          "centroid_x_px": 1200.920430107527,
+          "centroid_y_px": 608.4666666666667,
+          "equivalent_radius_px": 12.166104433032896
+        },
+        {
+          "area_px": 4220.0,
+          "centroid_x_px": 643.0007109004739,
+          "centroid_y_px": 636.1559241706161,
+          "equivalent_radius_px": 36.6506169074355
+        },
+        {
+          "area_px": 51.0,
+          "centroid_x_px": 575.9411764705883,
+          "centroid_y_px": 601.3725490196078,
+          "equivalent_radius_px": 4.029119531035698
+        },
+        {
+          "area_px": 27.0,
+          "centroid_x_px": 261.81481481481484,
+          "centroid_y_px": 606.2962962962963,
+          "equivalent_radius_px": 2.9316150714175193
+        },
+        {
+          "area_px": 100.0,
+          "centroid_x_px": 1036.91,
+          "centroid_y_px": 607.69,
+          "equivalent_radius_px": 5.641895835477563
+        },
+        {
+          "area_px": 1389.0,
+          "centroid_x_px": 1159.6904247660186,
+          "centroid_y_px": 628.3657307415407,
+          "equivalent_radius_px": 21.0269453775218
+        },
+        {
+          "area_px": 29.0,
+          "centroid_x_px": 692.1724137931035,
+          "centroid_y_px": 613.1379310344828,
+          "equivalent_radius_px": 3.0382538898732494
+        },
+        {
+          "area_px": 887.0,
+          "centroid_x_px": 385.5062006764374,
+          "centroid_y_px": 638.4870349492672,
+          "equivalent_radius_px": 16.80300178673508
+        },
+        {
+          "area_px": 475.0,
+          "centroid_x_px": 1032.4715789473685,
+          "centroid_y_px": 629.9052631578948,
+          "equivalent_radius_px": 12.296226898414837
+        },
+        {
+          "area_px": 240.0,
+          "centroid_x_px": 845.5083333333333,
+          "centroid_y_px": 630.3541666666666,
+          "equivalent_radius_px": 8.740387444736633
+        },
+        {
+          "area_px": 42.0,
+          "centroid_x_px": 966.2619047619048,
+          "centroid_y_px": 617.547619047619,
+          "equivalent_radius_px": 3.656366395715726
+        },
+        {
+          "area_px": 102.0,
+          "centroid_x_px": 255.2058823529412,
+          "centroid_y_px": 633.156862745098,
+          "equivalent_radius_px": 5.698035485213008
+        },
+        {
+          "area_px": 252.0,
+          "centroid_x_px": 936.1825396825396,
+          "centroid_y_px": 658.6269841269841,
+          "equivalent_radius_px": 8.95623198216277
+        },
+        {
+          "area_px": 129.0,
+          "centroid_x_px": 243.7751937984496,
+          "centroid_y_px": 660.4263565891473,
+          "equivalent_radius_px": 6.407961869245868
+        },
+        {
+          "area_px": 57.0,
+          "centroid_x_px": 6.368421052631579,
+          "centroid_y_px": 656.1578947368421,
+          "equivalent_radius_px": 4.259537945889915
+        },
+        {
+          "area_px": 80.0,
+          "centroid_x_px": 722.175,
+          "centroid_y_px": 660.125,
+          "equivalent_radius_px": 5.046265044040321
+        },
+        {
+          "area_px": 138.0,
+          "centroid_x_px": 1166.5942028985507,
+          "centroid_y_px": 671.7463768115942,
+          "equivalent_radius_px": 6.627726932618989
+        },
+        {
+          "area_px": 15968.0,
+          "centroid_x_px": 300.75237975951904,
+          "centroid_y_px": 754.5855460921844,
+          "equivalent_radius_px": 71.29356396325527
+        },
+        {
+          "area_px": 47.0,
+          "centroid_x_px": 546.4893617021277,
+          "centroid_y_px": 678.3617021276596,
+          "equivalent_radius_px": 3.8678889139475245
+        },
+        {
+          "area_px": 335.0,
+          "centroid_x_px": 1129.489552238806,
+          "centroid_y_px": 687.5611940298508,
+          "equivalent_radius_px": 10.32636489145962
+        },
+        {
+          "area_px": 2034.0,
+          "centroid_x_px": 480.7433628318584,
+          "centroid_y_px": 715.3372664700098,
+          "equivalent_radius_px": 25.444887669192614
+        },
+        {
+          "area_px": 15.0,
+          "centroid_x_px": 166.13333333333333,
+          "centroid_y_px": 691.3333333333334,
+          "equivalent_radius_px": 2.1850968611841584
+        },
+        {
+          "area_px": 14563.0,
+          "centroid_x_px": 863.1674105610108,
+          "centroid_y_px": 791.9509029732885,
+          "equivalent_radius_px": 68.08485053589047
+        },
+        {
+          "area_px": 14.0,
+          "centroid_x_px": 173.64285714285714,
+          "centroid_y_px": 693.6428571428571,
+          "equivalent_radius_px": 2.111004122822376
+        },
+        {
+          "area_px": 21136.0,
+          "centroid_x_px": 590.1225397426192,
+          "centroid_y_px": 855.1969152157457,
+          "equivalent_radius_px": 82.02315377002155
+        },
+        {
+          "area_px": 567.0,
+          "centroid_x_px": 181.84303350970018,
+          "centroid_y_px": 716.0652557319224,
+          "equivalent_radius_px": 13.434347973244154
+        },
+        {
+          "area_px": 743.0,
+          "centroid_x_px": 1161.9448183041723,
+          "centroid_y_px": 729.9690444145357,
+          "equivalent_radius_px": 15.378694529593743
+        },
+        {
+          "area_px": 305.0,
+          "centroid_x_px": 952.7737704918032,
+          "centroid_y_px": 745.567213114754,
+          "equivalent_radius_px": 9.853147481188747
+        },
+        {
+          "area_px": 3836.0,
+          "centroid_x_px": 457.85375391032323,
+          "centroid_y_px": 788.7163712200208,
+          "equivalent_radius_px": 34.943335894001606
+        },
+        {
+          "area_px": 91.0,
+          "centroid_x_px": 1050.868131868132,
+          "centroid_y_px": 769.4065934065934,
+          "equivalent_radius_px": 5.382025607773058
+        },
+        {
+          "area_px": 311.0,
+          "centroid_x_px": 1116.475884244373,
+          "centroid_y_px": 779.6302250803858,
+          "equivalent_radius_px": 9.949591680222808
+        },
+        {
+          "area_px": 17.0,
+          "centroid_x_px": 388.6470588235294,
+          "centroid_y_px": 789.0588235294117,
+          "equivalent_radius_px": 2.326213245840639
+        },
+        {
+          "area_px": 92.0,
+          "centroid_x_px": 651.0,
+          "centroid_y_px": 792.5326086956521,
+          "equivalent_radius_px": 5.4115163798060095
+        },
+        {
+          "area_px": 14.0,
+          "centroid_x_px": 369.5,
+          "centroid_y_px": 799.5,
+          "equivalent_radius_px": 2.111004122822376
+        },
+        {
+          "area_px": 99.0,
+          "centroid_x_px": 661.2626262626262,
+          "centroid_y_px": 816.9494949494949,
+          "equivalent_radius_px": 5.613615477764332
+        },
+        {
+          "area_px": 22.0,
+          "centroid_x_px": 410.3636363636364,
+          "centroid_y_px": 816.3636363636364,
+          "equivalent_radius_px": 2.6462837142006137
+        },
+        {
+          "area_px": 51.0,
+          "centroid_x_px": 653.4705882352941,
+          "centroid_y_px": 822.9411764705883,
+          "equivalent_radius_px": 4.029119531035698
+        },
+        {
+          "area_px": 414.0,
+          "centroid_x_px": 1079.8260869565217,
+          "centroid_y_px": 853.2971014492754,
+          "equivalent_radius_px": 11.479559785988718
+        },
+        {
+          "area_px": 682.0,
+          "centroid_x_px": 301.3797653958944,
+          "centroid_y_px": 861.9853372434018,
+          "equivalent_radius_px": 14.733884157863644
+        },
+        {
+          "area_px": 100.0,
+          "centroid_x_px": 620.01,
+          "centroid_y_px": 851.25,
+          "equivalent_radius_px": 5.641895835477563
+        },
+        {
+          "area_px": 42.0,
+          "centroid_x_px": 276.5952380952381,
+          "centroid_y_px": 855.0,
+          "equivalent_radius_px": 3.656366395715726
+        },
+        {
+          "area_px": 15.0,
+          "centroid_x_px": 1158.2666666666667,
+          "centroid_y_px": 859.1333333333333,
+          "equivalent_radius_px": 2.1850968611841584
+        },
+        {
+          "area_px": 46.0,
+          "centroid_x_px": 341.9782608695652,
+          "centroid_y_px": 862.2391304347826,
+          "equivalent_radius_px": 3.826519928662906
+        },
+        {
+          "area_px": 776.0,
+          "centroid_x_px": 835.805412371134,
+          "centroid_y_px": 887.6971649484536,
+          "equivalent_radius_px": 15.716503163191918
+        },
+        {
+          "area_px": 2628.0,
+          "centroid_x_px": 485.16514459665143,
+          "centroid_y_px": 894.7800608828006,
+          "equivalent_radius_px": 28.92262748940701
+        },
+        {
+          "area_px": 249.0,
+          "centroid_x_px": 392.5381526104418,
+          "centroid_y_px": 902.3815261044176,
+          "equivalent_radius_px": 8.902761462589227
+        },
+        {
+          "area_px": 17.0,
+          "centroid_x_px": 891.7058823529412,
+          "centroid_y_px": 903.9411764705883,
+          "equivalent_radius_px": 2.326213245840639
+        },
+        {
+          "area_px": 108.0,
+          "centroid_x_px": 438.5,
+          "centroid_y_px": 915.5925925925926,
+          "equivalent_radius_px": 5.863230142835039
+        },
+        {
+          "area_px": 189.0,
+          "centroid_x_px": 909.8518518518518,
+          "centroid_y_px": 929.5079365079365,
+          "equivalent_radius_px": 7.756324418739616
+        },
+        {
+          "area_px": 721.0,
+          "centroid_x_px": 872.7364771151179,
+          "centroid_y_px": 952.2233009708738,
+          "equivalent_radius_px": 15.149304536463484
+        },
+        {
+          "area_px": 41.0,
+          "centroid_x_px": 343.2439024390244,
+          "centroid_y_px": 951.0243902439024,
+          "equivalent_radius_px": 3.6125759969217834
+        },
+        {
+          "area_px": 312.0,
+          "centroid_x_px": 422.5416666666667,
+          "centroid_y_px": 955.7820512820513,
+          "equivalent_radius_px": 9.965574970333758
+        },
+        {
+          "area_px": 61747.0,
+          "centroid_x_px": 785.5464880884902,
+          "centroid_y_px": 1083.4383532803213,
+          "equivalent_radius_px": 140.19515163581985
+        },
+        {
+          "area_px": 34.0,
+          "centroid_x_px": 380.0882352941176,
+          "centroid_y_px": 955.9117647058823,
+          "equivalent_radius_px": 3.2897623212397704
+        },
+        {
+          "area_px": 683.0,
+          "centroid_x_px": 189.33967789165447,
+          "centroid_y_px": 970.3879941434847,
+          "equivalent_radius_px": 14.744682168956
+        },
+        {
+          "area_px": 80.0,
+          "centroid_x_px": 354.4375,
+          "centroid_y_px": 961.825,
+          "equivalent_radius_px": 5.046265044040321
+        },
+        {
+          "area_px": 11210.0,
+          "centroid_x_px": 425.7371989295272,
+          "centroid_y_px": 1044.7454950936665,
+          "equivalent_radius_px": 59.73486271952329
+        },
+        {
+          "area_px": 72.0,
+          "centroid_x_px": 869.9027777777778,
+          "centroid_y_px": 977.6805555555555,
+          "equivalent_radius_px": 4.787307364817192
+        },
+        {
+          "area_px": 2995.0,
+          "centroid_x_px": 254.4974958263773,
+          "centroid_y_px": 1013.398998330551,
+          "equivalent_radius_px": 30.87617380959715
+        },
+        {
+          "area_px": 81.0,
+          "centroid_x_px": 1068.2716049382716,
+          "centroid_y_px": 995.2222222222222,
+          "equivalent_radius_px": 5.077706251929807
+        },
+        {
+          "area_px": 346.0,
+          "centroid_x_px": 182.11271676300578,
+          "centroid_y_px": 1009.1878612716763,
+          "equivalent_radius_px": 10.49453289192004
+        },
+        {
+          "area_px": 28.0,
+          "centroid_x_px": 435.14285714285717,
+          "centroid_y_px": 1021.2142857142857,
+          "equivalent_radius_px": 2.985410660720923
+        },
+        {
+          "area_px": 14.0,
+          "centroid_x_px": 640.5714285714286,
+          "centroid_y_px": 1029.7857142857142,
+          "equivalent_radius_px": 2.111004122822376
+        },
+        {
+          "area_px": 660.0,
+          "centroid_x_px": 266.43636363636364,
+          "centroid_y_px": 1068.959090909091,
+          "equivalent_radius_px": 14.494292838262302
+        },
+        {
+          "area_px": 29.0,
+          "centroid_x_px": 363.55172413793105,
+          "centroid_y_px": 1069.5862068965516,
+          "equivalent_radius_px": 3.0382538898732494
+        },
+        {
+          "area_px": 120.0,
+          "centroid_x_px": 426.95,
+          "centroid_y_px": 1089.3583333333333,
+          "equivalent_radius_px": 6.180387232371033
+        },
+        {
+          "area_px": 1261.0,
+          "centroid_x_px": 282.38620142743855,
+          "centroid_y_px": 1104.3354480570974,
+          "equivalent_radius_px": 20.03468907863958
+        },
+        {
+          "area_px": 978.0,
+          "centroid_x_px": 517.1871165644171,
+          "centroid_y_px": 1118.4928425357873,
+          "equivalent_radius_px": 17.64389607449974
+        },
+        {
+          "area_px": 19.0,
+          "centroid_x_px": 372.10526315789474,
+          "centroid_y_px": 1114.0526315789473,
+          "equivalent_radius_px": 2.4592453796829674
+        },
+        {
+          "area_px": 84.0,
+          "centroid_x_px": 359.6547619047619,
+          "centroid_y_px": 1130.1309523809523,
+          "equivalent_radius_px": 5.170882945826411
+        },
+        {
+          "area_px": 22.0,
+          "centroid_x_px": 519.0454545454545,
+          "centroid_y_px": 1207.0,
+          "equivalent_radius_px": 2.6462837142006137
+        }
+      ],
+      "droplet_id": 1
+    },
+    {
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x01/droplet_002.png",
+      "pixel_count_mask": 195614,
+      "gray_mean": 121.20587158203125,
+      "gray_std": 20.06696319580078,
+      "gradient_mean": 2.8609778881073,
+      "gradient_p90": 5.4893412590026855,
+      "edge_density_p75": 0.25000255605427013,
+      "dark_mass_norm": 0.030072355642914772,
+      "dark_centroid_x_px": 299.11564201118074,
+      "dark_centroid_y_px": 199.54705353745692,
+      "dark_component_count": 38,
+      "largest_dark_component_area_px": 29422.0,
+      "fusion_score_objective_0_to_5": 0.31766535625082837,
+      "organoid_candidates_objective": [
+        {
+          "area_px": 3953.0,
+          "centroid_x_px": 249.8403743991905,
+          "centroid_y_px": 27.11181381229446,
+          "equivalent_radius_px": 35.47222829319473
+        },
+        {
+          "area_px": 55.0,
+          "centroid_x_px": 326.0,
+          "centroid_y_px": 2.727272727272727,
+          "equivalent_radius_px": 4.1841419359420025
+        },
+        {
+          "area_px": 73.0,
+          "centroid_x_px": 251.65753424657535,
+          "centroid_y_px": 6.684931506849315,
+          "equivalent_radius_px": 4.820437914901168
+        },
+        {
+          "area_px": 24.0,
+          "centroid_x_px": 339.4166666666667,
+          "centroid_y_px": 10.833333333333334,
+          "equivalent_radius_px": 2.763953195770684
+        },
+        {
+          "area_px": 49.0,
+          "centroid_x_px": 394.42857142857144,
+          "centroid_y_px": 27.918367346938776,
+          "equivalent_radius_px": 3.949327084834294
+        },
+        {
+          "area_px": 790.0,
+          "centroid_x_px": 418.0367088607595,
+          "centroid_y_px": 61.94303797468354,
+          "equivalent_radius_px": 15.85764200898717
+        },
+        {
+          "area_px": 22.0,
+          "centroid_x_px": 353.8636363636364,
+          "centroid_y_px": 48.0,
+          "equivalent_radius_px": 2.6462837142006137
+        },
+        {
+          "area_px": 62.0,
+          "centroid_x_px": 334.93548387096774,
+          "centroid_y_px": 56.62903225806452,
+          "equivalent_radius_px": 4.442433223290478
+        },
+        {
+          "area_px": 235.0,
+          "centroid_x_px": 147.39148936170213,
+          "centroid_y_px": 80.0468085106383,
+          "equivalent_radius_px": 8.6488625410045
+        },
+        {
+          "area_px": 37.0,
+          "centroid_x_px": 344.72972972972974,
+          "centroid_y_px": 72.1891891891892,
+          "equivalent_radius_px": 3.431831258788849
+        },
+        {
+          "area_px": 17.0,
+          "centroid_x_px": 392.70588235294116,
+          "centroid_y_px": 75.0,
+          "equivalent_radius_px": 2.326213245840639
+        },
+        {
+          "area_px": 948.0,
+          "centroid_x_px": 442.8586497890295,
+          "centroid_y_px": 117.5,
+          "equivalent_radius_px": 17.371176474327626
+        },
+        {
+          "area_px": 39.0,
+          "centroid_x_px": 369.2564102564103,
+          "centroid_y_px": 108.23076923076923,
+          "equivalent_radius_px": 3.523362819972964
+        },
+        {
+          "area_px": 29422.0,
+          "centroid_x_px": 298.54442254095574,
+          "centroid_y_px": 206.89290326966216,
+          "equivalent_radius_px": 96.77454970858551
+        },
+        {
+          "area_px": 443.0,
+          "centroid_x_px": 370.0428893905192,
+          "centroid_y_px": 136.9232505643341,
+          "equivalent_radius_px": 11.87481703351337
+        },
+        {
+          "area_px": 84.0,
+          "centroid_x_px": 405.4761904761905,
+          "centroid_y_px": 131.4047619047619,
+          "equivalent_radius_px": 5.170882945826411
+        },
+        {
+          "area_px": 294.0,
+          "centroid_x_px": 20.527210884353742,
+          "centroid_y_px": 150.3639455782313,
+          "equivalent_radius_px": 9.673836185197393
+        },
+        {
+          "area_px": 17.0,
+          "centroid_x_px": 176.11764705882354,
+          "centroid_y_px": 141.0,
+          "equivalent_radius_px": 2.326213245840639
+        },
+        {
+          "area_px": 200.0,
+          "centroid_x_px": 429.0,
+          "centroid_y_px": 157.845,
+          "equivalent_radius_px": 7.978845608028654
+        },
+        {
+          "area_px": 21.0,
+          "centroid_x_px": 237.8095238095238,
+          "centroid_y_px": 159.76190476190476,
+          "equivalent_radius_px": 2.5854414729132054
+        },
+        {
+          "area_px": 162.0,
+          "centroid_x_px": 255.91975308641975,
+          "centroid_y_px": 166.46913580246914,
+          "equivalent_radius_px": 7.1809610472257885
+        },
+        {
+          "area_px": 82.0,
+          "centroid_x_px": 347.9878048780488,
+          "centroid_y_px": 176.6951219512195,
+          "equivalent_radius_px": 5.108953969950291
+        },
+        {
+          "area_px": 29.0,
+          "centroid_x_px": 286.7931034482759,
+          "centroid_y_px": 209.10344827586206,
+          "equivalent_radius_px": 3.0382538898732494
+        },
+        {
+          "area_px": 30.0,
+          "centroid_x_px": 299.56666666666666,
+          "centroid_y_px": 209.93333333333334,
+          "equivalent_radius_px": 3.0901936161855166
+        },
+        {
+          "area_px": 198.0,
+          "centroid_x_px": 108.18686868686869,
+          "centroid_y_px": 221.05555555555554,
+          "equivalent_radius_px": 7.938851142601841
+        },
+        {
+          "area_px": 28.0,
+          "centroid_x_px": 459.0,
+          "centroid_y_px": 219.42857142857142,
+          "equivalent_radius_px": 2.985410660720923
+        },
+        {
+          "area_px": 16.0,
+          "centroid_x_px": 289.9375,
+          "centroid_y_px": 251.6875,
+          "equivalent_radius_px": 2.256758334191025
+        },
+        {
+          "area_px": 48.0,
+          "centroid_x_px": 127.45833333333333,
+          "centroid_y_px": 261.9791666666667,
+          "equivalent_radius_px": 3.9088200952233594
+        },
+        {
+          "area_px": 172.0,
+          "centroid_x_px": 296.8081395348837,
+          "centroid_y_px": 268.8488372093023,
+          "equivalent_radius_px": 7.399277020331919
+        },
+        {
+          "area_px": 55.0,
+          "centroid_x_px": 26.163636363636364,
+          "centroid_y_px": 274.43636363636364,
+          "equivalent_radius_px": 4.1841419359420025
+        },
+        {
+          "area_px": 427.0,
+          "centroid_x_px": 287.10772833723655,
+          "centroid_y_px": 289.4543325526932,
+          "equivalent_radius_px": 11.65840132267193
+        },
+        {
+          "area_px": 3843.0,
+          "centroid_x_px": 183.94977881863127,
+          "centroid_y_px": 384.64012490242,
+          "equivalent_radius_px": 34.97520396801579
+        },
+        {
+          "area_px": 22.0,
+          "centroid_x_px": 253.5,
+          "centroid_y_px": 295.40909090909093,
+          "equivalent_radius_px": 2.6462837142006137
+        },
+        {
+          "area_px": 28.0,
+          "centroid_x_px": 257.0,
+          "centroid_y_px": 377.0357142857143,
+          "equivalent_radius_px": 2.985410660720923
+        },
+        {
+          "area_px": 95.0,
+          "centroid_x_px": 267.9789473684211,
+          "centroid_y_px": 388.4315789473684,
+          "equivalent_radius_px": 5.499039842323396
+        },
+        {
+          "area_px": 21.0,
+          "centroid_x_px": 308.95238095238096,
+          "centroid_y_px": 401.6666666666667,
+          "equivalent_radius_px": 2.5854414729132054
+        },
+        {
+          "area_px": 29.0,
+          "centroid_x_px": 371.6896551724138,
+          "centroid_y_px": 412.0689655172414,
+          "equivalent_radius_px": 3.0382538898732494
+        },
+        {
+          "area_px": 819.0,
+          "centroid_x_px": 375.3040293040293,
+          "centroid_y_px": 436.46886446886447,
+          "equivalent_radius_px": 16.146076823319174
+        }
+      ],
+      "droplet_id": 2
+    },
+    {
+      "segment_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-SEGMENTS/App80 DEO/10uM/05-十二月-2025/10x01/droplet_003.png",
+      "pixel_count_mask": 41634,
+      "gray_mean": 144.95896911621094,
+      "gray_std": 5.870248794555664,
+      "gradient_mean": 1.8791025876998901,
+      "gradient_p90": 1.8736261129379272,
+      "edge_density_p75": 0.2499399529230917,
+      "dark_mass_norm": 0.008189242333173752,
+      "dark_centroid_x_px": 245.33044061039578,
+      "dark_centroid_y_px": 56.62217601669759,
+      "dark_component_count": 20,
+      "largest_dark_component_area_px": 3957.0,
+      "fusion_score_objective_0_to_5": 0.2683657481727326,
+      "organoid_candidates_objective": [
+        {
+          "area_px": 3957.0,
+          "centroid_x_px": 198.31665403083144,
+          "centroid_y_px": 19.983067980793532,
+          "equivalent_radius_px": 35.490170746690694
+        },
+        {
+          "area_px": 1637.0,
+          "centroid_x_px": 382.72388515577273,
+          "centroid_y_px": 89.81857055589494,
+          "equivalent_radius_px": 22.827029672799423
+        },
+        {
+          "area_px": 221.0,
+          "centroid_x_px": 300.76018099547514,
+          "centroid_y_px": 73.19004524886878,
+          "equivalent_radius_px": 8.387281135541944
+        },
+        {
+          "area_px": 17.0,
+          "centroid_x_px": 124.52941176470588,
+          "centroid_y_px": 72.82352941176471,
+          "equivalent_radius_px": 2.326213245840639
+        },
+        {
+          "area_px": 103.0,
+          "centroid_x_px": 405.13592233009706,
+          "centroid_y_px": 83.2135922330097,
+          "equivalent_radius_px": 5.725898905580716
+        },
+        {
+          "area_px": 321.0,
+          "centroid_x_px": 430.58255451713393,
+          "centroid_y_px": 96.11838006230529,
+          "equivalent_radius_px": 10.108287365572707
+        },
+        {
+          "area_px": 367.0,
+          "centroid_x_px": 330.02724795640324,
+          "centroid_y_px": 95.38964577656675,
+          "equivalent_radius_px": 10.808317548511017
+        },
+        {
+          "area_px": 342.0,
+          "centroid_x_px": 61.3187134502924,
+          "centroid_y_px": 96.54385964912281,
+          "equivalent_radius_px": 10.433694507453072
+        },
+        {
+          "area_px": 15.0,
+          "centroid_x_px": 74.8,
+          "centroid_y_px": 92.33333333333333,
+          "equivalent_radius_px": 2.1850968611841584
+        },
+        {
+          "area_px": 18.0,
+          "centroid_x_px": 134.05555555555554,
+          "centroid_y_px": 96.61111111111111,
+          "equivalent_radius_px": 2.393653682408596
+        },
+        {
+          "area_px": 48.0,
+          "centroid_x_px": 221.625,
+          "centroid_y_px": 99.1875,
+          "equivalent_radius_px": 3.9088200952233594
+        },
+        {
+          "area_px": 408.0,
+          "centroid_x_px": 284.24754901960785,
+          "centroid_y_px": 113.9828431372549,
+          "equivalent_radius_px": 11.396070970426017
+        },
+        {
+          "area_px": 578.0,
+          "centroid_x_px": 241.12975778546712,
+          "centroid_y_px": 119.93079584775087,
+          "equivalent_radius_px": 13.564037533648712
+        },
+        {
+          "area_px": 25.0,
+          "centroid_x_px": 79.2,
+          "centroid_y_px": 118.0,
+          "equivalent_radius_px": 2.8209479177387813
+        },
+        {
+          "area_px": 169.0,
+          "centroid_x_px": 119.04733727810651,
+          "centroid_y_px": 122.16568047337279,
+          "equivalent_radius_px": 7.334464586120832
+        },
+        {
+          "area_px": 203.0,
+          "centroid_x_px": 358.6896551724138,
+          "centroid_y_px": 126.20197044334975,
+          "equivalent_radius_px": 8.03846421247924
+        },
+        {
+          "area_px": 15.0,
+          "centroid_x_px": 368.6,
+          "centroid_y_px": 118.13333333333334,
+          "equivalent_radius_px": 2.1850968611841584
+        },
+        {
+          "area_px": 287.0,
+          "centroid_x_px": 426.006968641115,
+          "centroid_y_px": 125.10801393728222,
+          "equivalent_radius_px": 9.557977680176279
+        },
+        {
+          "area_px": 125.0,
+          "centroid_x_px": 451.864,
+          "centroid_y_px": 128.032,
+          "equivalent_radius_px": 6.3078313050504
+        },
+        {
+          "area_px": 27.0,
+          "centroid_x_px": 217.2962962962963,
+          "centroid_y_px": 127.07407407407408,
+          "equivalent_radius_px": 2.9316150714175193
+        }
+      ],
+      "droplet_id": 3
+    }
+  ]
+}
