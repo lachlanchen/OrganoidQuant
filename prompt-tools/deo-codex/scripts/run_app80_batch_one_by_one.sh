@@ -28,14 +28,21 @@ echo "DEO_CELLPOSE_MODE=$cellpose_mode" | tee -a "$log_file"
 echo | tee -a "$log_file"
 
 idx=0
+ok=0
+fail=0
 for tif in "${tifs[@]}"; do
   idx=$((idx + 1))
   echo "[$idx/${#tifs[@]}] START $tif" | tee -a "$log_file"
-  DEO_CELLPOSE_MODE="$cellpose_mode" "$repo_root/prompt-tools/deo-codex/scripts/run_single_image_test.sh" "$tif" 2>&1 | tee -a "$log_file"
-  echo "[$idx/${#tifs[@]}] DONE  $tif" | tee -a "$log_file"
+  if DEO_CELLPOSE_MODE="$cellpose_mode" "$repo_root/prompt-tools/deo-codex/scripts/run_single_image_test.sh" "$tif" 2>&1 | tee -a "$log_file"; then
+    ok=$((ok + 1))
+    echo "[$idx/${#tifs[@]}] DONE  $tif" | tee -a "$log_file"
+  else
+    fail=$((fail + 1))
+    echo "[$idx/${#tifs[@]}] FAIL  $tif" | tee -a "$log_file"
+  fi
   echo | tee -a "$log_file"
 done
 
 echo "Batch end: $(date -Is)" | tee -a "$log_file"
+echo "Success: $ok  Failed: $fail" | tee -a "$log_file"
 echo "Log: $log_file" | tee -a "$log_file"
-
