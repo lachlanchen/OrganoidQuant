@@ -10,17 +10,34 @@ This toolkit implements a prompt-driven DEO analysis pipeline for one image, the
 2. `00_extract_tif_metadata.py`
 - Extract TIFF metadata/tags to JSON.
 
-3. `01_prompt_image_context_and_droplets.sh`
-- Use `codex exec + image` to parse folder/file metadata and annotate droplet circles by vision.
+3. `00_build_vision_priors.py` (called inside prompt scripts)
+- Build gradient/edge/circle/blob priors from PNG.
+- Optional Cellpose priors are supported.
 
-4. `02_segment_droplets_from_annotations.py`
+4. `01_prompt_image_context_and_droplets.sh`
+- Use `codex exec + source image + prior overlays` to parse metadata and annotate droplet circles.
+- Prompt is magnification-aware (`4x` vs `10x`) and does not force fixed droplet counts.
+
+5. `01_refine_droplet_annotations.py`
+- Normalize annotation fields and remove duplicate/high-overlap partial droplets.
+
+6. `01_optimize_droplet_circles_by_edge.py`
+- Apply local edge-gradient circle micro-adjustment to reduce small center/radius shift.
+
+7. `02_segment_droplets_from_annotations.py`
 - Generate droplet-level segment PNGs from annotated circles.
-- No threshold/cellpose used.
 
-5. `03_prompt_droplet_level_quantification.sh`
+8. `03_prompt_droplet_level_quantification.sh`
 - Use `codex exec + original image + segment images` to estimate organoid count and fusion level per droplet.
 
-6. `04_update_markdown_and_databases.py`
+9. `03_compute_droplet_objective_metrics.py`
+- Compute objective metrics (gradient, edge density, dark-centroid, fusion heuristic).
+
+10. `05_prompt_organoid_analysis_complete_droplets.sh`
+- Analyze organoids per droplet for complete droplets only (`is_partial=false`).
+- Uses droplet-local prior overlays (gradient/blob/optional Cellpose) in the prompt context.
+
+11. `04_update_markdown_and_databases.py`
 - Write per-image markdown and maintain:
 - `DEO-DATABASE/image_database.csv`
 - `DEO-DATABASE/droplet_database.csv`
@@ -35,3 +52,8 @@ prompt-tools/deo-codex/scripts/run_single_image_test.sh \
 
 Default Python interpreter:
 - `/home/lachlan/miniconda3/envs/organoid/bin/python`
+
+Cellpose toggle:
+- `DEO_CELLPOSE_MODE=auto` (default): run Cellpose priors for organoid mode only.
+- `DEO_CELLPOSE_MODE=on`: force Cellpose priors in both droplet and organoid modes.
+- `DEO_CELLPOSE_MODE=off`: disable Cellpose priors.

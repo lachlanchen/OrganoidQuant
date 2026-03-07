@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DEO Organoid Analysis Per Complete Droplet",
+  "type": "object",
+  "required": [
+    "source_tif",
+    "source_png",
+    "droplet_id",
+    "droplet_quality_note",
+    "organoid_count_visual",
+    "organoids"
+  ],
+  "properties": {
+    "source_tif": { "type": "string" },
+    "source_png": { "type": "string" },
+    "droplet_id": { "type": "integer", "minimum": 1 },
+    "droplet_quality_note": { "type": "string" },
+    "organoid_count_visual": { "type": "integer", "minimum": 0 },
+    "organoids": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "organoid_id_local",
+          "center_x_px_local",
+          "center_y_px_local",
+          "radius_px_local",
+          "size_class",
+          "morphology",
+          "fusion_with_neighbors_0_to_5",
+          "confidence",
+          "note"
+        ],
+        "properties": {
+          "organoid_id_local": { "type": "integer", "minimum": 1 },
+          "center_x_px_local": { "type": "number" },
+          "center_y_px_local": { "type": "number" },
+          "radius_px_local": { "type": "number", "exclusiveMinimum": 0 },
+          "size_class": { "type": "string", "enum": ["small", "medium", "large"] },
+          "morphology": { "type": "string", "enum": ["cystic", "solid", "mixed", "uncertain"] },
+          "fusion_with_neighbors_0_to_5": { "type": "number", "minimum": 0, "maximum": 5 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
