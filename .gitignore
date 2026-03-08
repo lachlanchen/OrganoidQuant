@@ -5,6 +5,11 @@ DEO/
 # Local/system
 .DS_Store
 Thumbs.db
+.env
+tmp/
+tmp_*.png
+.tmp_*.png
+**/__pycache__/
 
 # LaTeX build artifacts
 *.aux

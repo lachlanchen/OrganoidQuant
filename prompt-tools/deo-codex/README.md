@@ -50,6 +50,33 @@ prompt-tools/deo-codex/scripts/run_single_image_test.sh \
   "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/4x00.tif"
 ```
 
+## 10x Guarded Pipeline (Recommended for App80 10x)
+
+- `run_single_image_10x_guarded.sh`
+- Runs full analysis for one `10x*.tif` with a dedicated guard stage.
+- Guard checks droplet detection quality and can trigger a single-center fallback correction.
+
+```bash
+prompt-tools/deo-codex/scripts/run_single_image_10x_guarded.sh \
+  "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif"
+```
+
+- `run_app80_10x_guarded_batch.sh`
+- Batch runs all `10x*.tif` under `DEO/App80 DEO`, one-by-one.
+
+- `archive_app80_outputs.sh`
+- Moves existing App80 outputs under `DEO-PNG/`, `DEO-MARKDOWN/`, `DEO-SEGMENTS/` to `archived-result/...`.
+
+- `start_tmux_app80_10x_guarded.sh`
+- Stops existing `deo_app` session, archives old App80 outputs, and launches guarded batch in tmux.
+
+```bash
+DEO_CELLPOSE_MODE=auto \
+prompt-tools/deo-codex/scripts/start_tmux_app80_10x_guarded.sh \
+  "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO" \
+  deo_app
+```
+
 Default Python interpreter:
 - `/home/lachlan/miniconda3/envs/organoid/bin/python`
 

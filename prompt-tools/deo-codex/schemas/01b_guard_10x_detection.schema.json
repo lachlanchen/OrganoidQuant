@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DEO 10x Guard Detection Check",
+  "type": "object",
+  "required": [
+    "source_tif",
+    "source_png",
+    "magnification_token",
+    "guard_passed",
+    "action",
+    "guard_note",
+    "detected_droplet_count",
+    "complete_droplet_count",
+    "primary_droplet_recommended"
+  ],
+  "properties": {
+    "source_tif": { "type": "string" },
+    "source_png": { "type": "string" },
+    "magnification_token": { "type": "string" },
+    "guard_passed": { "type": "boolean" },
+    "action": {
+      "type": "string",
+      "enum": ["accept", "retry_with_single_center", "skip"]
+    },
+    "guard_note": { "type": "string" },
+    "detected_droplet_count": { "type": "integer", "minimum": 0 },
+    "complete_droplet_count": { "type": "integer", "minimum": 0 },
+    "primary_droplet_recommended": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": [
+            "center_x_px",
+            "center_y_px",
+            "radius_px",
+            "is_partial",
+            "completeness",
+            "confidence",
+            "note"
+          ],
+          "properties": {
+            "center_x_px": { "type": "number" },
+            "center_y_px": { "type": "number" },
+            "radius_px": { "type": "number", "exclusiveMinimum": 1 },
+            "is_partial": { "type": "boolean" },
+            "completeness": { "type": "boolean" },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "note": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}
