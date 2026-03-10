@@ -28,7 +28,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def infer_magnification_token(source_png: Path) -> str:
-    m = re.search(r"(?:^|/)(\d+x)\d*", str(source_png))
+    m = re.search(r"(?:^|/)(\d+x)\d*", str(source_png), flags=re.IGNORECASE)
     return m.group(1).lower() if m else "unknown"
 
 
@@ -192,6 +192,7 @@ def try_cellpose(
         "model_type": model_name,
         "n_masks": 0,
         "mask_png": None,
+        "mask_stats_json": None,
         "note": "",
     }
     should_run = cellpose_mode == "on" or (cellpose_mode == "auto" and mode == "organoid")
@@ -213,14 +214,33 @@ def try_cellpose(
         masks, _, _, _ = model.eval(rgb, channels=[0, 0], diameter=None)
         labels = [int(x) for x in np.unique(masks) if int(x) > 0]
         info["n_masks"] = len(labels)
+        mask_stats: List[Dict[str, Any]] = []
         overlay = bgr.copy()
         for lid in labels:
             m = (masks == lid).astype(np.uint8)
             cnts, _ = cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             cv2.drawContours(overlay, cnts, -1, (0, 255, 255), 1)
+            ys, xs = np.where(m > 0)
+            if xs.size == 0:
+                continue
+            mask_stats.append(
+                {
+                    "mask_id": lid,
+                    "area_px": int(xs.size),
+                    "center_x_px": round(float(np.mean(xs)), 2),
+                    "center_y_px": round(float(np.mean(ys)), 2),
+                    "bbox_x0": int(np.min(xs)),
+                    "bbox_y0": int(np.min(ys)),
+                    "bbox_x1": int(np.max(xs) + 1),
+                    "bbox_y1": int(np.max(ys) + 1),
+                }
+            )
         mask_png = out_dir / "cellpose_overlay.png"
+        mask_stats_json = out_dir / "cellpose_mask_stats.json"
         cv2.imwrite(str(mask_png), overlay)
+        mask_stats_json.write_text(json.dumps(mask_stats, ensure_ascii=False, indent=2), encoding="utf-8")
         info["mask_png"] = str(mask_png)
+        info["mask_stats_json"] = str(mask_stats_json)
         info["success"] = True
         info["note"] = "cellpose finished"
     except Exception as e:  # pragma: no cover - runtime optional
@@ -351,4 +371,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

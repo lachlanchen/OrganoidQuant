@@ -66,6 +66,22 @@ while IFS= read -r img; do
   cmd+=(--image "$img")
 done < "$segment_images_file"
 
-"${cmd[@]}" < "$tmp_prompt"
+for attempt in 1 2; do
+  "${cmd[@]}" < "$tmp_prompt"
+  if python3 - << 'PY' "$output_json"
+import json,sys
+obj=json.load(open(sys.argv[1],encoding='utf-8'))
+ok=bool(obj.get('source_tif')) and bool(obj.get('source_png')) and len(obj.get('droplets',[]))>0 and obj.get('image_level',{}).get('droplet_count_including_partials',0)>0
+raise SystemExit(0 if ok else 1)
+PY
+  then
+    break
+  fi
+  if [[ "$attempt" -eq 2 ]]; then
+    echo "Quant prompt returned invalid/empty payload after retries: $output_json"
+    exit 1
+  fi
+  echo "[retry] quant payload looked empty; retrying prompt..."
+done
 
 echo "Wrote: $output_json"

@@ -5,7 +5,7 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 def parse_path_metadata(source_tif: Path, deo_root: Path) -> Dict[str, str]:
@@ -82,6 +82,39 @@ def write_csv_rows(path: Path, rows: List[Dict[str, str]], fieldnames: List[str]
             w.writerow({k: r.get(k, '') for k in fieldnames})
 
 
+def load_objective_metrics(path: Optional[Path]) -> Dict[int, Dict]:
+    if not path or not path.exists():
+        return {}
+    payload = json.loads(path.read_text(encoding='utf-8'))
+    out = {}
+    for d in payload.get('droplets', []):
+        out[int(d['droplet_id'])] = d
+    return out
+
+
+def load_organoid_outputs(organoid_dir: Optional[Path]) -> Dict[int, Dict]:
+    if not organoid_dir or not organoid_dir.exists():
+        return {}
+    out: Dict[int, Dict] = {}
+    for p in sorted(organoid_dir.glob('droplet_*_organoids.json')):
+        try:
+            obj = json.loads(p.read_text(encoding='utf-8'))
+            out[int(obj['droplet_id'])] = obj
+        except Exception:
+            continue
+    return out
+
+
+def combine_fusion(prompt_val: Optional[float], objective_val: Optional[float]) -> Optional[float]:
+    if prompt_val is None and objective_val is None:
+        return None
+    if prompt_val is None:
+        return objective_val
+    if objective_val is None:
+        return prompt_val
+    return round(0.6 * prompt_val + 0.4 * objective_val, 4)
+
+
 def build_markdown(
     source_tif: Path,
     source_png: Path,
@@ -90,6 +123,10 @@ def build_markdown(
     quant: Dict,
     seg_manifest: Dict,
     tif_meta: Dict,
+    obj_by_id: Dict[int, Dict],
+    org_by_id: Dict[int, Dict],
+    refine_report: Optional[Dict],
+    edgeopt_report: Optional[Dict],
 ) -> str:
     droplets_by_id = {int(d['droplet_id']): d for d in ann.get('droplets', [])}
     quant_by_id = {int(d['droplet_id']): d for d in quant.get('droplets', [])}
@@ -102,15 +139,10 @@ def build_markdown(
     lines.append(f"- TIFF: `{source_tif}`")
     lines.append(f"- PNG: `{source_png}`")
     lines.append('')
+
     lines.append('## Parsed Metadata')
-    lines.append(f"- experiment_id: `{path_meta['experiment_id']}`")
-    lines.append(f"- major_figure: `{path_meta['major_figure']}`")
-    lines.append(f"- part: `{path_meta['part']}`")
-    lines.append(f"- concentration_label: `{path_meta['concentration_label']}`")
-    lines.append(f"- concentration_value_uM: `{path_meta['concentration_value_uM']}`")
-    lines.append(f"- date_label: `{path_meta['date_label']}`")
-    lines.append(f"- magnification_token: `{path_meta['magnification_token']}`")
-    lines.append(f"- sample_token: `{path_meta['sample_token']}`")
+    for k in ['experiment_id', 'major_figure', 'part', 'concentration_label', 'concentration_value_uM', 'date_label', 'magnification_token', 'sample_token']:
+        lines.append(f"- {k}: `{path_meta[k]}`")
     lines.append('')
 
     isummary = quant.get('image_level', {})
@@ -120,17 +152,51 @@ def build_markdown(
     lines.append(f"- analyst_note: {isummary.get('analyst_note', '')}")
     lines.append('')
 
+    if refine_report:
+        lines.append('## Annotation Refinement')
+        lines.append(f"- input_droplet_count: `{refine_report.get('input_droplet_count', '')}`")
+        lines.append(f"- output_droplet_count: `{refine_report.get('output_droplet_count', '')}`")
+        lines.append(f"- removed_duplicates: `{len(refine_report.get('removed_duplicates', []))}`")
+        if edgeopt_report:
+            lines.append(f"- edge_optimized_circles: `{edgeopt_report.get('optimized_count', 0)}`")
+        lines.append('')
+
     lines.append('## Droplet-level Table')
     lines.append('')
-    lines.append('| droplet_id | center_x | center_y | radius | partial | organoid_count_estimated | fusion_level_0_to_5 | confidence | segment_png |')
-    lines.append('|---:|---:|---:|---:|:---:|---:|---:|---:|---|')
+    lines.append('| droplet_id | completeness | position | center_x | center_y | radius | prompt_organoid_count | fusion_prompt | fusion_objective | fusion_combined | confidence | segment_png |')
+    lines.append('|---:|:---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|')
+
     for did in sorted(droplets_by_id.keys()):
         a = droplets_by_id[did]
         q = quant_by_id.get(did, {})
         s = seg_by_id.get(did, {})
+        o = obj_by_id.get(did, {})
+
+        prompt_f = q.get('fusion_level_0_to_5', a.get('initial_fusion_level_0_to_5'))
+        prompt_f = float(prompt_f) if prompt_f is not None else None
+        obj_f = o.get('fusion_score_objective_0_to_5')
+        obj_f = float(obj_f) if obj_f is not None else None
+        comb_f = combine_fusion(prompt_f, obj_f)
+
         lines.append(
-            f"| {did} | {a.get('center_x_px', '')} | {a.get('center_y_px', '')} | {a.get('radius_px', '')} | {a.get('is_partial', '')} | {q.get('organoid_count_estimated', a.get('initial_organoid_count_estimate', ''))} | {q.get('fusion_level_0_to_5', a.get('initial_fusion_level_0_to_5', ''))} | {q.get('confidence', a.get('confidence', ''))} | `{s.get('segment_png', '')}` |"
+            f"| {did} | {bool(a.get('completeness', not a.get('is_partial', False)))} | {a.get('position_label', '')} | {a.get('center_x_px', '')} | {a.get('center_y_px', '')} | {a.get('radius_px', '')} | {q.get('organoid_count_estimated', a.get('initial_organoid_count_estimate', ''))} | {'' if prompt_f is None else prompt_f} | {'' if obj_f is None else round(obj_f, 4)} | {'' if comb_f is None else round(comb_f, 4)} | {q.get('confidence', a.get('confidence', ''))} | `{s.get('segment_png', '')}` |"
         )
+    lines.append('')
+
+    lines.append('## Complete-droplet Organoid Analysis')
+    lines.append('')
+    lines.append('| droplet_id | analyzed | organoid_count_visual | note |')
+    lines.append('|---:|:---:|---:|---|')
+    for did in sorted(droplets_by_id.keys()):
+        a = droplets_by_id[did]
+        complete = bool(a.get('completeness', not a.get('is_partial', False)))
+        rec = org_by_id.get(did)
+        if not complete:
+            lines.append(f"| {did} | false |  | partial droplet skipped |")
+        elif rec:
+            lines.append(f"| {did} | true | {rec.get('organoid_count_visual', '')} | {rec.get('droplet_quality_note', '')} |")
+        else:
+            lines.append(f"| {did} | false |  | complete droplet but no organoid json found |")
     lines.append('')
 
     lines.append('## TIFF Metadata (partial)')
@@ -139,27 +205,30 @@ def build_markdown(
     lines.append(f"- dtype: `{tif_meta.get('dtype', '')}`")
     lines.append(f"- page_count: `{tif_meta.get('page_count', '')}`")
     lines.append(f"- has_ImageDescription: `{str('ImageDescription' in tags)}`")
-    lines.append(f"- has_XResolution: `{str('XResolution' in tags)}`")
-    lines.append(f"- has_YResolution: `{str('YResolution' in tags)}`")
     lines.append('')
 
     lines.append('## Method Notes')
-    lines.append('- Droplet geometry is from vision-first prompt annotation (no threshold/cellpose used).')
-    lines.append('- Segments are circular crops generated from annotated droplet circles.')
-    lines.append('- Organoid-level DB rows are count-derived placeholders (no organoid segmentation in this step).')
+    lines.append('- Droplet geometry is vision-first prompt annotation, then refined to remove duplicate partial circles.')
+    lines.append('- Droplet segmentation uses annotated circles only (no threshold/cellpose for droplet boundary).')
+    lines.append('- Fusion uses dual sources: prompt-visual + objective image metrics.')
+    lines.append('- Organoid-level records are generated only for complete droplets in this version.')
     lines.append('')
 
     return '\n'.join(lines)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description='Update per-image markdown and DEO databases from prompt tool outputs.')
+    parser = argparse.ArgumentParser(description='Update per-image markdown and DEO databases from prompt tools + objective metrics.')
     parser.add_argument('--source-tif', required=True)
     parser.add_argument('--source-png', required=True)
     parser.add_argument('--annotation-json', required=True)
     parser.add_argument('--quant-json', required=True)
     parser.add_argument('--segment-manifest-json', required=True)
     parser.add_argument('--tif-meta-json', default='')
+    parser.add_argument('--objective-metrics-json', default='')
+    parser.add_argument('--organoid-analysis-dir', default='')
+    parser.add_argument('--annotation-refine-report-json', default='')
+    parser.add_argument('--annotation-edgeopt-report-json', default='')
     parser.add_argument('--deo-root', default='DEO')
     parser.add_argument('--markdown-root', default='DEO-MARKDOWN')
     parser.add_argument('--db-root', default='DEO-DATABASE')
@@ -178,6 +247,15 @@ def main() -> None:
     if args.tif_meta_json and Path(args.tif_meta_json).exists():
         tif_meta = json.loads(Path(args.tif_meta_json).read_text(encoding='utf-8'))
 
+    obj_by_id = load_objective_metrics(Path(args.objective_metrics_json)) if args.objective_metrics_json else {}
+    org_by_id = load_organoid_outputs(Path(args.organoid_analysis_dir)) if args.organoid_analysis_dir else {}
+    refine_report = None
+    if args.annotation_refine_report_json and Path(args.annotation_refine_report_json).exists():
+        refine_report = json.loads(Path(args.annotation_refine_report_json).read_text(encoding='utf-8'))
+    edgeopt_report = None
+    if args.annotation_edgeopt_report_json and Path(args.annotation_edgeopt_report_json).exists():
+        edgeopt_report = json.loads(Path(args.annotation_edgeopt_report_json).read_text(encoding='utf-8'))
+
     path_meta = parse_path_metadata(source_tif, deo_root)
 
     rel_parent = source_tif.relative_to(deo_root).parent
@@ -186,10 +264,17 @@ def main() -> None:
     md_dir.mkdir(parents=True, exist_ok=True)
     md_path = md_dir / f'{img_name}.md'
 
-    md_text = build_markdown(source_tif, source_png, path_meta, ann, quant, seg_manifest, tif_meta)
+    md_text = build_markdown(
+        source_tif, source_png, path_meta, ann, quant, seg_manifest, tif_meta,
+        obj_by_id=obj_by_id, org_by_id=org_by_id, refine_report=refine_report, edgeopt_report=edgeopt_report,
+    )
     md_path.write_text(md_text, encoding='utf-8')
 
     now = datetime.utcnow().isoformat() + 'Z'
+
+    ann_by_id = {int(d['droplet_id']): d for d in ann.get('droplets', [])}
+    quant_by_id = {int(d['droplet_id']): d for d in quant.get('droplets', [])}
+    seg_by_id = {int(d['droplet_id']): d for d in seg_manifest.get('segments', [])}
 
     image_row = {
         'source_tif': str(source_tif),
@@ -206,13 +291,11 @@ def main() -> None:
         'droplet_count_clear': str(quant.get('image_level', {}).get('droplet_count_clear', '')),
         'droplet_count_including_partials': str(quant.get('image_level', {}).get('droplet_count_including_partials', '')),
         'analyst_note': quant.get('image_level', {}).get('analyst_note', ''),
+        'objective_metrics_available': str(bool(obj_by_id)),
+        'organoid_analysis_available': str(bool(org_by_id)),
         'markdown_path': str(md_path),
         'updated_at_utc': now,
     }
-
-    ann_by_id = {int(d['droplet_id']): d for d in ann.get('droplets', [])}
-    quant_by_id = {int(d['droplet_id']): d for d in quant.get('droplets', [])}
-    seg_by_id = {int(d['droplet_id']): d for d in seg_manifest.get('segments', [])}
 
     droplet_rows = []
     organoid_rows = []
@@ -221,13 +304,22 @@ def main() -> None:
         a = ann_by_id[did]
         q = quant_by_id.get(did, {})
         s = seg_by_id.get(did, {})
-        organoid_count = int(q.get('organoid_count_estimated', a.get('initial_organoid_count_estimate', 0)))
-        fusion = float(q.get('fusion_level_0_to_5', a.get('initial_fusion_level_0_to_5', 0)))
-        conf = float(q.get('confidence', a.get('confidence', 0)))
+        o = obj_by_id.get(did, {})
+        org = org_by_id.get(did)
+
+        prompt_f = q.get('fusion_level_0_to_5', a.get('initial_fusion_level_0_to_5'))
+        prompt_f = float(prompt_f) if prompt_f is not None else None
+        obj_f = o.get('fusion_score_objective_0_to_5')
+        obj_f = float(obj_f) if obj_f is not None else None
+        comb_f = combine_fusion(prompt_f, obj_f)
+
+        complete = bool(a.get('completeness', not a.get('is_partial', False)))
 
         droplet_rows.append({
             'source_tif': str(source_tif),
             'droplet_id': str(did),
+            'completeness': str(complete),
+            'position_label': str(a.get('position_label', '')),
             'center_x_px': str(a.get('center_x_px', '')),
             'center_y_px': str(a.get('center_y_px', '')),
             'radius_px': str(a.get('radius_px', '')),
@@ -237,24 +329,47 @@ def main() -> None:
             'bbox_x1': str(s.get('bbox_x1', '')),
             'bbox_y1': str(s.get('bbox_y1', '')),
             'segment_png': str(s.get('segment_png', '')),
-            'organoid_count_estimated': str(organoid_count),
-            'fusion_level_0_to_5': str(fusion),
-            'confidence': str(conf),
+            'organoid_count_prompt_estimated': str(q.get('organoid_count_estimated', a.get('initial_organoid_count_estimate', ''))),
+            'organoid_count_visual_complete_droplet': str(org.get('organoid_count_visual', '') if org else ''),
+            'fusion_score_prompt_0_to_5': '' if prompt_f is None else str(prompt_f),
+            'fusion_score_objective_0_to_5': '' if obj_f is None else str(obj_f),
+            'fusion_score_combined_0_to_5': '' if comb_f is None else str(comb_f),
+            'confidence_prompt': str(q.get('confidence', a.get('confidence', ''))),
+            'gray_mean': str(o.get('gray_mean', '')),
+            'gray_std': str(o.get('gray_std', '')),
+            'gradient_mean': str(o.get('gradient_mean', '')),
+            'edge_density_p75': str(o.get('edge_density_p75', '')),
+            'dark_component_count': str(o.get('dark_component_count', '')),
+            'dark_centroid_x_px': str(o.get('dark_centroid_x_px', '')),
+            'dark_centroid_y_px': str(o.get('dark_centroid_y_px', '')),
             'quant_note': q.get('quant_note', a.get('note', '')),
             'updated_at_utc': now,
         })
 
-        for idx in range(1, organoid_count + 1):
-            organoid_rows.append({
-                'source_tif': str(source_tif),
-                'droplet_id': str(did),
-                'organoid_id_in_droplet': str(idx),
-                'position_x_px': '',
-                'position_y_px': '',
-                'size_px': '',
-                'estimation_mode': 'droplet_visual_count_placeholder',
-                'updated_at_utc': now,
-            })
+        # Only build organoid rows for complete droplets with dedicated organoid analysis output.
+        if complete and org:
+            for item in org.get('organoids', []):
+                local_x = float(item.get('center_x_px_local', 0.0))
+                local_y = float(item.get('center_y_px_local', 0.0))
+                sx0 = float(s.get('bbox_x0', 0.0))
+                sy0 = float(s.get('bbox_y0', 0.0))
+                organoid_rows.append({
+                    'source_tif': str(source_tif),
+                    'droplet_id': str(did),
+                    'organoid_id_in_droplet': str(item.get('organoid_id_local', '')),
+                    'position_x_px_local': str(local_x),
+                    'position_y_px_local': str(local_y),
+                    'position_x_px_source': str(local_x + sx0),
+                    'position_y_px_source': str(local_y + sy0),
+                    'radius_px_local': str(item.get('radius_px_local', '')),
+                    'size_class': str(item.get('size_class', '')),
+                    'morphology': str(item.get('morphology', '')),
+                    'fusion_with_neighbors_0_to_5': str(item.get('fusion_with_neighbors_0_to_5', '')),
+                    'confidence': str(item.get('confidence', '')),
+                    'note': str(item.get('note', '')),
+                    'estimation_mode': 'prompt_visual_complete_droplet',
+                    'updated_at_utc': now,
+                })
 
     image_csv = db_root / 'image_database.csv'
     droplet_csv = db_root / 'droplet_database.csv'
@@ -262,13 +377,22 @@ def main() -> None:
 
     image_cols = list(image_row.keys())
     droplet_cols = [
-        'source_tif', 'droplet_id', 'center_x_px', 'center_y_px', 'radius_px', 'is_partial',
+        'source_tif', 'droplet_id', 'completeness', 'position_label',
+        'center_x_px', 'center_y_px', 'radius_px', 'is_partial',
         'bbox_x0', 'bbox_y0', 'bbox_x1', 'bbox_y1', 'segment_png',
-        'organoid_count_estimated', 'fusion_level_0_to_5', 'confidence', 'quant_note', 'updated_at_utc'
+        'organoid_count_prompt_estimated', 'organoid_count_visual_complete_droplet',
+        'fusion_score_prompt_0_to_5', 'fusion_score_objective_0_to_5', 'fusion_score_combined_0_to_5',
+        'confidence_prompt', 'gray_mean', 'gray_std', 'gradient_mean', 'edge_density_p75',
+        'dark_component_count', 'dark_centroid_x_px', 'dark_centroid_y_px',
+        'quant_note', 'updated_at_utc'
     ]
     organoid_cols = [
-        'source_tif', 'droplet_id', 'organoid_id_in_droplet', 'position_x_px',
-        'position_y_px', 'size_px', 'estimation_mode', 'updated_at_utc'
+        'source_tif', 'droplet_id', 'organoid_id_in_droplet',
+        'position_x_px_local', 'position_y_px_local',
+        'position_x_px_source', 'position_y_px_source',
+        'radius_px_local', 'size_class', 'morphology',
+        'fusion_with_neighbors_0_to_5', 'confidence', 'note',
+        'estimation_mode', 'updated_at_utc'
     ]
 
     existing_images = [r for r in read_csv_rows(image_csv) if r.get('source_tif') != str(source_tif)]
