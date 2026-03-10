@@ -8,6 +8,7 @@ from typing import Dict, List, Tuple
 
 import cv2
 import numpy as np
+from PIL import Image
 
 
 def parse_path_metadata(source_tif: Path) -> Dict[str, object]:
@@ -42,19 +43,16 @@ def circle_edge_score(grad: np.ndarray, cx: float, cy: float, r: float, min_visi
     if r < 5:
         return -1.0
     h, w = grad.shape
-    vals = []
-    total = 180
-    inside = 0
-    for k in range(total):
-        theta = (2.0 * math.pi * k) / total
-        x = int(round(cx + r * math.cos(theta)))
-        y = int(round(cy + r * math.sin(theta)))
-        if 0 <= x < w and 0 <= y < h:
-            inside += 1
-            vals.append(float(grad[y, x]))
+    total = 120
+    theta = np.linspace(0.0, 2.0 * math.pi, total, endpoint=False, dtype=np.float32)
+    xs = np.rint(cx + r * np.cos(theta)).astype(np.int32)
+    ys = np.rint(cy + r * np.sin(theta)).astype(np.int32)
+    inside_mask = (xs >= 0) & (xs < w) & (ys >= 0) & (ys < h)
+    inside = int(np.count_nonzero(inside_mask))
     visible = inside / float(total)
-    if visible < min_visible or not vals:
+    if visible < min_visible or inside == 0:
         return -1.0
+    vals = grad[ys[inside_mask], xs[inside_mask]]
     return float(np.mean(vals) * (0.5 + 0.5 * visible))
 
 
@@ -75,7 +73,7 @@ def optimize_circle(grad: np.ndarray, cx: float, cy: float, r: float) -> Tuple[f
 
 
 def visible_fraction(cx: float, cy: float, r: float, width: int, height: int) -> float:
-    n = 20000
+    n = 6000
     rng = np.random.default_rng(0)
     ang = rng.random(n) * 2.0 * math.pi
     rad = np.sqrt(rng.random(n)) * r
@@ -178,7 +176,9 @@ def collect_circle_candidates(gray: np.ndarray, prior_json: Dict, blob: Dict[str
                 break
         if keep:
             deduped.append((cx, cy, r))
-    return deduped
+    target_r = max(ren, re * 1.15)
+    deduped.sort(key=lambda item: (math.hypot(item[0] - bx, item[1] - by), abs(item[2] - target_r)))
+    return deduped[:12]
 
 
 def estimate_shape_class(blob_area: float, droplet_area: float, edge_score: float) -> str:
@@ -190,6 +190,11 @@ def estimate_shape_class(blob_area: float, droplet_area: float, edge_score: floa
     if fill < 0.55:
         return "irregular"
     return "highly_distorted"
+
+
+def load_gray_image(source_png: Path) -> np.ndarray:
+    with Image.open(source_png) as im:
+        return np.array(im.convert("L"))
 
 
 def main() -> None:
@@ -207,9 +212,7 @@ def main() -> None:
     organoid_prior_json = Path(args.organoid_prior_json).resolve()
     out_json = Path(args.out_json).resolve()
 
-    gray = cv2.imread(str(source_png), cv2.IMREAD_GRAYSCALE)
-    if gray is None:
-        raise SystemExit(f"Failed to read image: {source_png}")
+    gray = load_gray_image(source_png)
     h, w = gray.shape[:2]
     gy, gx = np.gradient(gray.astype(np.float32))
     grad = np.sqrt(gx * gx + gy * gy)

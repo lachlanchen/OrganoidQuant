@@ -7,6 +7,7 @@ from typing import Dict, List
 
 import cv2
 import numpy as np
+from PIL import Image
 
 
 def build_circle_mask(width: int, height: int, cx: float, cy: float, radius: float) -> np.ndarray:
@@ -29,6 +30,11 @@ def load_cellpose_stats(prior_json_path: Path) -> List[Dict]:
         return []
 
 
+def load_gray_image(source_png: Path) -> np.ndarray:
+    with Image.open(source_png) as im:
+        return np.array(im.convert("L"))
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="Compute simple single-droplet 10x objective metrics.")
     p.add_argument("--source-png", required=True)
@@ -43,9 +49,7 @@ def main() -> None:
     out_json = Path(args.out_json).resolve()
 
     summary = json.loads(summary_json.read_text(encoding="utf-8"))
-    gray = cv2.imread(str(source_png), cv2.IMREAD_GRAYSCALE)
-    if gray is None:
-        raise SystemExit(f"Failed to read image: {source_png}")
+    gray = load_gray_image(source_png)
 
     h, w = gray.shape[:2]
     cx = float(summary["droplet_center_x_px"])

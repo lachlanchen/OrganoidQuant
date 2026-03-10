@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 from pathlib import Path
 from PIL import Image
 
@@ -29,11 +30,15 @@ def main() -> None:
 
     out = map_output_path(src, deo_root, png_root)
     out.parent.mkdir(parents=True, exist_ok=True)
+    tmp_out = out.with_name(f".{out.stem}.tmp.png")
 
     with Image.open(src) as im:
-        im.save(out)
+        im.save(tmp_out, format='PNG')
+        with Image.open(tmp_out) as verify_im:
+            verify_im.load()
         width, height = im.size
         mode = im.mode
+    os.replace(tmp_out, out)
 
     print(json.dumps({
         'source_tif': str(src),

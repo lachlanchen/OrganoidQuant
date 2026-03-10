@@ -13,19 +13,16 @@ def circle_edge_score(grad: np.ndarray, cx: float, cy: float, r: float, min_visi
     if r < 5:
         return -1.0
     h, w = grad.shape
-    values = []
-    n = 180
-    inside = 0
-    for k in range(n):
-        t = (2.0 * math.pi * k) / n
-        x = int(round(cx + r * math.cos(t)))
-        y = int(round(cy + r * math.sin(t)))
-        if 0 <= x < w and 0 <= y < h:
-            inside += 1
-            values.append(float(grad[y, x]))
+    n = 120
+    t = np.linspace(0.0, 2.0 * math.pi, n, endpoint=False, dtype=np.float32)
+    xs = np.rint(cx + r * np.cos(t)).astype(np.int32)
+    ys = np.rint(cy + r * np.sin(t)).astype(np.int32)
+    inside_mask = (xs >= 0) & (xs < w) & (ys >= 0) & (ys < h)
+    inside = int(np.count_nonzero(inside_mask))
     visible = inside / float(n)
-    if visible < min_visible or not values:
+    if visible < min_visible or inside == 0:
         return -1.0
+    values = grad[ys[inside_mask], xs[inside_mask]]
     return float(np.mean(values) * (0.5 + 0.5 * visible))
 
 

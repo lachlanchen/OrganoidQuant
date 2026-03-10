@@ -32,11 +32,8 @@ mkdir -p "$md_dir" "$db_root"
 
 meta_json="$md_dir/tif_metadata.json"
 summary_json="$md_dir/single_droplet_summary.json"
-summary_refined_json="$md_dir/single_droplet_summary_refined.json"
-summary_refine_report_json="$md_dir/single_droplet_summary_refine_report.json"
 objective_json="$md_dir/single_droplet_objective_metrics.json"
 combined_json="$md_dir/single_droplet_combined_result.json"
-prior_dir="$md_dir/single_droplet_analysis"
 
 echo "[1/5] Convert TIFF -> PNG"
 "$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/00_convert_tif_to_png.py" \
@@ -49,48 +46,22 @@ echo "[2/5] Extract TIFF metadata"
   --src "$source_tif" \
   --out "$meta_json" > /dev/null
 
-echo "[3/5] Prompt tool: single-droplet 10x summary"
-mkdir -p "$prior_dir"
-"$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/00_build_vision_priors.py" \
-  --source-png "$source_png" \
-  --out-json "$prior_dir/vision_prior_droplet.json" \
-  --out-dir "$prior_dir/vision_prior_droplet_artifacts" \
-  --mode droplet \
-  --cellpose-mode off > /dev/null
-"$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/00_build_vision_priors.py" \
-  --source-png "$source_png" \
-  --out-json "$prior_dir/vision_prior_organoid.json" \
-  --out-dir "$prior_dir/vision_prior_organoid_artifacts" \
-  --mode organoid \
-  --cellpose-mode "${DEO_CELLPOSE_MODE:-auto}" > /dev/null
-"$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/06_detect_single_droplet_10x_summary.py" \
+echo "[3/5] Analyze single-droplet 10x image"
+"$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/07_analyze_single_droplet_10x_pure.py" \
   --source-tif "$source_tif" \
   --source-png "$source_png" \
-  --droplet-prior-json "$prior_dir/vision_prior_droplet.json" \
-  --organoid-prior-json "$prior_dir/vision_prior_organoid.json" \
-  --out-json "$summary_json" > /dev/null
-
-echo "[4/5] Refine circle + objective metrics + combined quantification"
-"$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/06_refine_single_droplet_circle.py" \
   --summary-json "$summary_json" \
-  --source-png "$source_png" \
-  --out-json "$summary_refined_json" \
-  --report-json "$summary_refine_report_json" > /dev/null
-"$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/06_compute_single_droplet_10x_metrics.py" \
-  --source-png "$source_png" \
-  --summary-json "$summary_refined_json" \
-  --organoid-prior-json "$prior_dir/vision_prior_organoid.json" \
-  --out-json "$objective_json" > /dev/null
-"$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/06_combine_single_droplet_10x_quantification.py" \
-  --summary-json "$summary_refined_json" \
   --objective-json "$objective_json" \
-  --out-json "$combined_json" > /dev/null
+  --combined-json "$combined_json" > /dev/null
+
+echo "[4/5] Prepare structured quantification outputs"
+:
 
 echo "[5/5] Update markdown + simple results CSV"
 "$py_bin" "$repo_root/prompt-tools/deo-codex/scripts/06_update_single_droplet_10x_results.py" \
   --source-tif "$source_tif" \
   --source-png "$source_png" \
-  --summary-json "$summary_refined_json" \
+  --summary-json "$summary_json" \
   --objective-json "$objective_json" \
   --combined-json "$combined_json" \
   --tif-meta-json "$meta_json" \

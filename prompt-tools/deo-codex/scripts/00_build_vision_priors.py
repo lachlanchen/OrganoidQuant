@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Tuple
 
 import cv2
 import numpy as np
+from PIL import Image
 
 
 def parse_args() -> argparse.Namespace:
@@ -39,6 +40,12 @@ def normalize_u8(arr: np.ndarray) -> np.ndarray:
         return np.zeros_like(arr, dtype=np.uint8)
     out = (arr - lo) * (255.0 / (hi - lo))
     return np.clip(out, 0, 255).astype(np.uint8)
+
+
+def load_bgr_image(source_png: Path) -> np.ndarray:
+    with Image.open(source_png) as im:
+        rgb = np.array(im.convert("RGB"))
+    return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
 
 
 def compute_gradient_and_edges(gray: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -322,9 +329,7 @@ def main() -> None:
     out_dir = Path(args.out_dir).resolve() if args.out_dir else out_json.parent / "vision-priors"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    bgr = cv2.imread(str(source_png), cv2.IMREAD_COLOR)
-    if bgr is None:
-        raise SystemExit(f"Failed to read image: {source_png}")
+    bgr = load_bgr_image(source_png)
     gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
     h, w = gray.shape[:2]
     magnification = infer_magnification_token(source_png)
