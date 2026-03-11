@@ -1,0 +1,20 @@
+{
+  "code": 0,
+  "data": {
+    "callback_url": "-1",
+    "end_time": 1773235380,
+    "error": "",
+    "failure_reason": "",
+    "id": "12-ac052e02-ae90-42c8-b39e-8258bc2a4a1e",
+    "progress": 100,
+    "results": [
+      {
+        "content": "",
+        "url": "https://file4.aitohumanize.com/file/6ef43992231f4c78a2a2f788a8cbb427.png"
+      }
+    ],
+    "start_time": 1773235312,
+    "status": "succeeded"
+  },
+  "msg": "success"
+}

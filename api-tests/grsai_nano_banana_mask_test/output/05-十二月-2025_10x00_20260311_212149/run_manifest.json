@@ -1,0 +1,15 @@
+{
+  "input_tif": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif",
+  "input_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_test/output/05-十二月-2025_10x00_20260311_212149/10x00.png",
+  "request_image": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_test/output/05-十二月-2025_10x00_20260311_212149/10x00_request.jpg",
+  "prompt_file": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_test/output/05-十二月-2025_10x00_20260311_212149/prompt.txt",
+  "host": "https://grsaiapi.com",
+  "model": "nano-banana-pro",
+  "reference_format": "jpeg",
+  "jpeg_quality": 88,
+  "resize_max_dim": 1024,
+  "task_id": "12-ac052e02-ae90-42c8-b39e-8258bc2a4a1e",
+  "generated_mask": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_test/output/05-十二月-2025_10x00_20260311_212149/generated_mask.png",
+  "result_url": "https://file4.aitohumanize.com/file/6ef43992231f4c78a2a2f788a8cbb427.png",
+  "run_dir": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_test/output/05-十二月-2025_10x00_20260311_212149"
+}
