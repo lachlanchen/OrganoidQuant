@@ -1,0 +1,22 @@
+{
+  "input_tif": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif",
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/10x00.png",
+  "prepared_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/prepared_for_cellpose.png",
+  "droplet_mask_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/droplet_mask.png",
+  "droplet_circle": {
+    "center_x_px": 1369,
+    "center_y_px": 1089,
+    "radius_px": 659
+  },
+  "model_type": "cyto3",
+  "diameter": 32.0,
+  "cellprob_threshold": -1.5,
+  "flow_threshold": 0.4,
+  "raw_mask_count": 32,
+  "filtered_mask_count": 31,
+  "raw_label_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/cellpose_labels_raw_16bit.png",
+  "filtered_label_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/cellpose_labels_filtered_16bit.png",
+  "instance_rgb_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/cellpose_instance_rgb.png",
+  "overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/cellpose_overlay.png",
+  "mask_stats_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/cellpose_organoid_segmentation_test/output/05-十二月-2025_10x00_20260311_214045/cellpose_mask_stats.json"
+}
