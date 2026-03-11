@@ -1,0 +1,50 @@
+[
+  {
+    "mask_id": 1,
+    "source_mask_id": 1,
+    "area_px": 415455,
+    "center_x_px": 1567.42,
+    "center_y_px": 604.6,
+    "bbox_x0": 1200,
+    "bbox_y0": 207,
+    "bbox_x1": 1950,
+    "bbox_y1": 1070,
+    "equiv_radius_px": 363.65
+  },
+  {
+    "mask_id": 2,
+    "source_mask_id": 2,
+    "area_px": 51335,
+    "center_x_px": 1901.88,
+    "center_y_px": 1277.2,
+    "bbox_x0": 1707,
+    "bbox_y0": 1178,
+    "bbox_x1": 2078,
+    "bbox_y1": 1392,
+    "equiv_radius_px": 127.83
+  },
+  {
+    "mask_id": 3,
+    "source_mask_id": 3,
+    "area_px": 49176,
+    "center_x_px": 1889.39,
+    "center_y_px": 1470.42,
+    "bbox_x0": 1737,
+    "bbox_y0": 1358,
+    "bbox_x1": 2052,
+    "bbox_y1": 1595,
+    "equiv_radius_px": 125.11
+  },
+  {
+    "mask_id": 4,
+    "source_mask_id": 4,
+    "area_px": 52028,
+    "center_x_px": 1932.96,
+    "center_y_px": 1653.48,
+    "bbox_x0": 1782,
+    "bbox_y0": 1523,
+    "bbox_x1": 2085,
+    "bbox_y1": 1778,
+    "equiv_radius_px": 128.69
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "input_tif": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif",
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/10x00.png",
+  "small_branch_run_dir": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/branch_cellpose_small/05-十二月-2025_10x00_20260311_220632",
+  "large_branch_run_dir": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/branch_cellpose_large/05-十二月-2025_10x00_20260311_220644",
+  "small_branch_manifest": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/branch_cellpose_small/05-十二月-2025_10x00_20260311_220632/run_manifest.json",
+  "large_branch_manifest": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/branch_cellpose_large/05-十二月-2025_10x00_20260311_220644/run_manifest.json",
+  "multiscale_outputs": {
+    "label_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/multiscale_combined_labels_16bit.png",
+    "rgb_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/multiscale_combined_instance_rgb.png",
+    "overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/multiscale_combined_overlay.png",
+    "stats_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/multiscale_combined_stats.json"
+  },
+  "hybrid_outputs": {
+    "label_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_combined_labels_16bit.png",
+    "rgb_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_combined_instance_rgb.png",
+    "overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_combined_overlay.png",
+    "stats_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_combined_stats.json"
+  },
+  "hybrid_large_detector_overlay": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_large_detector_overlay.png",
+  "hybrid_large_detector_label_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_large_detector_labels_16bit.png",
+  "hybrid_large_detector_rgb_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_large_detector_rgb.png",
+  "hybrid_large_detector_debug": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/hybrid_large_detector_debug.json",
+  "comparison_panel_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_multiscale_hybrid_segmentation_test/output/05-十二月-2025_10x00_20260311_220631/comparison_panel.png",
+  "small_branch_mask_count": 55,
+  "large_branch_mask_count": 4,
+  "hybrid_large_detector_count": 5,
+  "multiscale_combined_count": 45,
+  "hybrid_combined_count": 52
+}

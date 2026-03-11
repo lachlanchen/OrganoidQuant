@@ -1,0 +1,63 @@
+{
+  "threshold_percentile_value": 108.0,
+  "central_radius_fraction": 0.41,
+  "min_area_px": 15000,
+  "region_count": 5,
+  "regions": [
+    {
+      "mask_id": 1,
+      "source_mask_id": 1,
+      "area_px": 277629,
+      "center_x_px": 1410.35,
+      "center_y_px": 677.16,
+      "bbox_x0": 1013,
+      "bbox_y0": 234,
+      "bbox_x1": 1890,
+      "bbox_y1": 1029
+    },
+    {
+      "mask_id": 2,
+      "source_mask_id": 56,
+      "area_px": 36726,
+      "center_x_px": 1923.2,
+      "center_y_px": 819.92,
+      "bbox_x0": 1759,
+      "bbox_y0": 637,
+      "bbox_x1": 2076,
+      "bbox_y1": 962
+    },
+    {
+      "mask_id": 3,
+      "source_mask_id": 97,
+      "area_px": 16144,
+      "center_x_px": 882.2,
+      "center_y_px": 922.52,
+      "bbox_x0": 769,
+      "bbox_y0": 841,
+      "bbox_x1": 975,
+      "bbox_y1": 1004
+    },
+    {
+      "mask_id": 4,
+      "source_mask_id": 129,
+      "area_px": 34918,
+      "center_x_px": 1874.81,
+      "center_y_px": 1163.98,
+      "bbox_x0": 1758,
+      "bbox_y0": 1002,
+      "bbox_x1": 1998,
+      "bbox_y1": 1375
+    },
+    {
+      "mask_id": 5,
+      "source_mask_id": 144,
+      "area_px": 238567,
+      "center_x_px": 1471.37,
+      "center_y_px": 1439.1,
+      "bbox_x0": 1084,
+      "bbox_y0": 1047,
+      "bbox_x1": 2006,
+      "bbox_y1": 1850
+    }
+  ]
+}
