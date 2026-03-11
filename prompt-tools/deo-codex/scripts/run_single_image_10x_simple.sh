@@ -5,6 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 py_bin="${DEO_PYTHON:-/home/lachlan/miniconda3/envs/organoid/bin/python}"
 
 source_tif="${1:-$repo_root/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif}"
+source_tif="$(realpath "$source_tif")"
 
 deo_root="$repo_root/DEO"
 png_root="$repo_root/DEO-PNG"
@@ -17,7 +18,7 @@ if [[ ! -f "$source_tif" ]]; then
 fi
 
 file_base="$(basename "$source_tif" .tif)"
-if [[ ! "$file_base" =~ ^10[xX] ]]; then
+if [[ ! "$file_base" =~ 10[xX][0-9]+$ ]]; then
   echo "This simple runner is 10x-only. Got: $file_base"
   exit 1
 fi

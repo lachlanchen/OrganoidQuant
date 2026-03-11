@@ -1,0 +1,8 @@
+{
+  "organoid_count_visual": 12,
+  "organoid_count_cellpose_inside": 0,
+  "organoid_count_combined": 12,
+  "fusion_score_visual_0_to_5": 3.2907,
+  "fusion_score_objective_0_to_5": 2.7815,
+  "fusion_score_combined_0_to_5": 3.0361
+}

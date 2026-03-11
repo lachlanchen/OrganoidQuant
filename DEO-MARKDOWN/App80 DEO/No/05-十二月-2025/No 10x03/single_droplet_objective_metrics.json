@@ -1,0 +1,19 @@
+{
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/DEO-PNG/App80 DEO/No/05-十二月-2025/No 10x03.png",
+  "droplet_area_px": 2224037.26,
+  "droplet_circumference_px": 5286.59,
+  "gray_mean_inside": 114.5816,
+  "gray_std_inside": 32.5108,
+  "gradient_mean_inside": 1.7987,
+  "edge_density_inside_0_to_1": 0.256435,
+  "dark_area_fraction_inside_0_to_1": 0.307471,
+  "dark_component_count_inside": 17,
+  "dark_component_largest_area_px": 370348,
+  "cellpose_mask_count_inside": 0,
+  "cellpose_total_area_inside_px": 0,
+  "cellpose_mean_area_inside_px": 0.0,
+  "cellpose_largest_area_inside_px": 0,
+  "component_mean_area_inside_px": 37601.3529,
+  "component_total_area_inside_px": 639223.0,
+  "fusion_score_objective_0_to_5": 2.7709
+}

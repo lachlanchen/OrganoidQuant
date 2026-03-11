@@ -65,7 +65,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def natural_sample_key(path: Path) -> Tuple[int, str]:
-    m = re.search(r"(?i)^10x(\d+)$", path.stem)
+    m = re.search(r"(?i)10x(\d+)$", path.stem)
     sample_idx = int(m.group(1)) if m else 10**9
     return (sample_idx, path.stem.lower())
 
@@ -125,7 +125,7 @@ def build_selected_subset(app80_root: Path, results_csv: Path) -> Tuple[pd.DataF
                 [
                     p.resolve()
                     for p in date_dir.iterdir()
-                    if p.is_file() and p.suffix.lower() == ".tif" and re.match(r"(?i)^10x", p.stem)
+                    if p.is_file() and p.suffix.lower() == ".tif" and re.search(r"(?i)10x\d+$", p.stem)
                 ],
                 key=natural_sample_key,
             )

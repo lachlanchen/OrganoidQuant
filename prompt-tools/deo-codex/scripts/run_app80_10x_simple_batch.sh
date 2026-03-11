@@ -16,7 +16,7 @@ mkdir -p "$log_dir"
 ts="$(date +%Y%m%d_%H%M%S)"
 log_file="$log_dir/app80_10x_simple_batch_${ts}.log"
 
-mapfile -d '' raw_tifs < <(find "$app80_root" -type f \( -iname '10x*.tif' -o -iname '10X*.tif' \) -print0 | sort -z)
+mapfile -d '' raw_tifs < <(find "$app80_root" -type f -iname '*10x*.tif' -print0 | sort -z)
 if [[ "${#raw_tifs[@]}" -eq 0 ]]; then
   echo "No 10x TIFF files found under: $app80_root"
   exit 1

@@ -8,7 +8,7 @@ from typing import Dict, List, Set
 
 
 def is_10x_tif(path: Path) -> bool:
-    return path.is_file() and path.suffix.lower() == ".tif" and re.match(r"(?i)^10x", path.stem) is not None
+    return path.is_file() and path.suffix.lower() == ".tif" and re.search(r"(?i)10x\d+$", path.stem) is not None
 
 
 def load_completed_from_csv(csv_path: Path) -> Set[Path]:
