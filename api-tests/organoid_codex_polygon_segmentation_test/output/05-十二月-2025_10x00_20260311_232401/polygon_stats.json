@@ -1,0 +1,92 @@
+[
+  {
+    "mask_id": 1,
+    "organoid_id": "organoid_01",
+    "morphology": "fused_mass",
+    "confidence_0_to_1": 0.92,
+    "area_px": 297676,
+    "center_x_px": 1421.62,
+    "center_y_px": 751.01,
+    "note": "Dominant central dark fused mass."
+  },
+  {
+    "mask_id": 2,
+    "organoid_id": "organoid_02",
+    "morphology": "irregular_organoid",
+    "confidence_0_to_1": 0.8,
+    "area_px": 109756,
+    "center_x_px": 1531.86,
+    "center_y_px": 361.82,
+    "note": "Lobulated cluster above the central mass."
+  },
+  {
+    "mask_id": 3,
+    "organoid_id": "organoid_03",
+    "morphology": "irregular_organoid",
+    "confidence_0_to_1": 0.83,
+    "area_px": 79001,
+    "center_x_px": 2029.99,
+    "center_y_px": 644.93,
+    "note": "Distinct upper-right lobulated organoid cluster."
+  },
+  {
+    "mask_id": 4,
+    "organoid_id": "organoid_04",
+    "morphology": "fused_mass",
+    "confidence_0_to_1": 0.86,
+    "area_px": 97966,
+    "center_x_px": 1969.53,
+    "center_y_px": 1060.54,
+    "note": "Large textured mid-right mass."
+  },
+  {
+    "mask_id": 5,
+    "organoid_id": "organoid_05",
+    "morphology": "fused_mass",
+    "confidence_0_to_1": 0.9,
+    "area_px": 281016,
+    "center_x_px": 1464.64,
+    "center_y_px": 1507.98,
+    "note": "Elongated dense lower fused mass."
+  },
+  {
+    "mask_id": 6,
+    "organoid_id": "organoid_06",
+    "morphology": "round_organoid",
+    "confidence_0_to_1": 0.82,
+    "area_px": 21361,
+    "center_x_px": 865.88,
+    "center_y_px": 925.07,
+    "note": "Distinct medium round/oval organoid left of center."
+  },
+  {
+    "mask_id": 7,
+    "organoid_id": "organoid_07",
+    "morphology": "round_organoid",
+    "confidence_0_to_1": 0.78,
+    "area_px": 20576,
+    "center_x_px": 1135.74,
+    "center_y_px": 1118.69,
+    "note": "Central medium round organoid."
+  },
+  {
+    "mask_id": 8,
+    "organoid_id": "organoid_08",
+    "morphology": "round_organoid",
+    "confidence_0_to_1": 0.8,
+    "area_px": 31546,
+    "center_x_px": 1915.1,
+    "center_y_px": 1498.13,
+    "note": "Distinct lower-right round organoid."
+  },
+  {
+    "mask_id": 9,
+    "organoid_id": "organoid_09",
+    "morphology": "round_organoid",
+    "confidence_0_to_1": 0.72,
+    "area_px": 25851,
+    "center_x_px": 1897.98,
+    "center_y_px": 1300.56,
+    "note": "Mid-lower right round organoid between larger right-side masses."
+  }
+]

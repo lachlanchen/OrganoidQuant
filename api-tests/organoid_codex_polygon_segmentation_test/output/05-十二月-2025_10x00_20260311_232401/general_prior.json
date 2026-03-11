@@ -1,0 +1,316 @@
+{
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260311_232401/10x00.png",
+  "image_width_px": 2880,
+  "image_height_px": 2048,
+  "blob_candidates": [
+    {
+      "center_x_px": 1505.56,
+      "center_y_px": 687.73,
+      "area_px": 381515,
+      "bbox_x0": 1006,
+      "bbox_y0": 232,
+      "bbox_x1": 2151,
+      "bbox_y1": 1033
+    },
+    {
+      "center_x_px": 1472.23,
+      "center_y_px": 1455.39,
+      "area_px": 302519,
+      "bbox_x0": 972,
+      "bbox_y0": 1021,
+      "bbox_x1": 2017,
+      "bbox_y1": 1879
+    },
+    {
+      "center_x_px": 1117.27,
+      "center_y_px": 158.05,
+      "area_px": 265605,
+      "bbox_x0": 376,
+      "bbox_y0": 0,
+      "bbox_x1": 2029,
+      "bbox_y1": 849
+    },
+    {
+      "center_x_px": 2232.99,
+      "center_y_px": 229.28,
+      "area_px": 98683,
+      "bbox_x0": 1905,
+      "bbox_y0": 0,
+      "bbox_x1": 2515,
+      "bbox_y1": 486
+    },
+    {
+      "center_x_px": 2660.66,
+      "center_y_px": 587.93,
+      "area_px": 86420,
+      "bbox_x0": 2403,
+      "bbox_y0": 339,
+      "bbox_x1": 2880,
+      "bbox_y1": 790
+    },
+    {
+      "center_x_px": 1942.38,
+      "center_y_px": 1122.3,
+      "area_px": 71411,
+      "bbox_x0": 1744,
+      "bbox_y0": 874,
+      "bbox_x1": 2159,
+      "bbox_y1": 1379
+    },
+    {
+      "center_x_px": 137.36,
+      "center_y_px": 116.91,
+      "area_px": 23507,
+      "bbox_x0": 0,
+      "bbox_y0": 0,
+      "bbox_x1": 286,
+      "bbox_y1": 226
+    },
+    {
+      "center_x_px": 2084.35,
+      "center_y_px": 1430.51,
+      "area_px": 21366,
+      "bbox_x0": 1431,
+      "bbox_y0": 654,
+      "bbox_x1": 2342,
+      "bbox_y1": 1995
+    },
+    {
+      "center_x_px": 498.45,
+      "center_y_px": 1341.28,
+      "area_px": 18827,
+      "bbox_x0": 380,
+      "bbox_y0": 1056,
+      "bbox_x1": 778,
+      "bbox_y1": 1776
+    },
+    {
+      "center_x_px": 880.94,
+      "center_y_px": 921.83,
+      "area_px": 17907,
+      "bbox_x0": 768,
+      "bbox_y0": 835,
+      "bbox_x1": 984,
+      "bbox_y1": 1006
+    },
+    {
+      "center_x_px": 72.55,
+      "center_y_px": 1952.36,
+      "area_px": 15036,
+      "bbox_x0": 0,
+      "bbox_y0": 1875,
+      "bbox_x1": 204,
+      "bbox_y1": 2048
+    },
+    {
+      "center_x_px": 672.99,
+      "center_y_px": 1156.44,
+      "area_px": 12329,
+      "bbox_x0": 538,
+      "bbox_y0": 1075,
+      "bbox_x1": 783,
+      "bbox_y1": 1224
+    },
+    {
+      "center_x_px": 64.12,
+      "center_y_px": 316.12,
+      "area_px": 12255,
+      "bbox_x0": 0,
+      "bbox_y0": 237,
+      "bbox_x1": 180,
+      "bbox_y1": 404
+    },
+    {
+      "center_x_px": 151.75,
+      "center_y_px": 610.32,
+      "area_px": 10834,
+      "bbox_x0": 80,
+      "bbox_y0": 526,
+      "bbox_x1": 238,
+      "bbox_y1": 712
+    },
+    {
+      "center_x_px": 925.03,
+      "center_y_px": 1700.79,
+      "area_px": 10805,
+      "bbox_x0": 848,
+      "bbox_y0": 1617,
+      "bbox_x1": 1017,
+      "bbox_y1": 1768
+    },
+    {
+      "center_x_px": 733.05,
+      "center_y_px": 1322.15,
+      "area_px": 10324,
+      "bbox_x0": 614,
+      "bbox_y0": 1241,
+      "bbox_x1": 819,
+      "bbox_y1": 1397
+    },
+    {
+      "center_x_px": 835.94,
+      "center_y_px": 649.1,
+      "area_px": 9493,
+      "bbox_x0": 739,
+      "bbox_y0": 560,
+      "bbox_x1": 962,
+      "bbox_y1": 710
+    },
+    {
+      "center_x_px": 883.33,
+      "center_y_px": 1273.17,
+      "area_px": 9364,
+      "bbox_x0": 797,
+      "bbox_y0": 1212,
+      "bbox_x1": 956,
+      "bbox_y1": 1338
+    },
+    {
+      "center_x_px": 884.27,
+      "center_y_px": 1124.14,
+      "area_px": 7973,
+      "bbox_x0": 782,
+      "bbox_y0": 1041,
+      "bbox_x1": 965,
+      "bbox_y1": 1192
+    },
+    {
+      "center_x_px": 359.76,
+      "center_y_px": 184.12,
+      "area_px": 6984,
+      "bbox_x0": 289,
+      "bbox_y0": 121,
+      "bbox_x1": 415,
+      "bbox_y1": 263
+    }
+  ],
+  "large_mass_candidates": [
+    {
+      "mass_id": 4,
+      "center_x_px": 1516.41,
+      "center_y_px": 1050.46,
+      "area_px": 894068,
+      "bbox_x0": 789,
+      "bbox_y0": 217,
+      "bbox_x1": 2211,
+      "bbox_y1": 1879
+    },
+    {
+      "mass_id": 11,
+      "center_x_px": 849.41,
+      "center_y_px": 968.26,
+      "area_px": 41989,
+      "bbox_x0": 669,
+      "bbox_y0": 713,
+      "bbox_x1": 988,
+      "bbox_y1": 1192
+    },
+    {
+      "mass_id": 17,
+      "center_x_px": 832.41,
+      "center_y_px": 1271.24,
+      "area_px": 28873,
+      "bbox_x0": 608,
+      "bbox_y0": 1135,
+      "bbox_x1": 1084,
+      "bbox_y1": 1397
+    },
+    {
+      "mass_id": 16,
+      "center_x_px": 679.4,
+      "center_y_px": 1153.56,
+      "area_px": 12976,
+      "bbox_x0": 585,
+      "bbox_y0": 1063,
+      "bbox_x1": 782,
+      "bbox_y1": 1224
+    },
+    {
+      "mass_id": 23,
+      "center_x_px": 860.66,
+      "center_y_px": 1439.55,
+      "area_px": 11963,
+      "bbox_x0": 690,
+      "bbox_y0": 1372,
+      "bbox_x1": 1046,
+      "bbox_y1": 1507
+    },
+    {
+      "mass_id": 9,
+      "center_x_px": 836.09,
+      "center_y_px": 653.62,
+      "area_px": 11249,
+      "bbox_x0": 671,
+      "bbox_y0": 583,
+      "bbox_x1": 964,
+      "bbox_y1": 709
+    },
+    {
+      "mass_id": 1,
+      "center_x_px": 1809.63,
+      "center_y_px": 316.13,
+      "area_px": 11189,
+      "bbox_x0": 1388,
+      "bbox_y0": 165,
+      "bbox_x1": 2138,
+      "bbox_y1": 585
+    },
+    {
+      "mass_id": 24,
+      "center_x_px": 2113.47,
+      "center_y_px": 1453.4,
+      "area_px": 8992,
+      "bbox_x0": 2028,
+      "bbox_y0": 1378,
+      "bbox_x1": 2208,
+      "bbox_y1": 1544
+    },
+    {
+      "mass_id": 5,
+      "center_x_px": 1100.42,
+      "center_y_px": 421.12,
+      "area_px": 5934,
+      "bbox_x0": 1018,
+      "bbox_y0": 364,
+      "bbox_x1": 1179,
+      "bbox_y1": 483
+    },
+    {
+      "mass_id": 2,
+      "center_x_px": 1554.14,
+      "center_y_px": 241.08,
+      "area_px": 5330,
+      "bbox_x0": 1456,
+      "bbox_y0": 205,
+      "bbox_x1": 1633,
+      "bbox_y1": 296
+    },
+    {
+      "mass_id": 13,
+      "center_x_px": 991.65,
+      "center_y_px": 1026.66,
+      "area_px": 5080,
+      "bbox_x0": 926,
+      "bbox_y0": 945,
+      "bbox_x1": 1053,
+      "bbox_y1": 1078
+    },
+    {
+      "mass_id": 3,
+      "center_x_px": 1180.95,
+      "center_y_px": 260.53,
+      "area_px": 4771,
+      "bbox_x0": 1103,
+      "bbox_y0": 210,
+      "bbox_x1": 1230,
+      "bbox_y1": 330
+    }
+  ],
+  "artifacts": {
+    "gradient_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260311_232401/general_prior_artifacts/gradient.png",
+    "edge_overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260311_232401/general_prior_artifacts/edge_overlay.png",
+    "blob_overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260311_232401/general_prior_artifacts/blob_overlay.png",
+    "mass_overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260311_232401/general_prior_artifacts/mass_overlay.png",
+    "cellpose_overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260311_232401/cellpose_prior/05-十二月-2025_10x00_20260311_232403/cellpose_overlay.png"
+  }
+}

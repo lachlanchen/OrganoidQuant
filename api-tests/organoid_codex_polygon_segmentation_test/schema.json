@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Organoid Polygon Segmentation",
+  "type": "object",
+  "required": [
+    "source_tif",
+    "source_png",
+    "image_width_px",
+    "image_height_px",
+    "magnification_token",
+    "segmentation_note",
+    "organoids"
+  ],
+  "properties": {
+    "source_tif": { "type": "string" },
+    "source_png": { "type": "string" },
+    "image_width_px": { "type": "integer", "minimum": 1 },
+    "image_height_px": { "type": "integer", "minimum": 1 },
+    "magnification_token": { "type": "string" },
+    "segmentation_note": { "type": "string" },
+    "organoids": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "organoid_id",
+          "morphology",
+          "confidence_0_to_1",
+          "polygon_xy",
+          "note"
+        ],
+        "properties": {
+          "organoid_id": { "type": "string" },
+          "morphology": {
+            "type": "string",
+            "enum": ["fused_mass", "round_organoid", "irregular_organoid", "uncertain"]
+          },
+          "confidence_0_to_1": { "type": "number", "minimum": 0, "maximum": 1 },
+          "polygon_xy": {
+            "type": "array",
+            "minItems": 3,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": { "type": "number" }
+            }
+          },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
