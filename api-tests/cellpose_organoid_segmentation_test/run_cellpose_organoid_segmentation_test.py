@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import colorsys
 import json
-import math
 import re
 from datetime import datetime
 from pathlib import Path
@@ -28,6 +27,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--flow-threshold", type=float, default=0.4)
     p.add_argument("--min-area-px", type=int, default=60)
     p.add_argument("--max-area-fraction", type=float, default=0.18)
+    p.add_argument("--resize-max-dim", type=int, default=1536)
     return p.parse_args()
 
 
@@ -50,46 +50,28 @@ def load_rgb(path: Path) -> np.ndarray:
         return np.array(im.convert("RGB"))
 
 
-def detect_droplet(gray: np.ndarray) -> Tuple[int, int, int]:
-    blur = cv2.GaussianBlur(gray, (9, 9), 0)
-    circles = cv2.HoughCircles(
-        blur,
-        cv2.HOUGH_GRADIENT,
-        dp=1.2,
-        minDist=min(gray.shape[:2]) // 2,
-        param1=80,
-        param2=30,
-        minRadius=min(gray.shape[:2]) // 5,
-        maxRadius=min(gray.shape[:2]) // 2,
-    )
-    h, w = gray.shape[:2]
-    if circles is None:
-        return w // 2, h // 2, int(min(h, w) * 0.38)
-    cx0, cy0 = w / 2.0, h / 2.0
-    best = min(np.round(circles[0]).astype(int), key=lambda c: (c[0] - cx0) ** 2 + (c[1] - cy0) ** 2)
-    return int(best[0]), int(best[1]), int(best[2])
-
-
-def make_circle_mask(shape: Tuple[int, int], cx: int, cy: int, r: int) -> np.ndarray:
-    yy, xx = np.ogrid[:shape[0], :shape[1]]
-    return ((xx - cx) ** 2 + (yy - cy) ** 2) <= r ** 2
-
-
-def preprocess_for_cellpose(rgb: np.ndarray, droplet_mask: np.ndarray) -> np.ndarray:
+def preprocess_for_cellpose(rgb: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(gray)
     enhanced = cv2.GaussianBlur(enhanced, (3, 3), 0)
     rgb_enhanced = cv2.cvtColor(enhanced, cv2.COLOR_GRAY2RGB)
-    outside = ~droplet_mask
-    bg = int(np.median(enhanced[outside])) if np.any(outside) else int(np.median(enhanced))
-    rgb_enhanced[outside] = bg
     return rgb_enhanced
+
+
+def resize_if_needed(rgb: np.ndarray, max_dim: int) -> Tuple[np.ndarray, float]:
+    h, w = rgb.shape[:2]
+    cur_max = max(h, w)
+    if max_dim <= 0 or cur_max <= max_dim:
+        return rgb, 1.0
+    scale = max_dim / float(cur_max)
+    new_size = (max(1, int(w * scale)), max(1, int(h * scale)))
+    resized = cv2.resize(rgb, new_size, interpolation=cv2.INTER_AREA)
+    return resized, scale
 
 
 def filter_masks(
     masks: np.ndarray,
-    droplet_mask: np.ndarray,
     min_area_px: int,
     max_area_fraction: float,
 ) -> Tuple[np.ndarray, List[Dict[str, Any]]]:
@@ -106,9 +88,6 @@ def filter_masks(
             continue
         ys, xs = np.where(m)
         if xs.size == 0:
-            continue
-        overlap_in = int(np.count_nonzero(m & droplet_mask))
-        if overlap_in < 0.55 * area:
             continue
         cx = float(np.mean(xs))
         cy = float(np.mean(ys))
@@ -127,8 +106,7 @@ def filter_masks(
                 "bbox_y0": y0,
                 "bbox_x1": x1,
                 "bbox_y1": y1,
-                "equiv_radius_px": round(math.sqrt(area / math.pi), 2),
-                "droplet_overlap_fraction": round(overlap_in / float(area), 4),
+                "equiv_radius_px": round(float(np.sqrt(area / np.pi)), 2),
             }
         )
     return kept, stats
@@ -162,6 +140,46 @@ def render_overlay(source_rgb: np.ndarray, masks: np.ndarray) -> np.ndarray:
     return overlay
 
 
+def normalize_to_u8(arr: np.ndarray) -> np.ndarray:
+    arr = arr.astype(np.float32)
+    lo = float(np.min(arr))
+    hi = float(np.max(arr))
+    if hi <= lo:
+        return np.zeros(arr.shape, dtype=np.uint8)
+    out = (arr - lo) * (255.0 / (hi - lo))
+    return np.clip(out, 0, 255).astype(np.uint8)
+
+
+def save_cellpose_intermediates(run_dir: Path, flows: List[Any]) -> Dict[str, str]:
+    artifacts: Dict[str, str] = {}
+    if len(flows) >= 1 and isinstance(flows[0], np.ndarray):
+        flow_rgb_png = run_dir / "cellpose_flow_rgb.png"
+        Image.fromarray(flows[0]).save(flow_rgb_png)
+        artifacts["flow_rgb_png"] = str(flow_rgb_png)
+
+    if len(flows) >= 2 and isinstance(flows[1], np.ndarray) and flows[1].ndim == 3 and flows[1].shape[0] == 2:
+        flow_y = flows[1][0]
+        flow_x = flows[1][1]
+        flow_mag = np.sqrt(flow_x ** 2 + flow_y ** 2)
+        flow_x_png = run_dir / "cellpose_flow_x.png"
+        flow_y_png = run_dir / "cellpose_flow_y.png"
+        flow_mag_png = run_dir / "cellpose_flow_magnitude.png"
+        cv2.imwrite(str(flow_x_png), cv2.applyColorMap(normalize_to_u8(flow_x), cv2.COLORMAP_TURBO))
+        cv2.imwrite(str(flow_y_png), cv2.applyColorMap(normalize_to_u8(flow_y), cv2.COLORMAP_TURBO))
+        cv2.imwrite(str(flow_mag_png), cv2.applyColorMap(normalize_to_u8(flow_mag), cv2.COLORMAP_VIRIDIS))
+        artifacts["flow_x_png"] = str(flow_x_png)
+        artifacts["flow_y_png"] = str(flow_y_png)
+        artifacts["flow_magnitude_png"] = str(flow_mag_png)
+
+    if len(flows) >= 3 and isinstance(flows[2], np.ndarray):
+        cellprob = flows[2]
+        cellprob_png = run_dir / "cellpose_cellprob_heatmap.png"
+        cv2.imwrite(str(cellprob_png), cv2.applyColorMap(normalize_to_u8(cellprob), cv2.COLORMAP_INFERNO))
+        artifacts["cellprob_png"] = str(cellprob_png)
+
+    return artifacts
+
+
 def main() -> int:
     args = parse_args()
     input_tif = Path(args.input_tif).resolve()
@@ -173,32 +191,33 @@ def main() -> int:
     source_png = run_dir / f"{input_tif.stem}.png"
     save_png_from_tif(input_tif, source_png)
     source_rgb = load_rgb(source_png)
-    gray = cv2.cvtColor(source_rgb, cv2.COLOR_RGB2GRAY)
-
-    cx, cy, r = detect_droplet(gray)
-    droplet_mask = make_circle_mask(gray.shape, cx, cy, r)
-    droplet_mask_png = run_dir / "droplet_mask.png"
-    Image.fromarray((droplet_mask.astype(np.uint8) * 255)).save(droplet_mask_png)
-
-    prepared_rgb = preprocess_for_cellpose(source_rgb, droplet_mask)
+    working_rgb, working_scale = resize_if_needed(source_rgb, args.resize_max_dim)
+    prepared_rgb = preprocess_for_cellpose(working_rgb)
     prepared_png = run_dir / "prepared_for_cellpose.png"
     Image.fromarray(prepared_rgb).save(prepared_png)
 
     from cellpose import models  # type: ignore
 
     model = models.Cellpose(model_type=args.model_type, gpu=False)
-    masks, flows, styles, diams = model.eval(
+    masks_working, flows, styles, diams = model.eval(
         prepared_rgb,
         channels=[0, 0],
         diameter=args.diameter,
         cellprob_threshold=args.cellprob_threshold,
         flow_threshold=args.flow_threshold,
     )
+    if working_scale != 1.0:
+        masks = cv2.resize(
+            masks_working.astype(np.uint16),
+            (source_rgb.shape[1], source_rgb.shape[0]),
+            interpolation=cv2.INTER_NEAREST,
+        )
+    else:
+        masks = masks_working
 
     raw_labels = [int(x) for x in np.unique(masks) if int(x) > 0]
     filtered_masks, stats = filter_masks(
         masks.astype(np.int32),
-        droplet_mask=droplet_mask,
         min_area_px=args.min_area_px,
         max_area_fraction=args.max_area_fraction,
     )
@@ -207,6 +226,7 @@ def main() -> int:
     filtered_label_png = run_dir / "cellpose_labels_filtered_16bit.png"
     cv2.imwrite(str(raw_label_png), masks.astype(np.uint16))
     cv2.imwrite(str(filtered_label_png), filtered_masks.astype(np.uint16))
+    intermediate_artifacts = save_cellpose_intermediates(run_dir, flows)
 
     instance_rgb = render_instance_rgb(filtered_masks)
     instance_rgb_png = run_dir / "cellpose_instance_rgb.png"
@@ -220,8 +240,10 @@ def main() -> int:
         "input_tif": str(input_tif),
         "source_png": str(source_png),
         "prepared_png": str(prepared_png),
-        "droplet_mask_png": str(droplet_mask_png),
-        "droplet_circle": {"center_x_px": cx, "center_y_px": cy, "radius_px": r},
+        "preprocessing_mode": "full_image_clahe_gaussian_blur",
+        "working_scale": round(working_scale, 6),
+        "working_image_shape": [int(prepared_rgb.shape[1]), int(prepared_rgb.shape[0])],
+        "source_image_shape": [int(source_rgb.shape[1]), int(source_rgb.shape[0])],
         "model_type": args.model_type,
         "diameter": args.diameter,
         "cellprob_threshold": args.cellprob_threshold,
@@ -233,6 +255,7 @@ def main() -> int:
         "instance_rgb_png": str(instance_rgb_png),
         "overlay_png": str(overlay_png),
         "mask_stats_json": str(run_dir / "cellpose_mask_stats.json"),
+        "intermediate_artifacts": intermediate_artifacts,
     }
     (run_dir / "cellpose_mask_stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
     (run_dir / "run_manifest.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
