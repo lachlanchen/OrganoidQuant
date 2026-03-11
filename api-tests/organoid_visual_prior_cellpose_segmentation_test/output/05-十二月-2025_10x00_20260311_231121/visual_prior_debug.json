@@ -1,0 +1,109 @@
+{
+  "priors": [
+    {
+      "name": "upper_fused_mass",
+      "selected": true,
+      "mask_id": 1,
+      "seed_x_px": 1498,
+      "seed_y_px": 512,
+      "residual_threshold": 6.0,
+      "dark_threshold": 114.0,
+      "grow_px": 5,
+      "selection": {
+        "selected": true,
+        "source_component_id": 7,
+        "area_px": 240753,
+        "center_x_px": 1452.92,
+        "center_y_px": 587.67,
+        "distance_to_seed_px": 88.08,
+        "boundary_touch_px": 2568,
+        "score": 96498.21,
+        "component_count": 130
+      }
+    },
+    {
+      "name": "left_mid_dark_cluster",
+      "selected": true,
+      "mask_id": 2,
+      "seed_x_px": 806,
+      "seed_y_px": 737,
+      "residual_threshold": 7.0,
+      "dark_threshold": 133.0,
+      "grow_px": 3,
+      "selection": {
+        "selected": true,
+        "source_component_id": 6,
+        "area_px": 23517,
+        "center_x_px": 788.35,
+        "center_y_px": 666.82,
+        "distance_to_seed_px": 72.37,
+        "boundary_touch_px": 0,
+        "score": 10491.26,
+        "component_count": 33
+      }
+    },
+    {
+      "name": "right_upper_cluster",
+      "selected": true,
+      "mask_id": 3,
+      "seed_x_px": 2160,
+      "seed_y_px": 696,
+      "residual_threshold": 2.0,
+      "dark_threshold": 148.0,
+      "grow_px": 4,
+      "selection": {
+        "selected": true,
+        "source_component_id": 1,
+        "area_px": 31511,
+        "center_x_px": 2100.63,
+        "center_y_px": 675.48,
+        "distance_to_seed_px": 62.81,
+        "boundary_touch_px": 862,
+        "score": -22895.59,
+        "component_count": 21
+      }
+    },
+    {
+      "name": "right_mid_cluster",
+      "selected": true,
+      "mask_id": 4,
+      "seed_x_px": 2189,
+      "seed_y_px": 1126,
+      "residual_threshold": 5.0,
+      "dark_threshold": 145.0,
+      "grow_px": 4,
+      "selection": {
+        "selected": true,
+        "source_component_id": 2,
+        "area_px": 40711,
+        "center_x_px": 2051.12,
+        "center_y_px": 1052.21,
+        "distance_to_seed_px": 156.38,
+        "boundary_touch_px": 1166,
+        "score": -45737.49,
+        "component_count": 44
+      }
+    },
+    {
+      "name": "lower_fused_mass",
+      "selected": true,
+      "mask_id": 5,
+      "seed_x_px": 1526,
+      "seed_y_px": 1352,
+      "residual_threshold": 11.0,
+      "dark_threshold": 99.0,
+      "grow_px": 5,
+      "selection": {
+        "selected": true,
+        "source_component_id": 8,
+        "area_px": 194592,
+        "center_x_px": 1422.46,
+        "center_y_px": 1371.91,
+        "distance_to_seed_px": 105.44,
+        "boundary_touch_px": 1061,
+        "score": 122563.32,
+        "component_count": 118
+      }
+    }
+  ]
+}

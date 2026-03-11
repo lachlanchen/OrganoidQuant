@@ -1,0 +1,19 @@
+{
+  "input_tif": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif",
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/10x00.png",
+  "small_branch_manifest": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/branch_cellpose_small/05-十二月-2025_10x00_20260311_230558/run_manifest.json",
+  "visual_prior_labels": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_labels_16bit.png",
+  "visual_prior_rgb": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_rgb.png",
+  "visual_prior_overlay": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_overlay.png",
+  "visual_prior_debug": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_debug.json",
+  "combined_outputs": {
+    "label_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_cellpose_combined_labels_16bit.png",
+    "rgb_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_cellpose_combined_instance_rgb.png",
+    "overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_cellpose_combined_overlay.png",
+    "stats_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/visual_prior_cellpose_combined_stats.json"
+  },
+  "comparison_panel_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_visual_prior_cellpose_segmentation_test/output/05-十二月-2025_10x00_20260311_231121/comparison_panel.png",
+  "small_branch_mask_count": 55,
+  "visual_prior_count": 5,
+  "combined_count": 48
+}
