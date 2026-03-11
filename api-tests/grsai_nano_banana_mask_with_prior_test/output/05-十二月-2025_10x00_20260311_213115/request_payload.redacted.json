@@ -1,0 +1,11 @@
+{
+  "model": "nano-banana-pro",
+  "prompt_preview": "You are given three reference images of the same specimen.\n\nReference image 1: the original microscopy image.\nReference image 2: a prior guidance overlay created from local inspection. Warm colored irregular regions indicate likely fused organoid masses. Cool colored circles indicate likely medium/small organoid candidates. The white circle shows the droplet boundary.\nReference image 3: a coarse segmentation mask from an earlier run. Treat it only as an initial guess. Correct it using references...",
+  "urls": [
+    "<10x00_request.jpg>",
+    "<prior_overlay.png>",
+    "<coarse_mask_reference.png>"
+  ],
+  "webHook": "-1",
+  "shutProgress": true
+}

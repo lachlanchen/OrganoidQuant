@@ -1,0 +1,35 @@
+You are given three reference images of the same specimen.
+
+Reference image 1: the original microscopy image.
+Reference image 2: a prior guidance overlay created from local inspection. Warm colored irregular regions indicate likely fused organoid masses. Cool colored circles indicate likely medium/small organoid candidates. The white circle shows the droplet boundary.
+Reference image 3: a coarse segmentation mask from an earlier run. Treat it only as an initial guess. Correct it using references 1 and 2.
+
+Observed scene summary:
+- Approximate large fused regions highlighted: 4
+- Approximate medium/small organoid candidates highlighted: 28
+- There is one circular droplet centered in the frame.
+- A dominant irregular fused dark organoid mass occupies the upper-central region.
+- A second elongated fused organoid mass occupies the lower-central region.
+- Several medium round organoids cluster along the right arc of the droplet.
+- Many small round organoids are scattered in the left and lower regions inside the droplet.
+- Do not over-segment tiny background speckles or halo artifacts as organoids.
+- Preserve overlap and fusion in the dense central regions instead of flattening them into one blob.
+
+Task:
+Generate an improved RGB instance segmentation mask for all real organoids in the droplet.
+
+Rules:
+- Output only the segmentation mask on a black background.
+- Preserve overlap identity using additive RGB composition in overlap regions.
+- Do not merge overlapping organoids into one object.
+- Correctly separate touching and partially fused organoids where real morphological boundaries exist.
+- Keep fused areas explicit and readable.
+- Respect the candidate positions and coarse organoid extents shown in the prior overlay unless the source image clearly contradicts them.
+- Use the coarse mask only as a rough starting point; remove its mistakes.
+- Ignore background speckles, halos, and tiny debris that are not real organoids.
+- Stay inside the droplet.
+- Preserve true shape, size, and topology as much as possible.
+- Do not hallucinate additional organoids.
+- Do not remove real organoids.
+
+Return only the final RGB segmentation mask image.

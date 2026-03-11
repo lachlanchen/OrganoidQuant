@@ -1,0 +1,15 @@
+{
+  "input_tif": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif",
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115/10x00.png",
+  "request_image": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115/10x00_request.jpg",
+  "prior_overlay": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115/prior_overlay.png",
+  "prior_summary": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115/prior_summary.json",
+  "coarse_mask_reference": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115/coarse_mask_reference.png",
+  "prompt_file": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115/prompt.txt",
+  "host": "https://grsaiapi.com",
+  "model": "nano-banana-pro",
+  "task_id": "14-dd4fa4a8-bb95-411a-9a42-ceed8ac4e0d7",
+  "generated_mask": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115/generated_mask_refined.png",
+  "result_url": "https://file3.aitohumanize.com/file/5504780c12de4b878f61b33def1dbf7d.png",
+  "run_dir": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/grsai_nano_banana_mask_with_prior_test/output/05-十二月-2025_10x00_20260311_213115"
+}
