@@ -1,0 +1,42 @@
+[
+  {
+    "mask_id": 1,
+    "organoid_id": "organoid_01",
+    "morphology": "fused_mass",
+    "confidence_0_to_1": 0.94,
+    "area_px": 317096,
+    "center_x_px": 1516.79,
+    "center_y_px": 717.88,
+    "note": "Upper central fused dark mass; polygon tightened and expanded to include superior lobulated cap."
+  },
+  {
+    "mask_id": 2,
+    "organoid_id": "organoid_02",
+    "morphology": "fused_mass",
+    "confidence_0_to_1": 0.92,
+    "area_px": 331951,
+    "center_x_px": 1444.17,
+    "center_y_px": 1444.55,
+    "note": "Lower central elongated fused mass; boundary tightened and inferior extent preserved."
+  },
+  {
+    "mask_id": 3,
+    "organoid_id": "organoid_03",
+    "morphology": "irregular_organoid",
+    "confidence_0_to_1": 0.88,
+    "area_px": 222691,
+    "center_x_px": 2026.27,
+    "center_y_px": 970.64,
+    "note": "Right-side irregular compact cluster; refined to visible outer edge including upper-right lobe."
+  },
+  {
+    "mask_id": 4,
+    "organoid_id": "organoid_04",
+    "morphology": "irregular_organoid",
+    "confidence_0_to_1": 0.71,
+    "area_px": 35661,
+    "center_x_px": 917.72,
+    "center_y_px": 933.43,
+    "note": "Small left-mid organoid-like dark clump retained; minor boundary tightening."
+  }
+]

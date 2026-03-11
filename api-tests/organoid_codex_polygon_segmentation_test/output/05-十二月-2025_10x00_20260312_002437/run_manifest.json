@@ -1,0 +1,20 @@
+{
+  "pipeline": "cellpose_small_large_plus_codex_coarse_refine",
+  "run_dir": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437",
+  "source_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/10x00.png",
+  "prior_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/general_prior.json",
+  "cellpose_small_manifest": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/cellpose_small/05-十二月-2025_10x00_20260312_002439/run_manifest.json",
+  "cellpose_large_manifest": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/cellpose_large/05-十二月-2025_10x00_20260312_002450/run_manifest.json",
+  "coarse_prompt_file": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/coarse_prompt.txt",
+  "coarse_polygon_response_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/coarse_polygon_response.json",
+  "coarse_polygon_overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/coarse_polygon_overlay.png",
+  "coarse_polygon_instance_rgb_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/coarse_polygon_instance_rgb.png",
+  "coarse_polygon_labels_16bit_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/coarse_polygon_labels_16bit.png",
+  "coarse_polygon_stats_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/coarse_polygon_stats.json",
+  "refine_prompt_file": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/refine_prompt.txt",
+  "polygon_response_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/polygon_response.json",
+  "polygon_overlay_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/polygon_overlay.png",
+  "polygon_instance_rgb_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/polygon_instance_rgb.png",
+  "polygon_labels_16bit_png": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/polygon_labels_16bit.png",
+  "polygon_stats_json": "/home/lachlan/ProjectsLFS/Zhengyu/api-tests/organoid_codex_polygon_segmentation_test/output/05-十二月-2025_10x00_20260312_002437/polygon_stats.json"
+}

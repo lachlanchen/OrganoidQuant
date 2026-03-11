@@ -17,6 +17,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--source-png", required=True)
     p.add_argument("--polygon-json", required=True)
     p.add_argument("--out-dir", required=True)
+    p.add_argument("--prefix", default="")
     return p.parse_args()
 
 
@@ -54,6 +55,7 @@ def main() -> None:
     polygon_json = Path(args.polygon_json).resolve()
     out_dir = Path(args.out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    prefix = args.prefix
 
     rgb = load_rgb(source_png)
     h, w = rgb.shape[:2]
@@ -93,10 +95,10 @@ def main() -> None:
             }
         )
 
-    cv2.imwrite(str(out_dir / "polygon_labels_16bit.png"), label_mask)
-    Image.fromarray(instance_rgb).save(out_dir / "polygon_instance_rgb.png")
-    Image.fromarray(overlay).save(out_dir / "polygon_overlay.png")
-    (out_dir / "polygon_stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
+    cv2.imwrite(str(out_dir / f"{prefix}polygon_labels_16bit.png"), label_mask)
+    Image.fromarray(instance_rgb).save(out_dir / f"{prefix}polygon_instance_rgb.png")
+    Image.fromarray(overlay).save(out_dir / f"{prefix}polygon_overlay.png")
+    (out_dir / f"{prefix}polygon_stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":
