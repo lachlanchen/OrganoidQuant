@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "App80 Panel Metrics",
+  "type": "object",
+  "required": ["rows", "cols", "fusion_2d", "size_2d", "perimeter_2d", "panel_note"],
+  "properties": {
+    "rows": {"type": "integer", "minimum": 1},
+    "cols": {"type": "integer", "minimum": 1},
+    "fusion_2d": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {"type": ["number", "null"]}
+      }
+    },
+    "size_2d": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {"type": ["number", "null"]}
+      }
+    },
+    "perimeter_2d": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {"type": ["number", "null"]}
+      }
+    },
+    "panel_note": {"type": "string"}
+  },
+  "additionalProperties": false
+}

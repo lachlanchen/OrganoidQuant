@@ -1,0 +1,370 @@
+[
+  {
+    "concentration": "100uM",
+    "sample_rank": 0,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_00/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_00/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 1,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_01/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_01/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 2,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_02/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_02/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 3,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_03/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_03/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 4,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_04/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_04/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 5,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_05/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_05/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 6,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_06/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_06/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 7,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_07/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_07/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 8,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_08/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_08/panel_prompt.log"
+  },
+  {
+    "concentration": "100uM",
+    "sample_rank": 9,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_09/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/100uM/sample_09/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 0,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_00/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_00/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 1,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_01/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_01/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 2,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_02/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_02/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 3,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_03/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_03/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 4,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_04/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_04/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 5,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_05/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_05/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 6,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_06/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_06/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 7,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_07/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_07/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 8,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_08/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_08/panel_prompt.log"
+  },
+  {
+    "concentration": "10uM",
+    "sample_rank": 9,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_09/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/10uM/sample_09/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 0,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_00/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_00/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 1,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_01/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_01/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 2,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_02/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_02/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 3,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_03/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_03/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 4,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_04/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_04/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 5,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_05/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_05/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 6,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_06/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_06/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 7,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_07/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_07/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 8,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_08/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_08/panel_prompt.log"
+  },
+  {
+    "concentration": "20uM",
+    "sample_rank": 9,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_09/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/20uM/sample_09/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 0,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_00/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_00/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 1,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_01/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_01/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 2,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_02/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_02/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 3,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_03/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_03/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 4,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_04/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_04/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 5,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_05/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_05/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 6,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_06/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_06/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 7,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_07/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_07/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 8,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_08/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_08/panel_prompt.log"
+  },
+  {
+    "concentration": "50uM",
+    "sample_rank": 9,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_09/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/50uM/sample_09/panel_prompt.log"
+  },
+  {
+    "concentration": "No",
+    "sample_rank": 0,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_00/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_00/panel_prompt.log"
+  },
+  {
+    "concentration": "No",
+    "sample_rank": 1,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_01/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_01/panel_prompt.log"
+  },
+  {
+    "concentration": "No",
+    "sample_rank": 2,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_02/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_02/panel_prompt.log"
+  },
+  {
+    "concentration": "No",
+    "sample_rank": 3,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_03/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_03/panel_prompt.log"
+  },
+  {
+    "concentration": "No",
+    "sample_rank": 4,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_04/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_04/panel_prompt.log"
+  },
+  {
+    "concentration": "No",
+    "sample_rank": 5,
+    "status": "ok",
+    "returncode": 0,
+    "output_json": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_05/panel_metrics.json",
+    "log_txt": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_panel_prompt_metrics_20260316/panel_prompt_raw/No/sample_05/panel_prompt.log"
+  }
+]

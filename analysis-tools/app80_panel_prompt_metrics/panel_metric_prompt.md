@@ -1,0 +1,52 @@
+You are scoring a microscopy contact-sheet panel.
+
+Operational rules:
+- The attached image is the only image you need.
+- Do not inspect files, run tools, or use external knowledge.
+- Do not infer dates, concentrations, or time series.
+- Return strict JSON only.
+
+Panel structure:
+- The panel has __ROWS__ rows and __COLS__ columns.
+- Each non-empty tile contains one microscopy view of a single droplet.
+- Inside the droplet there may be organoids.
+- Large dark masses are still organoid tissue.
+- The droplet may deform as organoids grow, so it may no longer be spherical.
+- Some tiles may be blank placeholders. Use null for those positions.
+
+Output requirement:
+- Return three 2D arrays with the same shape as the panel grid.
+- Arrays are row-major and aligned to the visible grid.
+- Use null for empty tiles.
+
+Metric definitions:
+1. fusion_2d:
+- score 0 to 5
+- 0 = mostly separate organoids, little or no fusion
+- 1 = weak local contacts only
+- 2 = partial fusion, several contacts/bridges
+- 3 = moderate fusion, substantial merged tissue but still separable regions
+- 4 = strong fusion, mostly merged mass with a few distinct lobes
+- 5 = near-complete fused organoid tissue / dominant continuous mass
+
+2. size_2d:
+- score 0 to 100
+- estimate total visible organoid burden inside the droplet
+- 0 = barely visible organoid tissue
+- 50 = moderate fraction of droplet occupied by organoid tissue
+- 100 = organoid tissue occupies most of the droplet
+
+3. perimeter_2d:
+- score 0 to 100
+- estimate the apparent outer boundary extent/complexity of the combined organoid tissue
+- 0 = tiny/simple/compact boundary
+- 50 = moderate boundary extent
+- 100 = extensive irregular boundary spanning much of the droplet
+
+Requested JSON fields:
+- rows
+- cols
+- fusion_2d
+- size_2d
+- perimeter_2d
+- panel_note
