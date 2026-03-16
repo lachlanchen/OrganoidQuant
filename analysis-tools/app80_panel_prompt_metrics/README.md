@@ -23,3 +23,14 @@ Main scripts:
 - `aggregate_panel_metrics.py`
 - `plot_panel_metrics.py`
 - `run_app80_panel_prompt_metrics.sh`
+- `start_tmux_app80_panel_prompt_metrics.sh`
+
+Replicate stitching rule:
+- for each concentration, `sample_00` contains the first valid image from each day
+- `sample_01` contains the second valid image from each day
+- this continues through `sample_09` or the smallest valid count across days
+
+Tmux run:
+- `analysis-tools/app80_panel_prompt_metrics/start_tmux_app80_panel_prompt_metrics.sh`
+- default session name: `app80_panel`
+- default output root: `analysis-output/app80_panel_prompt_metrics_YYYYMMDD_HHMMSS`
