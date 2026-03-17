@@ -24,6 +24,13 @@ Main scripts:
 - `plot_panel_metrics.py`
 - `run_app80_panel_prompt_metrics.sh`
 - `start_tmux_app80_panel_prompt_metrics.sh`
+- `run_single_tile_enhanced_metric.sh`
+- `run_tile_metric_batch.py`
+- `build_panel_metrics_from_tile_metrics.py`
+- `compute_polygon_tile_metrics.py`
+- `plot_panel_metrics_enhanced.py`
+- `run_app80_panel_prompt_metrics_enhanced.sh`
+- `start_tmux_app80_panel_prompt_metrics_enhanced.sh`
 
 Replicate stitching rule:
 - for each concentration, `sample_00` contains the first valid image from each day
@@ -34,3 +41,16 @@ Tmux run:
 - `analysis-tools/app80_panel_prompt_metrics/start_tmux_app80_panel_prompt_metrics.sh`
 - default session name: `app80_panel`
 - default output root: `analysis-output/app80_panel_prompt_metrics_YYYYMMDD_HHMMSS`
+
+Enhanced pipeline:
+- analyze each single image first instead of directly scoring the whole panel
+- build image priors from Cellpose small/large branches plus gradient/edge overlays
+- run Codex coarse/refine polygon segmentation on each image
+- compute fusion, combined area, and combined perimeter from the final polygon masks
+- rebuild the panel 2D arrays from those per-image metrics
+- keep the same aggregation and publication plotting stages
+
+Enhanced tmux run:
+- `analysis-tools/app80_panel_prompt_metrics/start_tmux_app80_panel_prompt_metrics_enhanced.sh`
+- default session name: `app80_panel_enhanced`
+- default output root: `analysis-output/app80_panel_prompt_metrics_enhanced_YYYYMMDD_HHMMSS`
