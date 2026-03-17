@@ -6,6 +6,7 @@ py_bin="${DEO_PYTHON:-/home/lachlan/miniconda3/envs/organoid/bin/python}"
 output_root="${1:-$repo_root/analysis-output/app80_panel_prompt_metrics_enhanced}"
 workers="${DEO_PANEL_PROMPT_WORKERS:-2}"
 export OPENCV_LOG_LEVEL=ERROR
+export PYTHONNOUSERSITE=1
 
 mkdir -p "$output_root"
 

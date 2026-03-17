@@ -90,8 +90,16 @@ def plot_metric(ax: plt.Axes, summary: pd.DataFrame, pvalues: pd.DataFrame, metr
 
 def save_all(fig: plt.Figure, base: Path) -> None:
     fig.savefig(base.with_suffix('.png'), dpi=300, bbox_inches='tight')
-    fig.savefig(base.with_suffix('.pdf'), bbox_inches='tight')
-    fig.savefig(base.with_suffix('.svg'), bbox_inches='tight')
+    for suffix in ('.pdf', '.svg'):
+        out_path = base.with_suffix(suffix)
+        try:
+            fig.savefig(out_path, bbox_inches='tight')
+        except Exception as exc:
+            print(json.dumps({
+                'warning': 'vector_export_failed',
+                'path': str(out_path),
+                'error': str(exc),
+            }, ensure_ascii=False))
 
 
 def main() -> int:

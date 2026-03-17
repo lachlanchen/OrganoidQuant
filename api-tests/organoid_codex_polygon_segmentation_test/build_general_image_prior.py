@@ -236,12 +236,12 @@ def main() -> None:
     mass_overlay_png = out_dir / "mass_overlay.png"
     combined_prior_overlay_png = out_dir / "combined_prior_overlay.png"
 
-    Image.fromarray(normalize_u8(maps["grad"])).save(gradient_png)
+    Image.fromarray(normalize_u8(maps["grad"])).save(str(gradient_png))
     edge_overlay = rgb.copy()
     edge_overlay[maps["edges"] > 0] = (0, 255, 0)
-    Image.fromarray(edge_overlay).save(edge_overlay_png)
-    Image.fromarray(render_blob_overlay(rgb, blobs)).save(blob_overlay_png)
-    Image.fromarray(render_mass_overlay(rgb, mass_labels)).save(mass_overlay_png)
+    Image.fromarray(edge_overlay).save(str(edge_overlay_png))
+    Image.fromarray(render_blob_overlay(rgb, blobs)).save(str(blob_overlay_png))
+    Image.fromarray(render_mass_overlay(rgb, mass_labels)).save(str(mass_overlay_png))
     Image.fromarray(
         render_combined_prior_overlay(
             rgb,
@@ -251,7 +251,7 @@ def main() -> None:
             small_branch,
             large_branch,
         )
-    ).save(combined_prior_overlay_png)
+    ).save(str(combined_prior_overlay_png))
 
     payload = {
         "source_png": str(source_png),
