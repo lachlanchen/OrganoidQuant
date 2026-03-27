@@ -36,3 +36,6 @@ tmp_droplet2_inspect/
 tmp_hybrid_probe/
 tmp_hybrid_probe2/
 tmp_hybrid_probe3/
+
+# User-added figure exports
+data-docs/DEO Figure/
