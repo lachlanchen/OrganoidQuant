@@ -13,6 +13,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+import tifffile
 from PIL import Image
 
 DATE_RE = re.compile(r"(?P<day>\d{2})-十二月-2025")
@@ -40,13 +41,22 @@ def load_gray_u8(path: Path) -> np.ndarray:
         with Image.open(path) as image:
             gray = np.array(image.convert('L'))
     except Exception:
-        image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
-        if image is None:
-            raise
-        if image.ndim == 3:
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        else:
-            gray = image
+        try:
+            image = tifffile.imread(str(path))
+            if image.ndim >= 3:
+                image = np.squeeze(image)
+            if image.ndim == 3:
+                gray = image[..., :3].mean(axis=2)
+            else:
+                gray = image
+        except Exception:
+            image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+            if image is None:
+                raise
+            if image.ndim == 3:
+                gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            else:
+                gray = image
     return normalize_u8(gray)
 
 

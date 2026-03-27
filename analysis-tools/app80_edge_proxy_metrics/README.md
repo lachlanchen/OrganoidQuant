@@ -14,6 +14,7 @@ This tool computes exploratory edge- and gradient-based morphology proxies for a
 - raw trend plots by day
 
 ## Usage
+Single concentration:
 ```bash
 /home/lachlan/miniconda3/envs/organoid/bin/python analysis-tools/app80_edge_proxy_metrics/plot_app80_day_edge_proxy_metrics.py \
   /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_10uM_edge_proxy_all_10x \
@@ -24,6 +25,13 @@ This tool computes exploratory edge- and gradient-based morphology proxies for a
   '/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/10-十二月-2025' \
   '/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/11-十二月-2025' \
   '/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/12-十二月-2025'
+```
+
+All concentrations together:
+```bash
+/home/lachlan/miniconda3/envs/organoid/bin/python analysis-tools/app80_edge_proxy_metrics/plot_app80_concentration_edge_proxy_metrics.py \
+  '/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO' \
+  /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentration_edge_proxy_all_10x
 ```
 
 ## Metric note
