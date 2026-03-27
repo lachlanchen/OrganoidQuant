@@ -8,6 +8,7 @@ This toolset analyzes a blinded microscopy image cohort without exposing date or
 - `build_blinded_image_bundle.py`: converts blinded TIFFs to PNG and builds a UID-labeled contact sheet in an isolated temp workspace.
 - `build_day_order_markdown_report.py`: combines the refined JSON with the private UID-to-source mapping to produce a human-readable day-ordered Markdown report.
 - `plot_day_order_metrics.py`: exports a metric table plus a multi-panel figure for the blinded day-ordered cohort.
+- `plot_edge_proxy_metrics.py`: exports exploratory Canny-edge and gradient-based proxy trends plus per-day overlay images.
 
 ## Design
 - converts blinded TIFFs to PNG in an isolated temp workspace
@@ -77,3 +78,5 @@ Report and plots under the ignored analysis folder:
 - `analysis-output/fusion-analysis-test/set_001_report/set_001_row_strip.png`
 - `analysis-output/fusion-analysis-test/set_001_report/set_001_metric_table.csv`
 - `analysis-output/fusion-analysis-test/set_001_report/set_001_metric_summary.png`
+- `analysis-output/fusion-analysis-test/set_001_report/set_001_edge_proxy_table.csv`
+- `analysis-output/fusion-analysis-test/set_001_report/set_001_edge_proxy_trends.png`
