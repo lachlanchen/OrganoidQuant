@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "review_note",
+    "analysis_note",
+    "uids_in_order",
+    "ranking_by_fusion_uid_desc",
+    "images"
+  ],
+  "properties": {
+    "review_note": {"type": "string"},
+    "analysis_note": {"type": "string"},
+    "uids_in_order": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1
+    },
+    "ranking_by_fusion_uid_desc": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1
+    },
+    "images": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "fusion_score_0_to_5",
+          "fusion_state_label",
+          "estimated_organoid_units",
+          "largest_mass_relative_0_to_100",
+          "size_relative_0_to_100",
+          "perimeter_complexity_0_to_100",
+          "confidence_0_to_1",
+          "prior_consistency_note",
+          "evidence"
+        ],
+        "properties": {
+          "uid": {"type": "string"},
+          "fusion_score_0_to_5": {"type": "number", "minimum": 0, "maximum": 5},
+          "fusion_state_label": {
+            "type": "string",
+            "enum": [
+              "mostly_separate",
+              "weak_contact",
+              "partial_fusion",
+              "moderate_fusion",
+              "advanced_fusion",
+              "late_irregular_fused_mass",
+              "uncertain"
+            ]
+          },
+          "estimated_organoid_units": {"type": "integer", "minimum": 1},
+          "largest_mass_relative_0_to_100": {"type": "number", "minimum": 0, "maximum": 100},
+          "size_relative_0_to_100": {"type": "number", "minimum": 0, "maximum": 100},
+          "perimeter_complexity_0_to_100": {"type": "number", "minimum": 0, "maximum": 100},
+          "confidence_0_to_1": {"type": "number", "minimum": 0, "maximum": 1},
+          "prior_consistency_note": {"type": "string"},
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "large_connected_mass_present",
+              "multiple_separate_round_units_present",
+              "visible_boundaries_between_units",
+              "irregular_thickened_or_collapsed_regions_present",
+              "relative_position_note",
+              "texture_color_note",
+              "summary_note"
+            ],
+            "properties": {
+              "large_connected_mass_present": {"type": "boolean"},
+              "multiple_separate_round_units_present": {"type": "boolean"},
+              "visible_boundaries_between_units": {"type": "boolean"},
+              "irregular_thickened_or_collapsed_regions_present": {"type": "boolean"},
+              "relative_position_note": {"type": "string"},
+              "texture_color_note": {"type": "string"},
+              "summary_note": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
