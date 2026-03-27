@@ -1,0 +1,32 @@
+{
+  "figure_name": "figure5_y27632",
+  "source_svg": "/home/lachlan/ProjectsLFS/Zhengyu/data-docs/DEO Figure/Figure 5 不同浓度Y-27632调亮.svg",
+  "output_root": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/figure_subfigure_export/figure5_y27632",
+  "position_tolerance": 3.0,
+  "row_labels": [
+    "Control",
+    "10uM",
+    "20uM",
+    "50uM",
+    "100uM"
+  ],
+  "panel_rows": {
+    "A": [0, 1, 2, 3, 4],
+    "B": [5, 6, 7, 8, 9]
+  },
+  "panel_columns": {
+    "A": [
+      "Day0",
+      "Day2",
+      "Day3",
+      "Day5",
+      "Day6",
+      "Day7"
+    ],
+    "B": [
+      "Day6_detail_replicate01",
+      "Day6_detail_replicate02",
+      "Day6_detail_replicate03"
+    ]
+  }
+}
