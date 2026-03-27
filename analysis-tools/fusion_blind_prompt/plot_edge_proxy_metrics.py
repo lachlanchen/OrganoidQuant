@@ -36,8 +36,17 @@ def normalize_u8(gray: np.ndarray) -> np.ndarray:
 
 
 def load_gray_u8(path: Path) -> np.ndarray:
-    with Image.open(path) as image:
-        gray = np.array(image.convert('L'))
+    try:
+        with Image.open(path) as image:
+            gray = np.array(image.convert('L'))
+    except Exception:
+        image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+        if image is None:
+            raise
+        if image.ndim == 3:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = image
     return normalize_u8(gray)
 
 
@@ -63,7 +72,12 @@ def compute_tissue_mask(gray_u8: np.ndarray) -> np.ndarray:
             if area < 2000:
                 continue
             ys, xs = np.where(labels == idx)
-            centroid = np.array([xs.mean(), ys.mean()])
+            if xs.size == 0 or ys.size == 0:
+                continue
+            centroid = np.array([
+                float(xs.sum()) / float(xs.size),
+                float(ys.sum()) / float(ys.size),
+            ])
             dist = float(np.linalg.norm(centroid - center))
             score = area - 12.0 * dist
             if best_score is None or score > best_score:
