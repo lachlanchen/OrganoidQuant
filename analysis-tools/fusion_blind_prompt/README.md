@@ -7,6 +7,7 @@ This toolset analyzes a blinded microscopy image cohort without exposing date or
 - `run_blind_fusion_refine_prompt.sh`: second-pass review that sees the same blinded images plus the first-pass JSON draft.
 - `build_blinded_image_bundle.py`: converts blinded TIFFs to PNG and builds a UID-labeled contact sheet in an isolated temp workspace.
 - `build_day_order_markdown_report.py`: combines the refined JSON with the private UID-to-source mapping to produce a human-readable day-ordered Markdown report.
+- `plot_day_order_metrics.py`: exports a metric table plus a multi-panel figure for the blinded day-ordered cohort.
 
 ## Design
 - converts blinded TIFFs to PNG in an isolated temp workspace
@@ -41,7 +42,15 @@ Day-ordered report:
 /home/lachlan/miniconda3/envs/organoid/bin/python analysis-tools/fusion_blind_prompt/build_day_order_markdown_report.py \
   /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/fusion-analysis-test/set_001/blind_fusion_analysis_refined.json \
   /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/fusion-analysis-test/set_001/internal_mapping/uid_to_source.csv \
-  /home/lachlan/ProjectsLFS/Zhengyu/references/fusion_analysis_reports/set_001
+  /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/fusion-analysis-test/set_001_report
+```
+
+Metric figure:
+```bash
+/home/lachlan/miniconda3/envs/organoid/bin/python analysis-tools/fusion_blind_prompt/plot_day_order_metrics.py \
+  /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/fusion-analysis-test/set_001/blind_fusion_analysis_refined.json \
+  /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/fusion-analysis-test/set_001/internal_mapping/uid_to_source.csv \
+  /home/lachlan/ProjectsLFS/Zhengyu/analysis-output/fusion-analysis-test/set_001_report
 ```
 
 ## Input visibility
@@ -62,5 +71,7 @@ Prompt outputs under the ignored analysis folder:
 - `blind_fusion_analysis_refined.json`
 - optional saved prompt text for audit/debugging
 
-Curated report output under `references/`:
-- `references/fusion_analysis_reports/set_001/set_001_day_order_report.md`
+Report and plots under the ignored analysis folder:
+- `analysis-output/fusion-analysis-test/set_001_report/set_001_day_order_report.md`
+- `analysis-output/fusion-analysis-test/set_001_report/set_001_metric_table.csv`
+- `analysis-output/fusion-analysis-test/set_001_report/set_001_metric_summary.png`
