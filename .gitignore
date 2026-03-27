@@ -18,3 +18,21 @@ tmp_*.png
 *.toc
 *.fls
 *.fdb_latexmk
+
+# Generated intermediate outputs
+analysis-output/
+archived-result/
+data-docs/logs/
+api-tests/*/output/
+api-tests/*/tmp_control/
+api-tests/*/vendor_legacy/
+DEO-MARKDOWN/
+DEO-PNG/
+DEO-SEGMENTS/
+tmp_cellpose_trials/
+tmp_cellpose_trials2/
+tmp_cellpose_trials3/
+tmp_droplet2_inspect/
+tmp_hybrid_probe/
+tmp_hybrid_probe2/
+tmp_hybrid_probe3/
