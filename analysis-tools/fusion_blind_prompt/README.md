@@ -73,5 +73,7 @@ Prompt outputs under the ignored analysis folder:
 
 Report and plots under the ignored analysis folder:
 - `analysis-output/fusion-analysis-test/set_001_report/set_001_day_order_report.md`
+- `analysis-output/fusion-analysis-test/set_001_report/set_001_compact_review_table.md`
+- `analysis-output/fusion-analysis-test/set_001_report/set_001_row_strip.png`
 - `analysis-output/fusion-analysis-test/set_001_report/set_001_metric_table.csv`
 - `analysis-output/fusion-analysis-test/set_001_report/set_001_metric_summary.png`

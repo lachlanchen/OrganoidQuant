@@ -6,9 +6,10 @@ import csv
 import json
 import re
 from datetime import datetime
+from html import escape
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 DATE_RE = re.compile(r"(?P<day>\d{2})-十二月-2025")
 
@@ -40,6 +41,42 @@ def preview_png(source_tif: Path, dest_png: Path, max_width: int = 420) -> None:
             height = int(image.height * (max_width / image.width))
             image = image.resize((max_width, height))
         image.save(dest_png)
+
+
+def build_row_strip(entries, assets_dir: Path, dest_png: Path, thumb_width: int = 220) -> None:
+    font = ImageFont.load_default()
+    thumbs = []
+    label_height = 34
+    padding = 12
+    max_height = 0
+
+    for seq_idx, uid, _date_label in entries:
+        src = assets_dir / f"{uid}.png"
+        with Image.open(src) as image:
+            image = image.convert('RGB')
+            height = int(image.height * (thumb_width / image.width))
+            image = image.resize((thumb_width, height))
+            thumbs.append((seq_idx, uid, image))
+            max_height = max(max_height, height)
+
+    width = padding + len(thumbs) * (thumb_width + padding)
+    height = padding * 2 + label_height + max_height
+    canvas = Image.new('RGB', (width, height), 'white')
+    draw = ImageDraw.Draw(canvas)
+
+    x = padding
+    for seq_idx, uid, image in thumbs:
+        label = f"D{seq_idx} | {uid.replace('uid_', '')[:6]}"
+        draw.text((x, padding), label, fill='black', font=font)
+        y = padding + label_height
+        canvas.paste(image, (x, y))
+        x += thumb_width + padding
+
+    canvas.save(dest_png)
+
+
+def html_bool(value) -> str:
+    return 'True' if value else 'False'
 
 
 def main() -> int:
@@ -90,11 +127,25 @@ def main() -> int:
     lines.append('## Day-Ordered Detail')
     lines.append('')
 
+    compact_lines = []
+    compact_lines.append('# Blind Fusion Compact Review Table: Set 001')
+    compact_lines.append('')
+    compact_lines.append('Merged row preview:')
+    compact_lines.append('')
+    compact_lines.append('![set_001_row_strip](set_001_row_strip.png)')
+    compact_lines.append('')
+    compact_lines.append('<table>')
+    compact_lines.append('<thead><tr><th>Image</th><th>Values</th><th>Justification</th></tr></thead>')
+    compact_lines.append('<tbody>')
+
+    strip_entries = []
+
     for seq_idx, (uid, date_label, row, item) in enumerate(dated, start=1):
         rel = relative_offset(date_label, first_dt)
         src_tif = Path(row['source_path'])
         preview = assets_dir / f"{uid}.png"
         preview_png(src_tif, preview)
+        strip_entries.append((seq_idx, uid, date_label))
         lines.append(f"### Sequence Day {seq_idx}")
         lines.append('')
         lines.append(f"- UID: `{uid}`")
@@ -124,8 +175,53 @@ def main() -> int:
         lines.append(f"- Irregular/thickened/collapsed regions present: `{item['evidence']['irregular_thickened_or_collapsed_regions_present']}`")
         lines.append('')
 
+        value_lines = [
+            f"<strong>Sequence Day:</strong> D{seq_idx}<br>",
+            f"<strong>UID:</strong> <code>{escape(uid)}</code><br>",
+            f"<strong>Source date:</strong> <code>{escape(date_label)}</code><br>",
+            f"<strong>Fusion score:</strong> {item['fusion_score_0_to_5']}<br>",
+            f"<strong>Fusion state:</strong> {escape(str(item['fusion_state_label']))}<br>",
+            f"<strong>Organoid units:</strong> {item['estimated_organoid_units']}<br>",
+            f"<strong>Largest mass relative:</strong> {item['largest_mass_relative_0_to_100']}<br>",
+            f"<strong>Size relative:</strong> {item['size_relative_0_to_100']}<br>",
+            f"<strong>Perimeter complexity:</strong> {item['perimeter_complexity_0_to_100']}<br>",
+            f"<strong>Confidence:</strong> {item['confidence_0_to_1']}",
+        ]
+        if 'prior_consistency_note' in item:
+            value_lines.append(f"<br><strong>Prior consistency:</strong> {escape(str(item['prior_consistency_note']))}")
+
+        evidence = item['evidence']
+        justification_lines = [
+            f"<strong>Summary:</strong> {escape(str(evidence['summary_note']))}<br>",
+            f"<strong>Relative position:</strong> {escape(str(evidence['relative_position_note']))}<br>",
+            f"<strong>Texture/color:</strong> {escape(str(evidence['texture_color_note']))}<br>",
+            f"<strong>Large connected mass:</strong> {html_bool(evidence['large_connected_mass_present'])}<br>",
+            f"<strong>Multiple round units:</strong> {html_bool(evidence['multiple_separate_round_units_present'])}<br>",
+            f"<strong>Visible boundaries:</strong> {html_bool(evidence['visible_boundaries_between_units'])}<br>",
+            f"<strong>Irregular/thickened/collapsed:</strong> {html_bool(evidence['irregular_thickened_or_collapsed_regions_present'])}",
+        ]
+
+        compact_lines.append('<tr>')
+        compact_lines.append(
+            f"<td><strong>D{seq_idx}</strong><br><img src=\"assets/{escape(preview.name)}\" width=\"220\"></td>"
+        )
+        compact_lines.append(f"<td>{''.join(value_lines)}</td>")
+        compact_lines.append(f"<td>{''.join(justification_lines)}</td>")
+        compact_lines.append('</tr>')
+
+    compact_lines.append('</tbody>')
+    compact_lines.append('</table>')
+    compact_lines.append('')
+
+    build_row_strip(strip_entries, assets_dir, report_dir / 'set_001_row_strip.png')
     (report_dir / 'set_001_day_order_report.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
-    print(json.dumps({"report_dir": str(report_dir), "entries": len(dated)}))
+    (report_dir / 'set_001_compact_review_table.md').write_text('\n'.join(compact_lines) + '\n', encoding='utf-8')
+    print(json.dumps({
+        "report_dir": str(report_dir),
+        "entries": len(dated),
+        "compact_table": str(report_dir / 'set_001_compact_review_table.md'),
+        "row_strip": str(report_dir / 'set_001_row_strip.png'),
+    }))
     return 0
 
 
