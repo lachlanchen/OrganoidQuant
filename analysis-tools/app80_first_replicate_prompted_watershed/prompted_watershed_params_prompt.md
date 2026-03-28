@@ -8,6 +8,11 @@ You are not drawing the segmentation yourself. Your job is to inspect the provid
 - watershed seed splitting
 - large smooth droplet-mask rejection
 
+Important algorithm note:
+- The deterministic step is intended to segment filled organoid interiors, not just the dark boundary lines.
+- It will combine thresholded tissue support with edge-enclosed region filling before watershed.
+- Choose parameters that help recover organoid interiors while suppressing large smooth droplet background regions.
+
 Biological interpretation rules:
 - Segment organoids as instances.
 - Do NOT treat the outer droplet boundary or smooth enclosing droplet shell as an organoid instance.
