@@ -78,6 +78,26 @@ def boundary_edge_intensity(label_mask: np.ndarray, signal_gray: np.ndarray) -> 
     return float(grad[boundary].mean())
 
 
+def render_instance_rgb(label_mask: np.ndarray) -> np.ndarray:
+    rgb = np.zeros((label_mask.shape[0], label_mask.shape[1], 3), dtype=np.uint8)
+    labels = np.unique(label_mask)
+    labels = labels[labels > 0]
+    for lab in labels:
+        rng = np.random.default_rng(int(lab) * 1009 + 17)
+        color = rng.integers(40, 256, size=3, dtype=np.uint8)
+        rgb[label_mask == lab] = color
+    return rgb
+
+
+def render_overlay(source_rgb: np.ndarray, label_mask: np.ndarray, color_mask: np.ndarray | None = None) -> np.ndarray:
+    if color_mask is None:
+        color_mask = render_instance_rgb(label_mask)
+    overlay = cv2.addWeighted(source_rgb, 0.72, color_mask, 0.55, 0)
+    edges = cv2.Canny((label_mask > 0).astype(np.uint8) * 255, 50, 150)
+    overlay[edges > 0] = (255, 0, 0)
+    return overlay
+
+
 def minmax_floor(values: list[float], floor: float) -> list[float]:
     if not values:
         return []
@@ -110,11 +130,13 @@ def process_one(model, tif: Path, out_dir: Path, overwrite: bool) -> dict:
     cfg = seg.DATE_CONFIG[date_key]
     stem = f'{date_key}_{tif.stem}'
     mask_path = out_dir / f'{stem}_mask_16bit.png'
+    rgb_path = out_dir / f'{stem}_instance_rgb.png'
+    overlay_path = out_dir / f'{stem}_overlay.png'
     signal_path = out_dir / f'{stem}_signal.png'
     stats_path = out_dir / f'{stem}_segmentation_stats.json'
     metric_path = out_dir / f'{stem}_metrics.json'
 
-    if not overwrite and metric_path.exists() and stats_path.exists() and mask_path.exists() and signal_path.exists():
+    if not overwrite and metric_path.exists() and stats_path.exists() and mask_path.exists() and signal_path.exists() and rgb_path.exists() and overlay_path.exists():
         return json.loads(metric_path.read_text(encoding='utf-8'))
 
     rgb, gray = seg.load_rgb_gray(tif)
@@ -141,9 +163,12 @@ def process_one(model, tif: Path, out_dir: Path, overwrite: bool) -> dict:
     branch_summaries.append({'diameter_px': None, 'kept_candidates_before_merge': len(signal_candidates), 'status': 'ok', 'source': 'signal_recovery'})
 
     kept = seg.merge_candidates(candidates)
-    label_mask, _ = seg.build_outputs(rgb, kept)
+    label_mask, color_mask = seg.build_outputs(rgb, kept)
+    overlay = render_overlay(rgb, label_mask, color_mask)
 
     cv2.imwrite(str(mask_path), label_mask)
+    cv2.imwrite(str(rgb_path), cv2.cvtColor(color_mask, cv2.COLOR_RGB2BGR))
+    cv2.imwrite(str(overlay_path), cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
     cv2.imwrite(str(signal_path), signal)
 
     obj_rows = object_metrics(label_mask)
@@ -186,6 +211,8 @@ def process_one(model, tif: Path, out_dir: Path, overwrite: bool) -> dict:
         'total_area_px': total_area,
         'average_perimeter_px': avg_perimeter,
         'mask_path': str(mask_path),
+        'instance_rgb_path': str(rgb_path),
+        'overlay_path': str(overlay_path),
         'signal_path': str(signal_path),
         'stats_path': str(stats_path),
     }
