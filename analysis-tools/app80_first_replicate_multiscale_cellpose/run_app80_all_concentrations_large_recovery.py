@@ -110,7 +110,7 @@ def main() -> int:
     src_root = Path(args.src_root).resolve()
     out_dir = Path(args.out_dir).resolve()
     runs_dir = out_dir / 'runs'
-    db_dir = out_dir / 'databases'
+    db_dir = out_dir / 'profiling' / 'quantification'
     runs_dir.mkdir(parents=True, exist_ok=True)
     db_dir.mkdir(parents=True, exist_ok=True)
 

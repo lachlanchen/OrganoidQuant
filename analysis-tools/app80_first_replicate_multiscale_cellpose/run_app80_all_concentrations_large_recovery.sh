@@ -11,16 +11,25 @@ conda activate organoid-gpu
 export PYTHONNOUSERSITE=1
 export TORCHDYNAMO_DISABLE=1
 export PYTORCH_JIT=0
+export TORCH_DISABLE_DYNAMO=1
+export PYTHONDONTWRITEBYTECODE=1
 
-mkdir -p "$OUT_DIR/runs/10uM" "$OUT_DIR/databases" "$OUT_DIR/figures"
+mkdir -p "$OUT_DIR/runs/10uM" "$OUT_DIR/profiling/quantification" "$OUT_DIR/figures"
 if [ -d "$SEED_10UM" ]; then
-  cp -an "$SEED_10UM"/. "$OUT_DIR/runs/10uM"/ || true
+  rsync -a --ignore-existing "$SEED_10UM"/ "$OUT_DIR/runs/10uM"/
 fi
 
 cd "$ROOT"
-python analysis-tools/app80_first_replicate_multiscale_cellpose/run_app80_all_concentrations_large_recovery.py \
+python -B - <<'PY'
+import torch
+if not torch.cuda.is_available():
+    raise SystemExit('GPU is required for this batch, but torch.cuda.is_available() is False')
+print(f'Using GPU: {torch.cuda.get_device_name(0)}')
+PY
+
+python -B analysis-tools/app80_first_replicate_multiscale_cellpose/run_app80_all_concentrations_large_recovery.py \
   --src-root "$SRC_ROOT" \
   --out-dir "$OUT_DIR"
 
-python3 analysis-tools/app80_first_replicate_multiscale_cellpose/plot_app80_all_concentrations_metrics.py \
-  --daily-csv "$OUT_DIR/databases/daily_summary.csv"
+python3 -B analysis-tools/app80_first_replicate_multiscale_cellpose/plot_app80_all_concentrations_metrics.py \
+  --daily-csv "$OUT_DIR/profiling/quantification/daily_summary.csv"

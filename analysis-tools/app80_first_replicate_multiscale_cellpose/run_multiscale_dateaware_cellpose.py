@@ -4,12 +4,19 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 from dataclasses import dataclass
 from pathlib import Path
+
+os.environ.setdefault('TORCHDYNAMO_DISABLE', '1')
+os.environ.setdefault('TORCH_DISABLE_DYNAMO', '1')
+os.environ.setdefault('PYTORCH_JIT', '0')
+os.environ.setdefault('PYTHONDONTWRITEBYTECODE', '1')
 
 import cv2
 import numpy as np
 import tifffile
+import torch  # noqa: F401
 from cellpose import models
 
 DATE_CONFIG = {
