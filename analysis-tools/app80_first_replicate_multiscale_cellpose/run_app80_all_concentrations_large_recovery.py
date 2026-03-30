@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 
 import numpy as np
+import torch  # noqa: F401
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
