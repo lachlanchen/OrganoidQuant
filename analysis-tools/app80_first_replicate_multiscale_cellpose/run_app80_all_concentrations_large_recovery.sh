@@ -27,9 +27,25 @@ if not torch.cuda.is_available():
 print(f'Using GPU: {torch.cuda.get_device_name(0)}')
 PY
 
-python -B analysis-tools/app80_first_replicate_multiscale_cellpose/run_app80_all_concentrations_large_recovery.py \
-  --src-root "$SRC_ROOT" \
-  --out-dir "$OUT_DIR"
+python -B - <<PY
+import sys
+sys.path.insert(0, "$ROOT/analysis-tools/app80_first_replicate_multiscale_cellpose")
+import run_app80_all_concentrations_large_recovery as mod
+sys.argv = [
+    "run_app80_all_concentrations_large_recovery.py",
+    "--src-root", "$SRC_ROOT",
+    "--out-dir", "$OUT_DIR",
+]
+raise SystemExit(mod.main())
+PY
 
-python3 -B analysis-tools/app80_first_replicate_multiscale_cellpose/plot_app80_all_concentrations_metrics.py \
-  --daily-csv "$OUT_DIR/profiling/quantification/daily_summary.csv"
+python3 -B - <<PY
+import sys
+sys.path.insert(0, "$ROOT/analysis-tools/app80_first_replicate_multiscale_cellpose")
+import plot_app80_all_concentrations_metrics as mod
+sys.argv = [
+    "plot_app80_all_concentrations_metrics.py",
+    "--daily-csv", "$OUT_DIR/profiling/quantification/daily_summary.csv",
+]
+raise SystemExit(mod.main())
+PY
