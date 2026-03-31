@@ -8,6 +8,8 @@ SEED_10UM="$ROOT/analysis-output/app80_10uM_all_replicates_multiscale_large_reco
 
 source /home/lachlan/miniconda3/etc/profile.d/conda.sh
 conda activate organoid-gpu
+export CUDA_DEVICE_ORDER=PCI_BUS_ID
+export CUDA_VISIBLE_DEVICES=0
 export PYTHONNOUSERSITE=1
 export TORCHDYNAMO_DISABLE=1
 export PYTORCH_JIT=0
