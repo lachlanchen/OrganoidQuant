@@ -120,7 +120,11 @@ def parse_condition_from_name(name: str) -> str:
 
 def discover_images(src_root: Path, conditions: list[str]) -> list[tuple[str, str, str, date, Path]]:
     rows: list[tuple[str, str, str, date, Path]] = []
-    for date_dir in sorted([p for p in src_root.iterdir() if p.is_dir()]):
+    date_dirs = sorted(
+        [p for p in src_root.iterdir() if p.is_dir()],
+        key=lambda p: parse_date_dir(p.name)[1],
+    )
+    for date_dir in date_dirs:
         date_key = date_dir.name
         date_label, dt = parse_date_dir(date_key)
         for tif in sorted(date_dir.iterdir(), key=natural_key):
@@ -133,6 +137,7 @@ def discover_images(src_root: Path, conditions: list[str]) -> list[tuple[str, st
             if condition not in conditions:
                 continue
             rows.append((condition, date_key, date_label, dt, tif))
+    rows.sort(key=lambda row: (CONDITION_ORDER.index(row[0]), row[3], natural_key(row[4])))
     return rows
 
 
