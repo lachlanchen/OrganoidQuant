@@ -106,7 +106,7 @@ source /home/lachlan/miniconda3/etc/profile.d/conda.sh
 conda activate organoid-gpu
 python - <<'PY'
 import os, site
-print('PYTHONNOUSERSITE', os.environ.get('PYTHONNOUSITE'))
+print('PYTHONNOUSERSITE', os.environ.get('PYTHONNOUSERSITE'))
 print('CUDA_VISIBLE_DEVICES', os.environ.get('CUDA_VISIBLE_DEVICES'))
 print('user_site_on_path', site.getusersitepackages() in __import__('sys').path)
 PY
