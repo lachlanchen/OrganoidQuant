@@ -136,8 +136,14 @@ def process_one(model, tif: Path, out_dir: Path, overwrite: bool) -> dict:
     stats_path = out_dir / f'{stem}_segmentation_stats.json'
     metric_path = out_dir / f'{stem}_metrics.json'
 
-    if not overwrite and metric_path.exists() and stats_path.exists() and mask_path.exists() and signal_path.exists() and rgb_path.exists() and overlay_path.exists():
-        return json.loads(metric_path.read_text(encoding='utf-8'))
+    if not overwrite:
+        required = [metric_path, stats_path, mask_path, signal_path, rgb_path, overlay_path]
+        existing_ok = all(p.exists() and p.stat().st_size > 0 for p in required)
+        if existing_ok:
+            try:
+                return json.loads(metric_path.read_text(encoding='utf-8'))
+            except (OSError, json.JSONDecodeError):
+                pass
 
     rgb, gray = seg.load_rgb_gray(tif)
     signal, support, grad_norm = seg.compute_hybrid_signal(gray)
