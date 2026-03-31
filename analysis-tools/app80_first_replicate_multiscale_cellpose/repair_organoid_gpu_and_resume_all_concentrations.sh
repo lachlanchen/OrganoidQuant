@@ -8,8 +8,10 @@ echo "$LOG_PREFIX start $(date '+%Y-%m-%d %H:%M:%S')"
 source /home/lachlan/miniconda3/etc/profile.d/conda.sh
 conda deactivate >/dev/null 2>&1 || true
 conda env remove -n "$ENV_NAME" -y || true
-conda create -n "$ENV_NAME" -y python=3.10 pip numpy=1.26 scipy pandas matplotlib tifffile -c conda-forge
-mamba install -n "$ENV_NAME" -y pytorch=2.6.0 torchvision=0.21.0 pytorch-cuda=12.4 -c pytorch -c nvidia -c conda-forge
+conda create -n "$ENV_NAME" -y \
+  python=3.10 pip numpy=1.26 scipy pandas matplotlib tifffile \
+  pytorch=2.6.0 torchvision=0.21.0 pytorch-cuda=12.4 \
+  -c pytorch -c nvidia -c conda-forge
 conda activate "$ENV_NAME"
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export CUDA_VISIBLE_DEVICES=0
