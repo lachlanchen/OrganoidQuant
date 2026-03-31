@@ -54,7 +54,10 @@ def style_axis(ax, xticks, xticklabels, title: str) -> None:
 def main() -> int:
     args = parse_args()
     daily_csv = Path(args.daily_csv).resolve()
-    out_dir = daily_csv.parent.parent / 'figures'
+    if daily_csv.parent.name == 'quantification' and daily_csv.parent.parent.name == 'profiling':
+        out_dir = daily_csv.parent.parent.parent / 'figures'
+    else:
+        out_dir = daily_csv.parent.parent / 'figures'
     out_dir.mkdir(parents=True, exist_ok=True)
     rows = read_daily(daily_csv)
     by_conc = grouped(rows)
