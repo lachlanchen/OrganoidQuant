@@ -5,7 +5,8 @@ source /home/lachlan/miniconda3/etc/profile.d/conda.sh
 conda activate organoid-gpu
 export PYTHONNOUSERSITE=1
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
-export CUDA_VISIBLE_DEVICES=0
+export ZQ_CUDA_VISIBLE_DEVICES="${ZQ_CUDA_VISIBLE_DEVICES:-0}"
+export CUDA_VISIBLE_DEVICES="$ZQ_CUDA_VISIBLE_DEVICES"
 export TORCHDYNAMO_DISABLE=1
 export TORCH_DISABLE_DYNAMO=1
 export PYTORCH_JIT=0
