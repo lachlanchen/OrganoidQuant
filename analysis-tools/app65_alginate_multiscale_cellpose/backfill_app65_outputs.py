@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 from pathlib import Path
 import sys
+
+import cv2
+import numpy as np
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
@@ -19,18 +23,53 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
+def imread_any(path: Path, flags: int) -> np.ndarray | None:
+    try:
+        buf = np.fromfile(str(path), dtype=np.uint8)
+    except OSError:
+        return None
+    if buf.size == 0:
+        return None
+    return cv2.imdecode(buf, flags)
+
+
+def refresh_metric_json(metric_path: Path) -> dict:
+    data = json.loads(metric_path.read_text(encoding='utf-8'))
+    mask_path = Path(data['mask_path'])
+    signal_path = Path(data['signal_path'])
+    label_mask = imread_any(mask_path, cv2.IMREAD_UNCHANGED)
+    signal_gray = imread_any(signal_path, cv2.IMREAD_GRAYSCALE)
+    if label_mask is None:
+        raise RuntimeError(f'Failed to load label mask: {mask_path}')
+    if signal_gray is None:
+        source_tif = Path(data['source_tif'])
+        _, gray = app65.seg.load_rgb_gray(source_tif)
+        signal_gray, _, _ = app65.seg.compute_hybrid_signal(gray)
+    shape_metrics = app65.aggregate_segmentation_metrics(label_mask, signal_gray)
+    data['count'] = shape_metrics['count']
+    data['curvature'] = shape_metrics['curvature']
+    data['roundness'] = shape_metrics['roundness']
+    data['roundness_deviation_norm'] = shape_metrics['roundness_deviation_norm']
+    data['roundness_deviation_px_total'] = shape_metrics['roundness_deviation_px_total']
+    data['edge_intensity'] = shape_metrics['edge_intensity']
+    data['total_area_px'] = shape_metrics['total_area_px']
+    data['average_perimeter_px'] = shape_metrics['average_perimeter_px']
+    metric_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+    return data
+
+
 def load_metrics(out_dir: Path) -> list[dict]:
     runs_dir = out_dir / 'runs'
     metrics: list[dict] = []
     if not runs_dir.exists():
         return metrics
     for metric_path in sorted(runs_dir.rglob('*_metrics.json')):
-        data = json.loads(metric_path.read_text(encoding='utf-8'))
+        data = refresh_metric_json(metric_path)
         condition = data['condition']
         date_key = data['date_key']
         date_label, dt = app65.parse_date_dir(date_key)
         relative_day = (dt - app65.date(2025, 11, 19)).days
-        row = dict(data)
+        row = copy.deepcopy(data)
         row['date_label'] = date_label
         row['relative_day'] = relative_day
         metrics.append(row)

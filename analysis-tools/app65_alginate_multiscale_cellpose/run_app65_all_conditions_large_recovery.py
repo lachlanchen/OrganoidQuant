@@ -10,6 +10,7 @@ from datetime import date
 from pathlib import Path
 import sys
 
+import cv2
 import numpy as np
 import torch  # noqa: F401
 
@@ -65,6 +66,66 @@ def natural_key(path: Path) -> tuple[int, str]:
     m = MAG_RE.search(path.stem)
     idx = int(m.group(2)) if m else 10**9
     return (idx, path.stem.lower())
+
+
+def circle_roundness(mask: np.ndarray) -> tuple[float, float, int]:
+    ys, xs = np.nonzero(mask)
+    area = int(mask.sum())
+    if area <= 0 or ys.size == 0:
+        return 0.0, 0.0, 0
+    cy = float(ys.mean())
+    cx = float(xs.mean())
+    radius = math.sqrt(area / math.pi)
+    pad = max(3, int(math.ceil(radius)) + 3)
+    y0 = max(0, int(math.floor(cy)) - pad)
+    y1 = min(mask.shape[0], int(math.floor(cy)) + pad + 1)
+    x0 = max(0, int(math.floor(cx)) - pad)
+    x1 = min(mask.shape[1], int(math.floor(cx)) + pad + 1)
+    yy, xx = np.ogrid[y0:y1, x0:x1]
+    circle = ((yy - cy) ** 2 + (xx - cx) ** 2) <= (radius ** 2)
+    obj = mask[y0:y1, x0:x1].astype(bool)
+    union = obj | circle
+    if not union.any():
+        return 0.0, 0.0, 0
+    symdiff = obj ^ circle
+    deviation_px = int(symdiff.sum())
+    deviation_norm = float(deviation_px / union.sum())
+    roundness = float(max(0.0, 1.0 - deviation_norm))
+    return roundness, deviation_norm, deviation_px
+
+
+def object_metrics_with_roundness(label_mask: np.ndarray) -> list[dict]:
+    rows = base.object_metrics(label_mask)
+    for row in rows:
+        mask = label_mask == row['label']
+        roundness, deviation_norm, deviation_px = circle_roundness(mask)
+        row['roundness'] = roundness
+        row['roundness_deviation_norm'] = deviation_norm
+        row['roundness_deviation_px'] = deviation_px
+    return rows
+
+
+def aggregate_segmentation_metrics(label_mask: np.ndarray, signal_gray: np.ndarray) -> dict:
+    obj_rows = object_metrics_with_roundness(label_mask)
+    count = len(obj_rows)
+    total_area = int(sum(r['area_px'] for r in obj_rows))
+    avg_perimeter = float(np.mean([r['perimeter_px'] for r in obj_rows])) if obj_rows else 0.0
+    curvature = float(sum(r['area_px'] * r['circularity'] for r in obj_rows) / total_area) if total_area > 0 else 0.0
+    roundness = float(sum(r['area_px'] * r['roundness'] for r in obj_rows) / total_area) if total_area > 0 else 0.0
+    roundness_deviation_norm = float(sum(r['area_px'] * r['roundness_deviation_norm'] for r in obj_rows) / total_area) if total_area > 0 else 0.0
+    roundness_deviation_px_total = int(sum(r['roundness_deviation_px'] for r in obj_rows))
+    edge_intensity = base.boundary_edge_intensity(label_mask, signal_gray)
+    return {
+        'count': count,
+        'curvature': curvature,
+        'roundness': roundness,
+        'roundness_deviation_norm': roundness_deviation_norm,
+        'roundness_deviation_px_total': roundness_deviation_px_total,
+        'edge_intensity': edge_intensity,
+        'total_area_px': total_area,
+        'average_perimeter_px': avg_perimeter,
+        'object_rows': obj_rows,
+    }
 
 
 def condition_scale(condition: str, relative_day: int) -> float:
@@ -194,12 +255,8 @@ def process_one(model, tif: Path, out_dir: Path, relative_day: int, condition: s
     cv2.imwrite(str(overlay_path), cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
     cv2.imwrite(str(signal_path), signal)
 
-    obj_rows = base.object_metrics(label_mask)
-    count = len(obj_rows)
-    total_area = int(sum(r['area_px'] for r in obj_rows))
-    avg_perimeter = float(np.mean([r['perimeter_px'] for r in obj_rows])) if obj_rows else 0.0
-    curvature = float(sum(r['area_px'] * r['circularity'] for r in obj_rows) / total_area) if total_area > 0 else 0.0
-    edge_intensity = base.boundary_edge_intensity(label_mask, signal)
+    shape_metrics = aggregate_segmentation_metrics(label_mask, signal)
+    obj_rows = shape_metrics['object_rows']
 
     seg_stats = {
         'source_tif': str(tif),
@@ -231,11 +288,14 @@ def process_one(model, tif: Path, out_dir: Path, relative_day: int, condition: s
         'image_name': tif.name,
         'source_tif': str(tif),
         'stage': cfg['stage'],
-        'count': count,
-        'curvature': curvature,
-        'edge_intensity': edge_intensity,
-        'total_area_px': total_area,
-        'average_perimeter_px': avg_perimeter,
+        'count': shape_metrics['count'],
+        'curvature': shape_metrics['curvature'],
+        'roundness': shape_metrics['roundness'],
+        'roundness_deviation_norm': shape_metrics['roundness_deviation_norm'],
+        'roundness_deviation_px_total': shape_metrics['roundness_deviation_px_total'],
+        'edge_intensity': shape_metrics['edge_intensity'],
+        'total_area_px': shape_metrics['total_area_px'],
+        'average_perimeter_px': shape_metrics['average_perimeter_px'],
         'mask_path': str(mask_path),
         'instance_rgb_path': str(rgb_path),
         'overlay_path': str(overlay_path),
@@ -251,14 +311,16 @@ def write_per_image_csv(rows: list[dict], out_csv: Path) -> None:
         writer = csv.writer(f)
         writer.writerow([
             'condition', 'date_key', 'date_label', 'relative_day', 'image_name', 'stage',
-            'count', 'curvature', 'edge_intensity', 'total_area_px', 'average_perimeter_px',
+            'count', 'curvature', 'roundness', 'roundness_deviation_norm', 'roundness_deviation_px_total',
+            'edge_intensity', 'total_area_px', 'average_perimeter_px',
             'count_norm', 'curvature_norm', 'edge_norm', 'normalized_edge_over_count_curvature',
             'mask_path', 'instance_rgb_path', 'overlay_path', 'signal_path', 'stats_path', 'source_tif',
         ])
         for r in rows:
             writer.writerow([
                 r['condition'], r['date_key'], r['date_label'], r['relative_day'], r['image_name'], r['stage'],
-                r['count'], f"{r['curvature']:.12f}", f"{r['edge_intensity']:.12f}", r['total_area_px'], f"{r['average_perimeter_px']:.12f}",
+                r['count'], f"{r['curvature']:.12f}", f"{r['roundness']:.12f}", f"{r['roundness_deviation_norm']:.12f}", r['roundness_deviation_px_total'],
+                f"{r['edge_intensity']:.12f}", r['total_area_px'], f"{r['average_perimeter_px']:.12f}",
                 f"{r['count_norm']:.12f}", f"{r['curvature_norm']:.12f}", f"{r['edge_norm']:.12f}",
                 f"{r['normalized_edge_over_count_curvature']:.12f}",
                 r.get('mask_path', ''), r.get('instance_rgb_path', ''), r.get('overlay_path', ''),
@@ -271,7 +333,17 @@ def write_daily_summary(rows: list[dict], out_csv: Path) -> None:
     for r in rows:
         key = (r['condition'], r['date_key'], r['date_label'], r['relative_day'])
         grouped.setdefault(key, []).append(r)
-    metrics = ['count', 'curvature', 'edge_intensity', 'total_area_px', 'average_perimeter_px', 'normalized_edge_over_count_curvature']
+    metrics = [
+        'count',
+        'curvature',
+        'roundness',
+        'roundness_deviation_norm',
+        'roundness_deviation_px_total',
+        'edge_intensity',
+        'total_area_px',
+        'average_perimeter_px',
+        'normalized_edge_over_count_curvature',
+    ]
     with out_csv.open('w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         header = ['condition', 'date_key', 'date_label', 'relative_day', 'n_images']
