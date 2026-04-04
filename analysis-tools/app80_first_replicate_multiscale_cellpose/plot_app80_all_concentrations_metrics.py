@@ -5,6 +5,8 @@ import argparse
 import csv
 from pathlib import Path
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
@@ -65,6 +67,7 @@ def main() -> int:
     xticklabels = [f'D{d}' for d in xticks]
 
     series = [
+        ('Roundness', 'roundness_mean', 'roundness_sem'),
         ('Curvature', 'curvature_mean', 'curvature_sem'),
         ('Counts', 'count_mean', 'count_sem'),
         ('Edge Intensity', 'edge_intensity_mean', 'edge_intensity_sem'),
@@ -73,7 +76,7 @@ def main() -> int:
         ('Normalized Edge / (Counts * Curvature)', 'normalized_edge_over_count_curvature_mean', 'normalized_edge_over_count_curvature_sem'),
     ]
 
-    fig, axes = plt.subplots(2, 3, figsize=(18.5, 10.5), constrained_layout=False)
+    fig, axes = plt.subplots(3, 3, figsize=(18.8, 13.0), constrained_layout=False)
     axes = axes.flatten()
     handles = [Line2D([0], [0], color=CONCENTRATION_COLORS[c], lw=2.4, marker='o', markersize=5, label=c) for c in CONCENTRATION_ORDER if c in by_conc]
     for ax, (title, mean_col, sem_col) in zip(axes, series):
@@ -88,10 +91,12 @@ def main() -> int:
             ax.plot(x, y, marker='o', linewidth=2.2, markersize=5.0, color=color)
             ax.fill_between(x, y - sem, y + sem, color=color, alpha=0.14, linewidth=0)
         style_axis(ax, xticks, xticklabels, title)
+    for ax in axes[len(series):]:
+        ax.axis('off')
 
     fig.suptitle('App80 10x Replicates: Segmentation Metrics by Day Across Concentrations', fontsize=15, y=0.975)
-    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.93), ncol=len(handles), frameon=False, fontsize=11)
-    fig.subplots_adjust(left=0.06, right=0.985, bottom=0.09, top=0.82, hspace=0.34, wspace=0.24)
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.94), ncol=len(handles), frameon=False, fontsize=11)
+    fig.subplots_adjust(left=0.06, right=0.985, bottom=0.08, top=0.86, hspace=0.38, wspace=0.24)
 
     png = out_dir / 'app80_all_concentrations_segmentation_metrics.png'
     pdf = out_dir / 'app80_all_concentrations_segmentation_metrics.pdf'
@@ -121,10 +126,34 @@ def main() -> int:
     fig2.savefig(pdf2, bbox_inches='tight')
     plt.close(fig2)
 
+    fig3, ax3 = plt.subplots(figsize=(10.2, 6.0), constrained_layout=False)
+    for concentration in CONCENTRATION_ORDER:
+        subset = by_conc.get(concentration, [])
+        if not subset:
+            continue
+        x = np.array([r['relative_day'] for r in subset], dtype=float)
+        y = np.array([float(r['roundness_mean']) for r in subset], dtype=float)
+        sem = np.array([float(r['roundness_sem']) for r in subset], dtype=float)
+        color = CONCENTRATION_COLORS[concentration]
+        ax3.plot(x, y, marker='o', linewidth=2.4, markersize=5.5, color=color, label=concentration)
+        ax3.fill_between(x, y - sem, y + sem, color=color, alpha=0.14, linewidth=0)
+    style_axis(ax3, xticks, xticklabels, 'Roundness')
+    fig3.suptitle('App80 10x Replicates: Circle-Deviation Roundness', fontsize=14, y=0.97)
+    ax3.legend(loc='upper center', bbox_to_anchor=(0.5, 1.16), ncol=min(5, len(handles)), frameon=False, fontsize=10.5)
+    fig3.subplots_adjust(left=0.09, right=0.985, bottom=0.13, top=0.78)
+
+    png3 = out_dir / 'app80_all_concentrations_roundness.png'
+    pdf3 = out_dir / 'app80_all_concentrations_roundness.pdf'
+    fig3.savefig(png3, dpi=220, bbox_inches='tight')
+    fig3.savefig(pdf3, bbox_inches='tight')
+    plt.close(fig3)
+
     print(png)
     print(pdf)
     print(png2)
     print(pdf2)
+    print(png3)
+    print(pdf3)
     return 0
 
 

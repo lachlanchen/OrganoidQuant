@@ -69,14 +69,16 @@ def write_per_image_csv(rows: list[dict], out_csv: Path) -> None:
         writer = csv.writer(f)
         writer.writerow([
             'concentration', 'date_key', 'date_label', 'relative_day', 'image_name', 'stage',
-            'count', 'curvature', 'edge_intensity', 'total_area_px', 'average_perimeter_px',
+            'count', 'curvature', 'roundness', 'roundness_deviation_norm', 'roundness_deviation_px_total',
+            'edge_intensity', 'total_area_px', 'average_perimeter_px',
             'count_norm', 'curvature_norm', 'edge_norm', 'normalized_edge_over_count_curvature',
             'mask_path', 'instance_rgb_path', 'overlay_path', 'signal_path', 'stats_path', 'source_tif',
         ])
         for r in rows:
             writer.writerow([
                 r['concentration'], r['date_key'], r['date_label'], r['relative_day'], r['image_name'], r['stage'],
-                r['count'], f"{r['curvature']:.12f}", f"{r['edge_intensity']:.12f}", r['total_area_px'], f"{r['average_perimeter_px']:.12f}",
+                r['count'], f"{r['curvature']:.12f}", f"{r['roundness']:.12f}", f"{r['roundness_deviation_norm']:.12f}", r['roundness_deviation_px_total'],
+                f"{r['edge_intensity']:.12f}", r['total_area_px'], f"{r['average_perimeter_px']:.12f}",
                 f"{r['count_norm']:.12f}", f"{r['curvature_norm']:.12f}", f"{r['edge_norm']:.12f}",
                 f"{r['normalized_edge_over_count_curvature']:.12f}",
                 r.get('mask_path', ''), r.get('instance_rgb_path', ''), r.get('overlay_path', ''),
@@ -89,7 +91,17 @@ def write_daily_summary(rows: list[dict], out_csv: Path) -> None:
     for r in rows:
         key = (r['concentration'], r['date_key'], r['date_label'], r['relative_day'])
         grouped.setdefault(key, []).append(r)
-    metrics = ['count', 'curvature', 'edge_intensity', 'total_area_px', 'average_perimeter_px', 'normalized_edge_over_count_curvature']
+    metrics = [
+        'count',
+        'curvature',
+        'roundness',
+        'roundness_deviation_norm',
+        'roundness_deviation_px_total',
+        'edge_intensity',
+        'total_area_px',
+        'average_perimeter_px',
+        'normalized_edge_over_count_curvature',
+    ]
     with out_csv.open('w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         header = ['concentration', 'date_key', 'date_label', 'relative_day', 'n_images']
