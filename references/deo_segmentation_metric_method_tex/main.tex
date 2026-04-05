@@ -196,12 +196,12 @@ T_{\mathrm{sup}} = \max\left(T_{\mathrm{Otsu}}(\signal),\; \quantile_{0.58}(\sig
 
 The raw threshold mask is
 \begin{equation}
-\support_0(x)=\1[\signal(x)\ge T_{\mathrm{sup}}].
+M_{\mathrm{sup},0}(x)=\1[\signal(x)\ge T_{\mathrm{sup}}].
 \end{equation}
 
 Morphological cleanup then gives the final support mask $\support$:
 \begin{equation}
-\support = \closeop\bigl(\openop(\support_0)\bigr).
+\support = \closeop\bigl(\openop(M_{\mathrm{sup},0})\bigr).
 \end{equation}
 
 This is not the final segmentation. It is a support prior used to:
