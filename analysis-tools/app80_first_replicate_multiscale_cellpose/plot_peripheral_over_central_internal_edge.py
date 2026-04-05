@@ -38,7 +38,7 @@ def main() -> int:
     per_image_csv = Path(args.per_image_csv).resolve()
     quant_dir = per_image_csv.parent
     out_root = quant_dir.parent.parent
-    figure_dir = out_root / 'figures'
+    figure_dir = out_root / 'figures' / 'fusion_internal_edge_metrics'
     figure_dir.mkdir(parents=True, exist_ok=True)
 
     df = pd.read_csv(per_image_csv)
