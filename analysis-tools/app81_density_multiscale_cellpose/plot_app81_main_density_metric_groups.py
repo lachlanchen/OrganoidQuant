@@ -124,9 +124,9 @@ def main() -> int:
     args = parse_args()
     daily_csv = Path(args.daily_csv).resolve()
     if daily_csv.parent.name == 'quantification' and daily_csv.parent.parent.name == 'profiling':
-        out_dir = daily_csv.parent.parent.parent / 'figures'
+        out_dir = daily_csv.parent.parent.parent / 'figures' / 'metric_group_panels'
     else:
-        out_dir = daily_csv.parent.parent / 'figures'
+        out_dir = daily_csv.parent.parent / 'figures' / 'metric_group_panels'
     out_dir.mkdir(parents=True, exist_ok=True)
     rows = read_daily(daily_csv)
 
