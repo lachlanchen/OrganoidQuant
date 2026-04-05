@@ -376,7 +376,7 @@ def main() -> int:
     out_dir = Path(args.out_dir).resolve()
     runs_dir = out_dir / 'runs'
     quant_dir = out_dir / 'profiling' / 'quantification'
-    fig_dir = out_dir / 'figures'
+    fig_dir = out_dir / 'figures' / 'differentiation_darkness'
     quant_dir.mkdir(parents=True, exist_ok=True)
     fig_dir.mkdir(parents=True, exist_ok=True)
 

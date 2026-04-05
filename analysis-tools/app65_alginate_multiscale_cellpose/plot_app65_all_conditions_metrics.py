@@ -64,6 +64,12 @@ def main() -> int:
     else:
         out_dir = daily_csv.parent.parent / 'figures'
     out_dir.mkdir(parents=True, exist_ok=True)
+    overview_dir = out_dir / 'overview_segmentation_metrics'
+    fusion_dir = out_dir / 'fusion_proxy_metrics'
+    roundness_dir = out_dir / 'differentiation_roundness'
+    overview_dir.mkdir(parents=True, exist_ok=True)
+    fusion_dir.mkdir(parents=True, exist_ok=True)
+    roundness_dir.mkdir(parents=True, exist_ok=True)
     rows = read_daily(daily_csv)
     by_cond = grouped(rows)
     xticks = sorted({r['relative_day'] for r in rows})
@@ -101,8 +107,8 @@ def main() -> int:
     fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.94), ncol=len(handles), frameon=False, fontsize=11)
     fig.subplots_adjust(left=0.06, right=0.985, bottom=0.08, top=0.86, hspace=0.38, wspace=0.24)
 
-    png = out_dir / 'app65_all_conditions_segmentation_metrics.png'
-    pdf = out_dir / 'app65_all_conditions_segmentation_metrics.pdf'
+    png = overview_dir / 'app65_all_conditions_segmentation_metrics.png'
+    pdf = overview_dir / 'app65_all_conditions_segmentation_metrics.pdf'
     fig.savefig(png, dpi=220, bbox_inches='tight')
     fig.savefig(pdf, bbox_inches='tight')
     plt.close(fig)
@@ -123,8 +129,8 @@ def main() -> int:
     ax2.legend(loc='upper center', bbox_to_anchor=(0.5, 1.16), ncol=min(3, len(handles)), frameon=False, fontsize=10.5)
     fig2.subplots_adjust(left=0.09, right=0.985, bottom=0.13, top=0.78)
 
-    png2 = out_dir / 'app65_all_conditions_normalized_edge_over_count_curvature.png'
-    pdf2 = out_dir / 'app65_all_conditions_normalized_edge_over_count_curvature.pdf'
+    png2 = fusion_dir / 'app65_all_conditions_normalized_edge_over_count_curvature.png'
+    pdf2 = fusion_dir / 'app65_all_conditions_normalized_edge_over_count_curvature.pdf'
     fig2.savefig(png2, dpi=220, bbox_inches='tight')
     fig2.savefig(pdf2, bbox_inches='tight')
     plt.close(fig2)
@@ -145,8 +151,8 @@ def main() -> int:
     ax3.legend(loc='upper center', bbox_to_anchor=(0.5, 1.16), ncol=min(3, len(handles)), frameon=False, fontsize=10.5)
     fig3.subplots_adjust(left=0.09, right=0.985, bottom=0.13, top=0.78)
 
-    png3 = out_dir / 'app65_all_conditions_roundness.png'
-    pdf3 = out_dir / 'app65_all_conditions_roundness.pdf'
+    png3 = roundness_dir / 'app65_all_conditions_roundness.png'
+    pdf3 = roundness_dir / 'app65_all_conditions_roundness.pdf'
     fig3.savefig(png3, dpi=220, bbox_inches='tight')
     fig3.savefig(pdf3, bbox_inches='tight')
     plt.close(fig3)
