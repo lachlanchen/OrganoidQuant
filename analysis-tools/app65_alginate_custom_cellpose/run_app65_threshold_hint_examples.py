@@ -43,7 +43,7 @@ def main() -> int:
 
         old_metrics = json.loads((OLD_BASE / f'29-十一月-2025_{stem}_metrics.json').read_text())
         old_stats_path = OLD_BASE / f'29-十一月-2025_{stem}_segmentation_stats.json'
-        new_summary_path = out_dir / 'step05_final/step57_final_summary.json'
+        new_summary_path = out_dir / 'step06_final/step57_final_summary.json'
         new_summary = json.loads(new_summary_path.read_text())
         old_sources = old_source_counts(old_stats_path)
 
@@ -56,8 +56,8 @@ def main() -> int:
             'new_candidate_count_before_merge': new_summary.get('candidate_count_before_merge'),
             'new_hint_component_count': new_summary.get('hint_component_count'),
             'new_output_dir': str(out_dir),
-            'new_overlay_path': str(out_dir / 'step05_final/step52_final_overlay.png'),
-            'new_mask_path': str(out_dir / 'step05_final/step50_final_mask_16bit.png'),
+            'new_overlay_path': str(out_dir / 'step06_final/step52_final_overlay.png'),
+            'new_mask_path': str(out_dir / 'step06_final/step50_final_mask_16bit.png'),
         })
 
     summary_csv = OUT_BASE / 'comparison_summary.csv'
