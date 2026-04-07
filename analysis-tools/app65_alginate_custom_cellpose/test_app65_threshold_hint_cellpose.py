@@ -34,6 +34,7 @@ class Candidate:
     overlap_core: float
     mean_signal: float
     mean_sat: float
+    boundary_strength: float
     border_touch: bool
     bbox_cover: float
 
@@ -95,6 +96,31 @@ def mask_stats(mask: np.ndarray) -> tuple[int, float, float, float, bool, float]
     return area, perimeter, circularity, fill_ratio, border_touch, bbox_cover
 
 
+def boundary_ring_strength(mask: np.ndarray, edge_map: np.ndarray) -> float:
+    if not mask.any():
+        return 0.0
+    mask_u8 = mask.astype(np.uint8) * 255
+    outer = cv2.dilate(mask_u8, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)), iterations=1) > 0
+    inner = cv2.erode(mask_u8, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)), iterations=1) > 0
+    ring = np.logical_and(outer, ~inner)
+    if ring.sum() <= 0:
+        ring = outer
+    return float(edge_map[ring].mean() / 255.0) if ring.any() else 0.0
+
+
+def grow_within(seed_mask: np.ndarray, allow_mask: np.ndarray, kernel_size: int = 9, max_iters: int = 28) -> np.ndarray:
+    region = (seed_mask.astype(np.uint8) * 255)
+    allow_u8 = (allow_mask.astype(np.uint8) * 255)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
+    for _ in range(max_iters):
+        dil = cv2.dilate(region, kernel, iterations=1)
+        nxt = cv2.bitwise_and(dil, allow_u8)
+        if np.array_equal(nxt, region):
+            break
+        region = nxt
+    return region > 0
+
+
 def build_threshold_hint(rgb: np.ndarray, gray: np.ndarray, signal: np.ndarray, out_dir: Path) -> tuple[np.ndarray, np.ndarray, dict]:
     step = out_dir / 'step02_threshold_hint'
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
@@ -127,8 +153,18 @@ def build_threshold_hint(rgb: np.ndarray, gray: np.ndarray, signal: np.ndarray, 
     grad_hi = grad >= grad_p80
     dark_wall = blackhat >= blackhat_p80
 
-    union = (signal_lo & (texture_hi | grad_hi | a_hi)) | (texture_hi & grad_hi) | (dark_wall & texture_hi) | sat_hi
-    strong = signal_hi | (texture_hi & grad_hi) | (dark_wall & (signal_lo | a_hi))
+    union = (
+        signal_lo & (texture_hi | grad_hi | a_hi | dark_wall)
+    ) | (
+        dark_wall & (texture_hi | grad_hi | signal_lo)
+    ) | (
+        signal_hi & (texture_hi | grad_hi | dark_wall)
+    )
+    strong = (
+        signal_hi & (texture_hi | grad_hi | dark_wall | a_hi)
+    ) | (
+        dark_wall & signal_lo & (texture_hi | grad_hi)
+    )
 
     save_gray(step / 'step10_signal.png', signal)
     save_gray(step / 'step11_gray.png', gray)
@@ -147,46 +183,71 @@ def build_threshold_hint(rgb: np.ndarray, gray: np.ndarray, signal: np.ndarray, 
     save_binary(step / 'step27_union_raw.png', union)
     save_binary(step / 'step28_strong_raw.png', strong)
 
-    env = (union.astype(np.uint8) * 255)
-    env = cv2.morphologyEx(env, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25)))
-    env = cv2.dilate(env, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (21, 21)), iterations=1)
-    env = cv2.morphologyEx(env, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
-    env = fill_holes(env)
+    union_mask = (union.astype(np.uint8) * 255)
+    union_mask = cv2.morphologyEx(union_mask, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)))
+    union_mask = cv2.morphologyEx(union_mask, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
 
     strong_mask = (strong.astype(np.uint8) * 255)
-    strong_mask = cv2.dilate(strong_mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)), iterations=1)
+    strong_mask = cv2.morphologyEx(strong_mask, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
+    strong_mask = cv2.morphologyEx(strong_mask, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+    strong_mask = cv2.dilate(strong_mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)), iterations=1)
 
-    n, labels, stats, _ = cv2.connectedComponentsWithStats((env > 0).astype(np.uint8), connectivity=8)
-    H, W = env.shape
-    kept = np.zeros_like(env)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats((strong_mask > 0).astype(np.uint8), connectivity=8)
+    H, W = union_mask.shape
+    kept = np.zeros_like(union_mask)
     rows = []
     for lab_id in range(1, n):
-        area = int(stats[lab_id, cv2.CC_STAT_AREA])
+        seed_area = int(stats[lab_id, cv2.CC_STAT_AREA])
+        if seed_area < 2500:
+            continue
+        seed_mask = labels == lab_id
+        grown = grow_within(seed_mask, union_mask > 0, kernel_size=9, max_iters=32)
+        grown_u8 = (grown.astype(np.uint8) * 255)
+        grown_u8 = cv2.morphologyEx(grown_u8, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (13, 13)))
+        grown_u8 = cv2.morphologyEx(grown_u8, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+        grown_u8 = fill_holes(grown_u8)
+        comp_mask = grown_u8 > 0
+        area = int(comp_mask.sum())
+        if area < 18000:
+            continue
         x = int(stats[lab_id, cv2.CC_STAT_LEFT])
         y = int(stats[lab_id, cv2.CC_STAT_TOP])
         w = int(stats[lab_id, cv2.CC_STAT_WIDTH])
         h = int(stats[lab_id, cv2.CC_STAT_HEIGHT])
-        border_touch = (x == 0 or y == 0 or x + w >= W or y + h >= H)
-        comp_mask = labels == lab_id
+        ys, xs = np.where(comp_mask)
+        x = int(xs.min())
+        y = int(ys.min())
+        w = int(xs.max() - xs.min() + 1)
+        h = int(ys.max() - ys.min() + 1)
+        border_touch = bool(comp_mask[0, :].any() or comp_mask[-1, :].any() or comp_mask[:, 0].any() or comp_mask[:, -1].any())
         strong_overlap = float((strong_mask[comp_mask] > 0).mean()) if area else 0.0
-        keep = area >= 18000 and strong_overlap >= 0.04 and not (border_touch and area < 90000)
+        _, _, circularity, fill_ratio, _, bbox_cover = mask_stats(comp_mask)
+        mean_dark = float((255 - gray[comp_mask]).mean() / 255.0) if area else 0.0
+        mean_texture = float(texture[comp_mask].mean() / 255.0) if area else 0.0
+        droplet_like_border = border_touch and bbox_cover > 0.78 and circularity > 0.72 and fill_ratio > 0.58 and mean_texture < 0.10
+        keep = strong_overlap >= 0.05 and not droplet_like_border
         if keep:
-            kept[labels == lab_id] = 255
+            kept[comp_mask] = 255
         rows.append({
             'component_id': lab_id,
             'area_px': area,
+            'seed_area_px': seed_area,
             'x': x,
             'y': y,
             'w': w,
             'h': h,
             'border_touch': border_touch,
             'strong_overlap': round(strong_overlap, 6),
+            'circularity': round(float(circularity), 6),
+            'fill_ratio': round(float(fill_ratio), 6),
+            'bbox_cover': round(float(bbox_cover), 6),
+            'mean_dark': round(float(mean_dark), 6),
+            'mean_texture': round(float(mean_texture), 6),
             'kept': keep,
         })
 
-    kept = cv2.morphologyEx(kept, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (31, 31)))
-    kept = cv2.morphologyEx(kept, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
-    kept = fill_holes(kept)
+    kept = cv2.morphologyEx(kept, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (17, 17)))
+    kept = cv2.morphologyEx(kept, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
     core = cv2.erode(kept, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (31, 31)))
     if core.sum() == 0:
         core = cv2.erode(kept, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (17, 17)))
@@ -228,6 +289,15 @@ def run_cellpose_branches(model, rgb: np.ndarray, gray: np.ndarray, hint_env: np
     step_raw = out_dir / 'step03_cellpose_raw'
     sat = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)[..., 1]
     bg_value = int(np.median(gray[~hint_env])) if (~hint_env).any() else int(np.median(gray))
+    gradx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
+    grady = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+    grad = cv2.normalize(cv2.magnitude(gradx, grady), None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    blackhat = cv2.morphologyEx(
+        cv2.GaussianBlur(gray, (0, 0), 5.0),
+        cv2.MORPH_BLACKHAT,
+        cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (31, 31)),
+    )
+    edge_map = cv2.normalize(cv2.addWeighted(grad, 0.62, blackhat, 0.38, 0.0), None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
     masked = gray.copy()
     masked[~hint_env] = bg_value
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(16, 16)).apply(gray)
@@ -264,6 +334,7 @@ def run_cellpose_branches(model, rgb: np.ndarray, gray: np.ndarray, hint_env: np
     save_gray(step_raw / 'step02_input_clahe_masked.png', clahe_masked)
     save_gray(step_raw / 'step03_input_inv_masked.png', inv_masked)
     save_gray(step_raw / 'step04_input_dark_emphasis_masked.png', dark_emphasis_masked)
+    save_gray(step_raw / 'step05_boundary_edge_map.png', edge_map)
 
     candidates: list[Candidate] = []
     branch_rows = []
@@ -286,6 +357,13 @@ def run_cellpose_branches(model, rgb: np.ndarray, gray: np.ndarray, hint_env: np
                     continue
                 mean_signal = float(gray[mask].mean() / 255.0) if area else 0.0
                 mean_sat = float(sat[mask].mean() / 255.0) if area else 0.0
+                boundary_strength = boundary_ring_strength(mask, edge_map)
+                if area < 28000 and boundary_strength < 0.16:
+                    continue
+                if area < 60000 and boundary_strength < 0.13:
+                    continue
+                if circularity < 0.18 and fill_ratio < 0.22 and boundary_strength < 0.15:
+                    continue
                 if border_touch and bbox_cover > 0.70 and circularity > 0.80 and fill_ratio > 0.65:
                     continue
                 score = (
@@ -293,6 +371,7 @@ def run_cellpose_branches(model, rgb: np.ndarray, gray: np.ndarray, hint_env: np
                     + 0.52 * circularity
                     + 0.18 * fill_ratio
                     + 0.32 * mean_signal
+                    + 0.42 * boundary_strength
                     + 0.16 * overlap_core
                     + branch_bonus
                 )
@@ -314,6 +393,7 @@ def run_cellpose_branches(model, rgb: np.ndarray, gray: np.ndarray, hint_env: np
                     overlap_core=float(overlap_core),
                     mean_signal=float(mean_signal),
                     mean_sat=float(mean_sat),
+                    boundary_strength=float(boundary_strength),
                     border_touch=bool(border_touch),
                     bbox_cover=float(bbox_cover),
                 ))
@@ -331,6 +411,7 @@ def run_cellpose_branches(model, rgb: np.ndarray, gray: np.ndarray, hint_env: np
                     'overlap_core': round(float(overlap_core), 6),
                     'mean_signal': round(float(mean_signal), 6),
                     'mean_sat': round(float(mean_sat), 6),
+                    'boundary_strength': round(float(boundary_strength), 6),
                     'border_touch': bool(border_touch),
                     'bbox_cover': round(float(bbox_cover), 6),
                 })
@@ -372,7 +453,7 @@ def component_cover_ratio(component_mask: np.ndarray, kept: list[Candidate]) -> 
 def merge_candidates(candidates: list[Candidate]) -> tuple[list[Candidate], list[dict]]:
     kept: list[Candidate] = []
     trace: list[dict] = []
-    for rank, cand in enumerate(sorted(candidates, key=lambda c: (c.score, c.area), reverse=True), start=1):
+    for rank, cand in enumerate(sorted(candidates, key=lambda c: (c.score, c.boundary_strength, c.area), reverse=True), start=1):
         action = 'keep'
         reason = 'new'
         replaced_index: list[int] = []
@@ -386,13 +467,15 @@ def merge_candidates(candidates: list[Candidate]) -> tuple[list[Candidate], list
             if overlap_hits:
                 union_mask = np.zeros_like(cand.mask, dtype=bool)
                 best_score = -1.0
+                best_boundary = -1.0
                 for idx, prev, _, _ in overlap_hits:
                     union_mask |= prev.mask
                     best_score = max(best_score, prev.score)
+                    best_boundary = max(best_boundary, prev.boundary_strength)
                 union_area = float(union_mask.sum())
                 union_overlap = overlap_small(cand.mask, union_mask)
                 area_ratio = float(cand.area / max(1.0, union_area))
-                if union_overlap > 0.60 and 0.78 <= area_ratio <= 1.45 and cand.score >= best_score - 0.25:
+                if union_overlap > 0.60 and 0.78 <= area_ratio <= 1.45 and cand.score >= best_score - 0.25 and cand.boundary_strength >= best_boundary - 0.08:
                     action = 'replace'
                     reason = f'rescue_union_overlap={union_overlap:.3f},area_ratio={area_ratio:.3f}'
                     for idx, *_ in reversed(overlap_hits):
@@ -473,6 +556,7 @@ def run_texture_rescue(
         + 0.22 * texture_norm
         + 0.16 * grad_norm
     )
+    edge_map = cv2.normalize(cv2.addWeighted(grad, 0.62, blackhat, 0.38, 0.0), None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
     texture_hi = texture >= np.percentile(texture, 80)
     blackhat_hi = blackhat >= np.percentile(blackhat, 82)
@@ -555,6 +639,7 @@ def run_texture_rescue(
             mean_texture = float(texture[mask].mean() / 255.0) if area else 0.0
             mean_blackhat = float(blackhat[mask].mean() / 255.0) if area else 0.0
             mean_dark = float(inv_gray[mask].mean() / 255.0) if area else 0.0
+            boundary_strength = boundary_ring_strength(mask, edge_map)
             droplet_like_border = (
                 border_touch
                 and bbox_cover > 0.78
@@ -577,6 +662,7 @@ def run_texture_rescue(
                 + 0.20 * mean_blackhat
                 + 0.10 * mean_grad
                 + 0.08 * overlap_core
+                + 0.12 * boundary_strength
             )
             cand = Candidate(
                 mask=mask,
@@ -590,6 +676,7 @@ def run_texture_rescue(
                 overlap_core=float(overlap_core),
                 mean_signal=float(mean_signal),
                 mean_sat=0.0,
+                boundary_strength=float(boundary_strength),
                 border_touch=bool(border_touch),
                 bbox_cover=float(bbox_cover),
             )
@@ -611,6 +698,7 @@ def run_texture_rescue(
                 'mean_texture': round(float(mean_texture), 6),
                 'mean_blackhat': round(float(mean_blackhat), 6),
                 'mean_dark': round(float(mean_dark), 6),
+                'boundary_strength': round(float(boundary_strength), 6),
                 'border_touch': bool(border_touch),
                 'bbox_cover': round(float(bbox_cover), 6),
             })
@@ -711,6 +799,7 @@ def main() -> int:
             'overlap_core': round(cand.overlap_core, 6),
             'mean_signal': round(cand.mean_signal, 6),
             'mean_sat': round(cand.mean_sat, 6),
+            'boundary_strength': round(cand.boundary_strength, 6),
             'border_touch': cand.border_touch,
             'bbox_cover': round(cand.bbox_cover, 6),
         })

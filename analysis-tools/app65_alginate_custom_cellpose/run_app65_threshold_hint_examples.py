@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import subprocess
@@ -11,7 +12,7 @@ REPO = Path('/home/lachlan/ProjectsLFS/Zhengyu')
 SCRIPT = REPO / 'analysis-tools/app65_alginate_custom_cellpose/test_app65_threshold_hint_cellpose.py'
 RAW_BASE = REPO / 'DEO/App65 DEO+Alginate/29-十一月-2025'
 OLD_BASE = REPO / 'analysis-output/app65_alginate_multiscale_large_recovery/runs/0.02% Alginate/29-十一月-2025'
-OUT_BASE = REPO / 'analysis-output/test_app65_alginate_custom_cellpose/runs/0.02% Alginate/29-十一月-2025'
+DEFAULT_OUT_BASE = REPO / 'analysis-output/test_app65_alginate_custom_cellpose/runs/0.02% Alginate/29-十一月-2025'
 
 STEMS = [
     '0.02% Alginate 10x00',
@@ -21,6 +22,12 @@ STEMS = [
     '0.02% Alginate 10x16',
     '0.02% Alginate 10x17',
 ]
+
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description='Run the App65 custom threshold-hint test set.')
+    p.add_argument('--out-base', default=str(DEFAULT_OUT_BASE))
+    return p.parse_args()
 
 
 def old_source_counts(stats_path: Path) -> dict[str, int]:
@@ -33,11 +40,13 @@ def old_source_counts(stats_path: Path) -> dict[str, int]:
 
 
 def main() -> int:
-    OUT_BASE.mkdir(parents=True, exist_ok=True)
+    args = parse_args()
+    out_base = Path(args.out_base).resolve()
+    out_base.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, object]] = []
     for stem in STEMS:
         tif = RAW_BASE / f'{stem}.tif'
-        out_dir = OUT_BASE / f'29-十一月-2025_{stem}_threshold_hint_cellpose'
+        out_dir = out_base / f'29-十一月-2025_{stem}_threshold_hint_cellpose'
         cmd = [sys.executable, str(SCRIPT), '--tif', str(tif), '--out-dir', str(out_dir)]
         subprocess.run(cmd, check=True)
 
@@ -60,7 +69,7 @@ def main() -> int:
             'new_mask_path': str(out_dir / 'step06_final/step50_final_mask_16bit.png'),
         })
 
-    summary_csv = OUT_BASE / 'comparison_summary.csv'
+    summary_csv = out_base / 'comparison_summary.csv'
     with summary_csv.open('w', newline='', encoding='utf-8') as fh:
         writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
         writer.writeheader()
@@ -75,8 +84,8 @@ def main() -> int:
         'images': STEMS,
         'summary_csv': str(summary_csv),
     }
-    (OUT_BASE / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
-    print(json.dumps({'output_base': str(OUT_BASE), 'summary_csv': str(summary_csv), 'image_count': len(rows)}, ensure_ascii=False))
+    (out_base / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(json.dumps({'output_base': str(out_base), 'summary_csv': str(summary_csv), 'image_count': len(rows)}, ensure_ascii=False))
     return 0
 
 
