@@ -359,13 +359,57 @@ def overlap_small(a: np.ndarray, b: np.ndarray) -> float:
     return inter / denom if denom else 0.0
 
 
+def component_cover_ratio(component_mask: np.ndarray, kept: list[Candidate]) -> float:
+    comp_area = float(component_mask.sum())
+    if comp_area <= 0:
+        return 0.0
+    covered = np.zeros_like(component_mask, dtype=bool)
+    for cand in kept:
+        covered |= np.logical_and(component_mask, cand.mask)
+    return float(covered.sum() / comp_area)
+
+
 def merge_candidates(candidates: list[Candidate]) -> tuple[list[Candidate], list[dict]]:
     kept: list[Candidate] = []
     trace: list[dict] = []
     for rank, cand in enumerate(sorted(candidates, key=lambda c: (c.score, c.area), reverse=True), start=1):
         action = 'keep'
         reason = 'new'
-        replaced_index = None
+        replaced_index: list[int] = []
+        if cand.branch.endswith('rescue'):
+            overlap_hits: list[tuple[int, Candidate, float, float]] = []
+            for idx, prev in enumerate(kept):
+                ov = overlap_small(cand.mask, prev.mask)
+                j = iou(cand.mask, prev.mask)
+                if ov > 0.35 or j > 0.18:
+                    overlap_hits.append((idx, prev, ov, j))
+            if overlap_hits:
+                union_mask = np.zeros_like(cand.mask, dtype=bool)
+                best_score = -1.0
+                for idx, prev, _, _ in overlap_hits:
+                    union_mask |= prev.mask
+                    best_score = max(best_score, prev.score)
+                union_area = float(union_mask.sum())
+                union_overlap = overlap_small(cand.mask, union_mask)
+                area_ratio = float(cand.area / max(1.0, union_area))
+                if union_overlap > 0.60 and 0.78 <= area_ratio <= 1.45 and cand.score >= best_score - 0.25:
+                    action = 'replace'
+                    reason = f'rescue_union_overlap={union_overlap:.3f},area_ratio={area_ratio:.3f}'
+                    for idx, *_ in reversed(overlap_hits):
+                        del kept[idx]
+                        replaced_index.append(idx + 1)
+                    kept.append(cand)
+                    trace.append({
+                        'rank': rank,
+                        'branch': cand.branch,
+                        'diameter_px': cand.diameter,
+                        'area_px': cand.area,
+                        'score': round(cand.score, 6),
+                        'action': action,
+                        'reason': reason,
+                        'replaced_slot': ','.join(str(x) for x in replaced_index) if replaced_index else None,
+                    })
+                    continue
         for idx, prev in enumerate(kept):
             ov = overlap_small(cand.mask, prev.mask)
             j = iou(cand.mask, prev.mask)
@@ -376,7 +420,7 @@ def merge_candidates(candidates: list[Candidate]) -> tuple[list[Candidate], list
                     action = 'replace'
                     reason = f'overlap_small={ov:.3f},iou={j:.3f}'
                     kept[idx] = cand
-                    replaced_index = idx + 1
+                    replaced_index = [idx + 1]
                 else:
                     action = 'skip'
                     reason = f'overlap_small={ov:.3f},iou={j:.3f}'
@@ -391,7 +435,7 @@ def merge_candidates(candidates: list[Candidate]) -> tuple[list[Candidate], list
             'score': round(cand.score, 6),
             'action': action,
             'reason': reason,
-            'replaced_slot': replaced_index,
+            'replaced_slot': ','.join(str(x) for x in replaced_index) if replaced_index else None,
         })
     return kept, trace
 
@@ -419,6 +463,17 @@ def run_texture_rescue(
     grad = cv2.normalize(cv2.magnitude(gradx, grady), None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
     texture = cv2.normalize(cv2.absdiff(gray, cv2.GaussianBlur(gray, (0, 0), 9.0)), None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
     inv_gray = cv2.normalize(255 - gray, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    inv_norm = inv_gray.astype(np.float32) / 255.0
+    texture_norm = texture.astype(np.float32) / 255.0
+    blackhat_norm = blackhat.astype(np.float32) / 255.0
+    grad_norm = grad.astype(np.float32) / 255.0
+    confidence = (
+        0.38 * inv_norm
+        + 0.24 * blackhat_norm
+        + 0.22 * texture_norm
+        + 0.16 * grad_norm
+    )
+
     texture_hi = texture >= np.percentile(texture, 80)
     blackhat_hi = blackhat >= np.percentile(blackhat, 82)
     grad_hi = grad >= np.percentile(grad, 82)
@@ -433,73 +488,158 @@ def run_texture_rescue(
     save_gray(step / 'step41_blackhat.png', blackhat)
     save_gray(step / 'step42_inverted_gray.png', inv_gray)
     save_binary(step / 'step43_support_mask.png', support > 0)
+    save_gray(step / 'step44_confidence.png', np.clip(confidence * 255.0, 0, 255).astype(np.uint8))
 
-    n, labels, stats, _ = cv2.connectedComponentsWithStats((support > 0).astype(np.uint8), connectivity=8)
+    hint_n, hint_labels, hint_stats, _ = cv2.connectedComponentsWithStats(hint_env.astype(np.uint8), connectivity=8)
     candidates: list[Candidate] = []
     rows = []
-    rescue_labels = np.zeros_like(labels, dtype=np.uint16)
+    rescue_labels = np.zeros_like(hint_labels, dtype=np.uint16)
     kept_count = 0
-    for label_id in range(1, n):
-        mask = labels == label_id
-        area, _, circularity, fill_ratio, border_touch, bbox_cover = mask_stats(mask)
-        if area < 30000:
+    component_rows = []
+    for comp_id in range(1, hint_n):
+        component_mask = hint_labels == comp_id
+        comp_area = int(hint_stats[comp_id, cv2.CC_STAT_AREA])
+        if comp_area < 30000:
             continue
-        if border_touch and bbox_cover > 0.75:
+        coverage = component_cover_ratio(component_mask, kept)
+        unresolved = component_mask & (~covered)
+        unresolved_area = int(unresolved.sum())
+        if coverage >= 0.72 or unresolved_area < 15000:
+            component_rows.append({
+                'component_id': comp_id,
+                'component_area_px': comp_area,
+                'cellpose_coverage': round(float(coverage), 6),
+                'unresolved_area_px': unresolved_area,
+                'rescue_triggered': False,
+            })
             continue
-        if area > int(0.35 * hint_env.sum()):
-            continue
-        overlap_env = float(hint_env[mask].mean()) if area else 0.0
-        overlap_core = float(hint_core[mask].mean()) if area else 0.0
-        mean_signal = float(gray[mask].mean() / 255.0) if area else 0.0
-        mean_grad = float(grad[mask].mean() / 255.0) if area else 0.0
-        mean_texture = float(texture[mask].mean() / 255.0) if area else 0.0
-        mean_blackhat = float(blackhat[mask].mean() / 255.0) if area else 0.0
-        mean_dark = float(inv_gray[mask].mean() / 255.0) if area else 0.0
-        if mean_texture < 0.12 and mean_blackhat < 0.08:
-            continue
-        score = 1.10 * overlap_env + 0.20 * fill_ratio + 0.25 * mean_dark + 0.24 * mean_texture + 0.18 * mean_blackhat + 0.12 * mean_grad + 0.08 * overlap_core
-        cand = Candidate(
-            mask=mask,
-            branch='texture_rescue',
-            diameter=0,
-            score=float(score),
-            area=area,
-            circularity=float(circularity),
-            fill_ratio=float(fill_ratio),
-            overlap_env=float(overlap_env),
-            overlap_core=float(overlap_core),
-            mean_signal=float(mean_signal),
-            mean_sat=0.0,
-            border_touch=bool(border_touch),
-            bbox_cover=float(bbox_cover),
-        )
-        candidates.append(cand)
-        kept_count += 1
-        rescue_labels[mask] = kept_count
-        rows.append({
-            'candidate_label': kept_count,
-            'area_px': area,
-            'score': round(float(score), 6),
-            'circularity': round(float(circularity), 6),
-            'fill_ratio': round(float(fill_ratio), 6),
-            'overlap_env': round(float(overlap_env), 6),
-            'overlap_core': round(float(overlap_core), 6),
-            'mean_signal': round(float(mean_signal), 6),
-            'mean_grad': round(float(mean_grad), 6),
-            'mean_texture': round(float(mean_texture), 6),
-            'mean_blackhat': round(float(mean_blackhat), 6),
-            'mean_dark': round(float(mean_dark), 6),
-            'border_touch': bool(border_touch),
-            'bbox_cover': round(float(bbox_cover), 6),
+
+        comp_conf = confidence[component_mask]
+        hi_thr = max(float(np.percentile(comp_conf, 72)), 0.40)
+        lo_thr = max(float(np.percentile(comp_conf, 56)), 0.28)
+        seed = unresolved & (confidence >= hi_thr)
+        grow = unresolved & (confidence >= lo_thr)
+        seed_u8 = (seed.astype(np.uint8) * 255)
+        grow_u8 = (grow.astype(np.uint8) * 255)
+        seed_u8 = cv2.morphologyEx(seed_u8, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)))
+        seed_u8 = cv2.morphologyEx(seed_u8, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+        region = seed_u8.copy()
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        for _ in range(24):
+            dil = cv2.dilate(region, kernel, iterations=1)
+            grown = cv2.bitwise_and(dil, grow_u8)
+            if np.array_equal(grown, region):
+                break
+            region = grown
+        region = cv2.morphologyEx(region, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15)))
+        region = fill_holes(region)
+        save_binary(step / f'component_{comp_id:02d}_seed.png', seed)
+        save_binary(step / f'component_{comp_id:02d}_grow.png', grow)
+        save_binary(step / f'component_{comp_id:02d}_region.png', region > 0)
+
+        n, labels, stats, _ = cv2.connectedComponentsWithStats((region > 0).astype(np.uint8), connectivity=8)
+        component_triggered = False
+        for label_id in range(1, n):
+            mask = labels == label_id
+            if np.logical_and(mask, component_mask).sum() <= 0:
+                continue
+            mask &= component_mask
+            area, _, circularity, fill_ratio, border_touch, bbox_cover = mask_stats(mask)
+            min_area = max(22000, int(0.08 * comp_area))
+            if area < min_area:
+                continue
+            overlap_env = float(hint_env[mask].mean()) if area else 0.0
+            overlap_core = float(hint_core[mask].mean()) if area else 0.0
+            mean_signal = float(gray[mask].mean() / 255.0) if area else 0.0
+            mean_grad = float(grad[mask].mean() / 255.0) if area else 0.0
+            mean_texture = float(texture[mask].mean() / 255.0) if area else 0.0
+            mean_blackhat = float(blackhat[mask].mean() / 255.0) if area else 0.0
+            mean_dark = float(inv_gray[mask].mean() / 255.0) if area else 0.0
+            droplet_like_border = (
+                border_touch
+                and bbox_cover > 0.78
+                and circularity > 0.72
+                and fill_ratio > 0.58
+                and mean_texture < 0.10
+                and mean_blackhat < 0.06
+            )
+            if droplet_like_border:
+                continue
+            if area > int(0.78 * comp_area):
+                continue
+            if mean_texture < 0.10 and mean_blackhat < 0.08 and mean_dark < 0.22:
+                continue
+            score = (
+                1.18 * overlap_env
+                + 0.16 * fill_ratio
+                + 0.26 * mean_dark
+                + 0.22 * mean_texture
+                + 0.20 * mean_blackhat
+                + 0.10 * mean_grad
+                + 0.08 * overlap_core
+            )
+            cand = Candidate(
+                mask=mask,
+                branch='component_rescue',
+                diameter=0,
+                score=float(score),
+                area=area,
+                circularity=float(circularity),
+                fill_ratio=float(fill_ratio),
+                overlap_env=float(overlap_env),
+                overlap_core=float(overlap_core),
+                mean_signal=float(mean_signal),
+                mean_sat=0.0,
+                border_touch=bool(border_touch),
+                bbox_cover=float(bbox_cover),
+            )
+            candidates.append(cand)
+            kept_count += 1
+            rescue_labels[mask] = kept_count
+            component_triggered = True
+            rows.append({
+                'candidate_label': kept_count,
+                'component_id': comp_id,
+                'area_px': area,
+                'score': round(float(score), 6),
+                'circularity': round(float(circularity), 6),
+                'fill_ratio': round(float(fill_ratio), 6),
+                'overlap_env': round(float(overlap_env), 6),
+                'overlap_core': round(float(overlap_core), 6),
+                'mean_signal': round(float(mean_signal), 6),
+                'mean_grad': round(float(mean_grad), 6),
+                'mean_texture': round(float(mean_texture), 6),
+                'mean_blackhat': round(float(mean_blackhat), 6),
+                'mean_dark': round(float(mean_dark), 6),
+                'border_touch': bool(border_touch),
+                'bbox_cover': round(float(bbox_cover), 6),
+            })
+        component_rows.append({
+            'component_id': comp_id,
+            'component_area_px': comp_area,
+            'cellpose_coverage': round(float(coverage), 6),
+            'unresolved_area_px': unresolved_area,
+            'rescue_triggered': component_triggered,
+            'hi_threshold': round(hi_thr, 6),
+            'lo_threshold': round(lo_thr, 6),
         })
 
-    save_gray(step / 'step44_region_labels_16bit.png', rescue_labels)
+    save_gray(step / 'step45_region_labels_16bit.png', rescue_labels)
     if rows:
         with (step / 'candidate_table.csv').open('w', newline='', encoding='utf-8') as fh:
             writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
             writer.writeheader()
             writer.writerows(rows)
-    write_json(step / 'step49_rescue_summary.json', {'support_px': int((support > 0).sum()), 'candidate_count': len(rows)})
+    if component_rows:
+        with (step / 'component_summary.csv').open('w', newline='', encoding='utf-8') as fh:
+            writer = csv.DictWriter(fh, fieldnames=list(component_rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(component_rows)
+    write_json(step / 'step49_rescue_summary.json', {
+        'support_px': int((support > 0).sum()),
+        'candidate_count': len(rows),
+        'component_count': len(component_rows),
+    })
     return candidates
 
 
