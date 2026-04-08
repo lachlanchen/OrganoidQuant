@@ -5,8 +5,10 @@ import argparse
 import csv
 import json
 from datetime import date
+import os
 from pathlib import Path
 import sys
+import traceback
 
 import cv2
 import numpy as np
@@ -40,6 +42,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument('--conditions', default=','.join(CONDITION_ORDER))
     p.add_argument('--overwrite', action='store_true')
     p.add_argument('--diameters', default='220,320,420,520,700')
+    p.add_argument('--checkpoint-every', type=int, default=25)
+    p.add_argument('--max-errors', type=int, default=100)
     return p.parse_args()
 
 
@@ -161,6 +165,55 @@ def process_one(model, tif: Path, out_dir: Path, relative_day: int, condition: s
     return metric
 
 
+def metric_sort_key(row: dict) -> tuple[int, int, list]:
+    return (
+        CONDITION_ORDER.index(row['condition']),
+        int(row['relative_day']),
+        natural_key(Path(row['image_name'])),
+    )
+
+
+def normalize_metrics(metrics: list[dict]) -> None:
+    if not metrics:
+        return
+    counts_norm = app65_base.base.minmax_floor([float(r['count']) for r in metrics], 0.1)
+    curvature_norm = app65_base.base.minmax_floor([float(r['curvature']) for r in metrics], 0.1)
+    edge_norm = app65_base.base.minmax_floor([float(r['edge_intensity']) for r in metrics], 0.1)
+    for r, cn, kn, en in zip(metrics, counts_norm, curvature_norm, edge_norm):
+        r['count_norm'] = cn
+        r['curvature_norm'] = kn
+        r['edge_norm'] = en
+        r['normalized_edge_over_count_curvature'] = en / (cn * kn)
+
+
+def write_checkpoint(metrics: list[dict], per_image_csv: Path, daily_csv: Path, manifest_path: Path, manifest: dict, failures: list[dict]) -> None:
+    metrics.sort(key=metric_sort_key)
+    normalize_metrics(metrics)
+    write_per_image_csv(metrics, per_image_csv)
+    write_daily_summary(metrics, daily_csv)
+    manifest['n_images'] = len(metrics)
+    manifest['failure_count'] = len(failures)
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
+
+
+def append_failure_row(path: Path, row: dict) -> None:
+    exists = path.exists()
+    with path.open('a', newline='', encoding='utf-8') as fh:
+        writer = csv.DictWriter(fh, fieldnames=[
+            'condition',
+            'date_key',
+            'date_label',
+            'relative_day',
+            'image_name',
+            'source_tif',
+            'error_type',
+            'error_message',
+        ])
+        if not exists:
+            writer.writeheader()
+        writer.writerow(row)
+
+
 def main() -> int:
     args = parse_args()
     src_root = Path(args.src_root).resolve()
@@ -169,6 +222,19 @@ def main() -> int:
     db_dir = out_dir / 'profiling' / 'quantification'
     runs_dir.mkdir(parents=True, exist_ok=True)
     db_dir.mkdir(parents=True, exist_ok=True)
+    cv2.setNumThreads(1)
+    os.environ.setdefault('OMP_NUM_THREADS', '1')
+    os.environ.setdefault('OPENBLAS_NUM_THREADS', '1')
+    os.environ.setdefault('MKL_NUM_THREADS', '1')
+    os.environ.setdefault('NUMEXPR_NUM_THREADS', '1')
+    os.environ.setdefault('VECLIB_MAXIMUM_THREADS', '1')
+    os.environ.setdefault('TBB_NUM_THREADS', '1')
+    try:
+        import torch
+        torch.set_num_threads(1)
+        torch.set_num_interop_threads(1)
+    except Exception:
+        pass
 
     conditions = resolve_conditions(args.conditions)
     images = discover_images(src_root, conditions)
@@ -179,47 +245,62 @@ def main() -> int:
     diameters = [int(x) for x in args.diameters.split(',') if x.strip()]
     model = v3.models.CellposeModel(gpu=True)
     metrics: list[dict] = []
+    failures: list[dict] = []
     total = len(images)
-    for idx, (condition, date_key, date_label, dt, tif) in enumerate(images, start=1):
-        per_date_out = runs_dir / condition / date_key
-        per_date_out.mkdir(parents=True, exist_ok=True)
-        relative_day = (dt - day0).days
-        metric = process_one(model, tif, per_date_out, relative_day, condition, overwrite=args.overwrite, diameters=diameters)
-        metric['condition'] = condition
-        metric['date_label'] = date_label
-        metric['relative_day'] = relative_day
-        metrics.append(metric)
-        print(f'[{idx}/{total}] {condition} {date_key} {tif.name} -> count={metric["count"]}', flush=True)
-
-    counts_norm = app65_base.base.minmax_floor([float(r['count']) for r in metrics], 0.1)
-    curvature_norm = app65_base.base.minmax_floor([float(r['curvature']) for r in metrics], 0.1)
-    edge_norm = app65_base.base.minmax_floor([float(r['edge_intensity']) for r in metrics], 0.1)
-    for r, cn, kn, en in zip(metrics, counts_norm, curvature_norm, edge_norm):
-        r['count_norm'] = cn
-        r['curvature_norm'] = kn
-        r['edge_norm'] = en
-        r['normalized_edge_over_count_curvature'] = en / (cn * kn)
-
-    metrics.sort(key=lambda r: (CONDITION_ORDER.index(r['condition']), r['relative_day'], natural_key(Path(r['image_name']))))
     per_image_csv = db_dir / 'per_image_metrics.csv'
     daily_csv = db_dir / 'daily_summary.csv'
-    write_per_image_csv(metrics, per_image_csv)
-    write_daily_summary(metrics, daily_csv)
-
+    failure_csv = db_dir / 'failed_images.csv'
+    failure_log = db_dir / 'failed_images_tracebacks.log'
     manifest = {
         'src_root': str(src_root),
         'out_dir': str(out_dir),
         'conditions': conditions,
         'diameters': diameters,
         'pipeline': 'app65_v3_direct_brightfield',
-        'n_images': len(metrics),
+        'n_images': 0,
         'per_image_csv': str(per_image_csv),
         'daily_summary_csv': str(daily_csv),
+        'failure_csv': str(failure_csv),
     }
-    (out_dir / 'run_manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
+    manifest_path = out_dir / 'run_manifest.json'
+    for idx, (condition, date_key, date_label, dt, tif) in enumerate(images, start=1):
+        per_date_out = runs_dir / condition / date_key
+        per_date_out.mkdir(parents=True, exist_ok=True)
+        relative_day = (dt - day0).days
+        try:
+            metric = process_one(model, tif, per_date_out, relative_day, condition, overwrite=args.overwrite, diameters=diameters)
+            metric['condition'] = condition
+            metric['date_label'] = date_label
+            metric['relative_day'] = relative_day
+            metrics.append(metric)
+            print(f'[{idx}/{total}] {condition} {date_key} {tif.name} -> count={metric["count"]}', flush=True)
+            if len(metrics) % args.checkpoint_every == 0 or idx == total:
+                write_checkpoint(metrics, per_image_csv, daily_csv, manifest_path, manifest, failures)
+        except Exception as exc:
+            failure = {
+                'condition': condition,
+                'date_key': date_key,
+                'date_label': date_label,
+                'relative_day': relative_day,
+                'image_name': tif.name,
+                'source_tif': str(tif),
+                'error_type': type(exc).__name__,
+                'error_message': str(exc),
+            }
+            failures.append(failure)
+            append_failure_row(failure_csv, failure)
+            with failure_log.open('a', encoding='utf-8') as fh:
+                fh.write(f'[{idx}/{total}] {condition} {date_key} {tif.name}\n')
+                fh.write(traceback.format_exc())
+                fh.write('\n')
+            print(f'[{idx}/{total}] ERROR {condition} {date_key} {tif.name}: {type(exc).__name__}: {exc}', flush=True)
+            if len(failures) >= args.max_errors:
+                raise RuntimeError(f'Too many image failures: {len(failures)}') from exc
+
+    write_checkpoint(metrics, per_image_csv, daily_csv, manifest_path, manifest, failures)
     print(per_image_csv)
     print(daily_csv)
-    print(out_dir / 'run_manifest.json')
+    print(manifest_path)
     return 0
 
 

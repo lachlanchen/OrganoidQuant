@@ -11,17 +11,33 @@ export CUDA_VISIBLE_DEVICES="$ZQ_CUDA_VISIBLE_DEVICES"
 export TORCHDYNAMO_DISABLE=1
 export TORCH_DISABLE_DYNAMO=1
 export PYTORCH_JIT=0
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1
+export TBB_NUM_THREADS=1
+export MPLBACKEND=Agg
+
+run_low_impact() {
+  if command -v ionice >/dev/null 2>&1; then
+    ionice -c 2 -n 7 nice -n 10 "$@"
+  else
+    nice -n 10 "$@"
+  fi
+}
+
 cd "$ROOT"
-python "$ROOT/analysis-tools/app65_alginate_custom_cellpose/run_app65_all_conditions_v3_direct_brightfield.py" \
+run_low_impact python "$ROOT/analysis-tools/app65_alginate_custom_cellpose/run_app65_all_conditions_v3_direct_brightfield.py" \
   --src-root "$ROOT/DEO/App65 DEO+Alginate" \
   --out-dir "$OUT"
-python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/backfill_app65_full_metrics.py" \
+run_low_impact python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/backfill_app65_full_metrics.py" \
   --out-dir "$OUT"
-python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/plot_app65_all_conditions_metrics.py" \
+run_low_impact python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/plot_app65_all_conditions_metrics.py" \
   --daily-csv "$OUT/profiling/quantification/daily_summary.csv"
-python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/plot_app65_differentiation_darkness_metrics.py" \
+run_low_impact python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/plot_app65_differentiation_darkness_metrics.py" \
   --out-dir "$OUT"
-python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/plot_app65_all_conditions_full_metric_groups.py" \
+run_low_impact python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/plot_app65_all_conditions_full_metric_groups.py" \
   --daily-csv "$OUT/profiling/quantification/daily_summary.csv"
-python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/analyze_app65_subexperiments.py" \
+run_low_impact python "$ROOT/analysis-tools/app65_alginate_multiscale_cellpose/analyze_app65_subexperiments.py" \
   --daily-csv "$OUT/profiling/quantification/daily_summary.csv"
