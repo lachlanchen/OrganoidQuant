@@ -438,6 +438,147 @@ def append_threshold_large_candidates(
         )
 
 
+def append_crop_rescue_candidates(
+    model,
+    candidates: list[Candidate],
+    step: Path,
+    gray: np.ndarray,
+    clahe: np.ndarray,
+    wall_emphasis: np.ndarray,
+    signal: np.ndarray,
+    grad_mag: np.ndarray,
+    blackhat_big: np.ndarray,
+    blackhat_small: np.ndarray,
+    hint_env: np.ndarray,
+    hint_core: np.ndarray,
+    support_mask: np.ndarray,
+    local_std: np.ndarray,
+) -> None:
+    inv_gray = 255 - gray
+    body_score = cv2.normalize(
+        0.45 * inv_gray.astype(np.float32)
+        + 0.25 * signal.astype(np.float32)
+        + 0.20 * local_std.astype(np.float32)
+        + 0.25 * blackhat_big.astype(np.float32),
+        None,
+        0,
+        255,
+        cv2.NORM_MINMAX,
+    ).astype(np.uint8)
+    save_gray(step / "crop_rescue_body_score.png", body_score)
+    seed = body_score >= int(np.percentile(body_score, 94))
+    seed = cv2.morphologyEx((seed.astype(np.uint8) * 255), cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))) > 0
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(seed.astype(np.uint8), connectivity=8)
+
+    ranked = []
+    for lab in range(1, n):
+        area = int(stats[lab, cv2.CC_STAT_AREA])
+        if area < 8000:
+            continue
+        x = int(stats[lab, cv2.CC_STAT_LEFT])
+        y = int(stats[lab, cv2.CC_STAT_TOP])
+        w = int(stats[lab, cv2.CC_STAT_WIDTH])
+        h = int(stats[lab, cv2.CC_STAT_HEIGHT])
+        ranked.append((area, x, y, w, h))
+    ranked.sort(reverse=True)
+    if not ranked:
+        return
+
+    top = ranked[:3]
+    x0 = min(x for _, x, _, _, _ in top)
+    y0 = min(y for _, _, y, _, _ in top)
+    x1 = max(x + w for _, x, _, w, _ in top)
+    y1 = max(y + h for _, _, y, _, h in top)
+    bw = x1 - x0
+    bh = y1 - y0
+    pad_x = max(220, int(round(bw * 0.45)))
+    pad_y = max(220, int(round(bh * 0.45)))
+    H, W = gray.shape
+    x0 = max(0, x0 - pad_x)
+    y0 = max(0, y0 - pad_y)
+    x1 = min(W, x1 + pad_x)
+    y1 = min(H, y1 + pad_y)
+    if (x1 - x0) * (y1 - y0) > int(H * W * 0.90):
+        return
+    if (x1 - x0) < 500 or (y1 - y0) < 500:
+        return
+
+    crop_meta = {"x0": x0, "y0": y0, "x1": x1, "y1": y1, "seed_components": len(top)}
+    write_json(step / "crop_rescue_roi.json", crop_meta)
+    save_gray(step / "crop_rescue_gray.png", gray[y0:y1, x0:x1])
+    save_gray(step / "crop_rescue_wall.png", wall_emphasis[y0:y1, x0:x1])
+
+    crop_inputs = [
+        ("crop_raw", gray[y0:y1, x0:x1]),
+        ("crop_clahe", clahe[y0:y1, x0:x1]),
+        ("crop_wall", wall_emphasis[y0:y1, x0:x1]),
+    ]
+    for branch_name, crop_img in crop_inputs:
+        for d in [260, 360, 520, 760]:
+            masks, *_ = model.eval(crop_img, diameter=float(d), channels=[0, 0], normalize=True, do_3D=False)
+            masks = masks.astype(np.uint16)
+            for lab_id in range(1, int(masks.max()) + 1):
+                crop_mask = masks == lab_id
+                if int(crop_mask.sum()) < 60000:
+                    continue
+                full_mask = np.zeros_like(gray, dtype=bool)
+                full_mask[y0:y1, x0:x1] = crop_mask
+                area, _, circularity, fill_ratio, border_touch, bbox_cover, cx, cy = mask_stats(full_mask)
+                overlap_env = float(hint_env[full_mask].mean()) if area else 0.0
+                overlap_core = float(hint_core[full_mask].mean()) if area else 0.0
+                support_overlap = float(support_mask[full_mask].mean()) if area else 0.0
+                b_strength = boundary_strength(full_mask, blackhat_big, blackhat_small, grad_mag)
+                texture = float(local_std[full_mask].mean() / 255.0) if area else 0.0
+                mean_signal = float(signal[full_mask].mean() / 255.0) if area else 0.0
+
+                if b_strength < 0.08 and support_overlap < 0.06:
+                    continue
+                if area > 180000 and texture < 0.15 and mean_signal < 0.18:
+                    continue
+                if border_touch and bbox_cover > 0.88 and circularity > 0.82 and fill_ratio > 0.62 and texture < 0.22:
+                    continue
+
+                score = (
+                    0.54 * b_strength
+                    + 0.12 * overlap_env
+                    + 0.34 * support_overlap
+                    + 0.10 * circularity
+                    + 0.08 * fill_ratio
+                    + 0.26 * texture
+                    + 0.22 * mean_signal
+                    + 0.14
+                )
+                if area > 120000:
+                    score += 0.12
+                if area > 280000 and texture > 0.16:
+                    score += 0.08
+                if not border_touch:
+                    score += 0.03
+
+                candidates.append(
+                    Candidate(
+                        mask=full_mask,
+                        branch=branch_name,
+                        branch_type="crop",
+                        diameter=d,
+                        score=float(score),
+                        area=area,
+                        circularity=float(circularity),
+                        fill_ratio=float(fill_ratio),
+                        overlap_env=float(overlap_env),
+                        overlap_core=float(overlap_core),
+                        support_overlap=float(support_overlap),
+                        boundary_strength=float(b_strength),
+                        interior_texture=float(texture),
+                        mean_signal=float(mean_signal),
+                        border_touch=bool(border_touch),
+                        bbox_cover=float(bbox_cover),
+                        centroid_x=float(cx),
+                        centroid_y=float(cy),
+                    )
+                )
+
+
 def run_branches(
     model,
     rgb: np.ndarray,
@@ -606,6 +747,22 @@ def run_branches(
                 )
             save_gray(step / f"{branch_name}_diameter_{d:04d}_labels_16bit.png", branch_label)
 
+    append_crop_rescue_candidates(
+        model,
+        candidates,
+        step,
+        gray,
+        clahe,
+        wall_emphasis,
+        signal,
+        grad_mag,
+        blackhat_big,
+        blackhat_small,
+        hint_env,
+        hint_core,
+        support_mask,
+        local_std,
+    )
     append_threshold_large_candidates(
         candidates,
         step,
@@ -691,10 +848,10 @@ def merge_candidates(candidates: list[Candidate]) -> tuple[list[Candidate], list
                     cand.area > prev.area * 1.22
                     and cand.boundary_strength >= prev.boundary_strength - 0.02
                     and cand.score > prev.score * 0.95
-                    and cand.branch_type in {"direct", "large", "rescue"}
+                    and cand.branch_type in {"direct", "large", "rescue", "crop"}
                 )
                 large_override = (
-                    cand.branch_type in {"large", "rescue"}
+                    cand.branch_type in {"large", "rescue", "crop"}
                     and prev.branch_type == "guided"
                     and cand.area > prev.area * 1.45
                     and cand.support_overlap >= prev.support_overlap * 0.75
@@ -867,6 +1024,9 @@ def main() -> int:
                 "direct_wall",
                 "large_direct_raw",
                 "large_direct_wall",
+                "crop_raw",
+                "crop_clahe",
+                "crop_wall",
                 "threshold_large",
                 "small_wall",
             ],
