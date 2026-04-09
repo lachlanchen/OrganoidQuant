@@ -3,7 +3,7 @@
 ## Sources
 - DOCX: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_selection_comments_2026-04-07.docx`
 - JPEG: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_metric_selection_handwritten_note_2026-04-07.jpeg`
-- Related earlier note: [zhengyu_feedback_plot_optimization_2026-04-06.md](/home/lachlan/ProjectsLFS/Zhengyu/references/zhengyu_feedback_plot_optimization_2026-04-06.md)
+- Related earlier note: [zhengyu_feedback_plot_optimization_2026-04-06.md](/home/lachlan/ProjectsLFS/Zhengyu/references-plots/derivatives/markdown/zhengyu_feedback_plot_optimization_2026-04-06.md)
 
 ## Purpose
 This note converts Zhengyu's figure-selection and statistical-annotation comments into structured Markdown so later plotting work can follow a consistent specification.

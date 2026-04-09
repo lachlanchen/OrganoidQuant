@@ -1,0 +1,12 @@
+# App80 Statistical Primary Metrics Paths
+
+Root:
+- `/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/figures/statistical_primary_metrics`
+
+Main figures:
+- `/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/figures/statistical_primary_metrics/longitudinal_errorbar_stats/app80_selected_primary_metrics_timecourse_stats.pdf`
+- `/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/figures/statistical_primary_metrics/focused_day_comparisons/app80_focused_day_selected_metric_comparisons.pdf`
+
+Tables:
+- `/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/figures/statistical_primary_metrics/same_day_statistics_tables/`
+- `/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/figures/statistical_primary_metrics/focused_day_comparisons/`

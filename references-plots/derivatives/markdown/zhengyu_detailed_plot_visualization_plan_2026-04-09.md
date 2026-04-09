@@ -6,8 +6,8 @@ This plan integrates all currently available guidance from Zhengyu's comments.
 Primary source files:
 - DOCX summary: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_selection_comments_2026-04-07.docx`
 - Handwritten figure note image: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_metric_selection_handwritten_note_2026-04-07.jpeg`
-- Structured conversion note: [zhengyu_plot_comment_conversion_2026-04-09.md](/home/lachlan/ProjectsLFS/Zhengyu/references/zhengyu_plot_comment_conversion_2026-04-09.md)
-- Earlier chat-derived note: [zhengyu_feedback_plot_optimization_2026-04-06.md](/home/lachlan/ProjectsLFS/Zhengyu/references/zhengyu_feedback_plot_optimization_2026-04-06.md)
+- Structured conversion note: [zhengyu_plot_comment_conversion_2026-04-09.md](/home/lachlan/ProjectsLFS/Zhengyu/references-plots/derivatives/markdown/zhengyu_plot_comment_conversion_2026-04-09.md)
+- Earlier chat-derived note: [zhengyu_feedback_plot_optimization_2026-04-06.md](/home/lachlan/ProjectsLFS/Zhengyu/references-plots/derivatives/markdown/zhengyu_feedback_plot_optimization_2026-04-06.md)
 
 Related transcript markdown under `references-plots/`:
 - `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/density_metric_selection_and_statistics_feedback_transcript.md`

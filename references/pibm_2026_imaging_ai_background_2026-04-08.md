@@ -70,7 +70,7 @@ The repository already contains a strong computational imaging backbone.
 
 Relevant notes:
 
-- `references/zhengyu_feedback_plot_optimization_2026-04-06.md`
+- `references-plots/derivatives/markdown/zhengyu_feedback_plot_optimization_2026-04-06.md`
 - `references/deo_metric_catalog_growth_fusion_differentiation.md`
 - `references/deo_segmentation_metric_method_tex/README.md`
 
@@ -238,7 +238,7 @@ If the abstract needs a single anchor sentence, the best local framing is:
 
 ## Main Source Files Used For This Reframe
 
-- `references/zhengyu_feedback_plot_optimization_2026-04-06.md`
+- `references-plots/derivatives/markdown/zhengyu_feedback_plot_optimization_2026-04-06.md`
 - `references/app65_differentiation_darkness_metrics.md`
 - `references/app80_internal_edge_centrality_metric.md`
 - `references/deo_metric_catalog_growth_fusion_differentiation.md`
