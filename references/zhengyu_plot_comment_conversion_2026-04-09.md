@@ -1,8 +1,8 @@
 # Zhengyu Plot Comment Conversion (2026-04-09)
 
 ## Sources
-- DOCX: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/DEO定量选择260407.docx`
-- JPEG: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/_cgi-bin_mmwebwx-bin_webwxgetmsgimg__&MsgID=772758886196015240&skey=@crypt_2b68eaed_2a1af3b57be0a9450bf53980c7e0197f&mmweb_appid=wx_webfilehelper.jpeg`
+- DOCX: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_selection_comments_2026-04-07.docx`
+- JPEG: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_metric_selection_handwritten_note_2026-04-07.jpeg`
 - Related earlier note: [zhengyu_feedback_plot_optimization_2026-04-06.md](/home/lachlan/ProjectsLFS/Zhengyu/references/zhengyu_feedback_plot_optimization_2026-04-06.md)
 
 ## Purpose

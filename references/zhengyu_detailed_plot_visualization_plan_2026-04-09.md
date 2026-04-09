@@ -4,15 +4,15 @@
 This plan integrates all currently available guidance from Zhengyu's comments.
 
 Primary source files:
-- DOCX summary: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/DEO定量选择260407.docx`
-- Handwritten figure note image: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/_cgi-bin_mmwebwx-bin_webwxgetmsgimg__&MsgID=772758886196015240&skey=@crypt_2b68eaed_2a1af3b57be0a9450bf53980c7e0197f&mmweb_appid=wx_webfilehelper.jpeg`
+- DOCX summary: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_selection_comments_2026-04-07.docx`
+- Handwritten figure note image: `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/deo_quantification_metric_selection_handwritten_note_2026-04-07.jpeg`
 - Structured conversion note: [zhengyu_plot_comment_conversion_2026-04-09.md](/home/lachlan/ProjectsLFS/Zhengyu/references/zhengyu_plot_comment_conversion_2026-04-09.md)
 - Earlier chat-derived note: [zhengyu_feedback_plot_optimization_2026-04-06.md](/home/lachlan/ProjectsLFS/Zhengyu/references/zhengyu_feedback_plot_optimization_2026-04-06.md)
 
 Related transcript markdown under `references-plots/`:
-- `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/80ae9844e0640c8e2c6243f3aa4fc1bb.md`
-- `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/78645baa31d472b21cfc6aa1df7c8481.md`
-- `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/aaa9ca9418173157eb853c6139a5b3e4.md`
+- `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/density_metric_selection_and_statistics_feedback_transcript.md`
+- `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/plot_annotation_significance_and_color_scheme_feedback_transcript.md`
+- `/home/lachlan/ProjectsLFS/Zhengyu/references-plots/nazen_art_demo_unrelated_transcript.md`
 
 ## Why This Plan Exists
 The previous figures already established usable metrics. The next step is not new quantification. It is figure refinement:
