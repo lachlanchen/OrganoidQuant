@@ -354,6 +354,90 @@ def candidate_ok(
     return True
 
 
+def append_threshold_large_candidates(
+    candidates: list[Candidate],
+    step: Path,
+    signal: np.ndarray,
+    grad_mag: np.ndarray,
+    blackhat_big: np.ndarray,
+    blackhat_small: np.ndarray,
+    hint_env: np.ndarray,
+    hint_core: np.ndarray,
+    support_mask: np.ndarray,
+    local_std: np.ndarray,
+) -> None:
+    rescue_mask = cv2.morphologyEx(
+        (support_mask.astype(np.uint8) * 255),
+        cv2.MORPH_CLOSE,
+        cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (81, 81)),
+    )
+    rescue_mask = fill_holes(rescue_mask)
+    rescue_mask = cv2.morphologyEx(
+        rescue_mask,
+        cv2.MORPH_OPEN,
+        cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)),
+    )
+    labels = cv2.connectedComponents(rescue_mask.astype(np.uint8))[1].astype(np.uint16)
+    save_gray(step / "threshold_large_labels_16bit.png", labels)
+
+    for lab_id in range(1, int(labels.max()) + 1):
+        mask = labels == lab_id
+        area, _, circularity, fill_ratio, border_touch, bbox_cover, cx, cy = mask_stats(mask)
+        if area < 50000:
+            continue
+        overlap_env = float(hint_env[mask].mean()) if area else 0.0
+        overlap_core = float(hint_core[mask].mean()) if area else 0.0
+        support_overlap = float(support_mask[mask].mean()) if area else 0.0
+        b_strength = boundary_strength(mask, blackhat_big, blackhat_small, grad_mag)
+        texture = float(local_std[mask].mean() / 255.0) if area else 0.0
+        mean_signal = float(signal[mask].mean() / 255.0) if area else 0.0
+
+        if b_strength < 0.08:
+            continue
+        if area > 180000 and texture < 0.16 and mean_signal < 0.20:
+            continue
+        if border_touch and bbox_cover > 0.82 and circularity > 0.82 and fill_ratio > 0.60 and texture < 0.22:
+            continue
+
+        score = (
+            0.44 * b_strength
+            + 0.42 * support_overlap
+            + 0.24 * texture
+            + 0.22 * mean_signal
+            + 0.10 * circularity
+            + 0.06 * fill_ratio
+            + 0.16 * overlap_env
+            + 0.12
+        )
+        if area > 120000:
+            score += 0.10
+        if area > 280000 and texture > 0.16:
+            score += 0.06
+
+        candidates.append(
+            Candidate(
+                mask=mask,
+                branch="threshold_large",
+                branch_type="rescue",
+                diameter=0,
+                score=float(score),
+                area=area,
+                circularity=float(circularity),
+                fill_ratio=float(fill_ratio),
+                overlap_env=float(overlap_env),
+                overlap_core=float(overlap_core),
+                support_overlap=float(support_overlap),
+                boundary_strength=float(b_strength),
+                interior_texture=float(texture),
+                mean_signal=float(mean_signal),
+                border_touch=bool(border_touch),
+                bbox_cover=float(bbox_cover),
+                centroid_x=float(cx),
+                centroid_y=float(cy),
+            )
+        )
+
+
 def run_branches(
     model,
     rgb: np.ndarray,
@@ -522,6 +606,19 @@ def run_branches(
                 )
             save_gray(step / f"{branch_name}_diameter_{d:04d}_labels_16bit.png", branch_label)
 
+    append_threshold_large_candidates(
+        candidates,
+        step,
+        signal,
+        grad_mag,
+        blackhat_big,
+        blackhat_small,
+        hint_env,
+        hint_core,
+        support_mask,
+        local_std,
+    )
+
     with (step / "candidate_table.csv").open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=list(branch_rows[0].keys()) if branch_rows else ["branch"])
         writer.writeheader()
@@ -594,10 +691,10 @@ def merge_candidates(candidates: list[Candidate]) -> tuple[list[Candidate], list
                     cand.area > prev.area * 1.22
                     and cand.boundary_strength >= prev.boundary_strength - 0.02
                     and cand.score > prev.score * 0.95
-                    and cand.branch_type in {"direct", "large"}
+                    and cand.branch_type in {"direct", "large", "rescue"}
                 )
                 large_override = (
-                    cand.branch_type == "large"
+                    cand.branch_type in {"large", "rescue"}
                     and prev.branch_type == "guided"
                     and cand.area > prev.area * 1.45
                     and cand.support_overlap >= prev.support_overlap * 0.75
@@ -770,6 +867,7 @@ def main() -> int:
                 "direct_wall",
                 "large_direct_raw",
                 "large_direct_wall",
+                "threshold_large",
                 "small_wall",
             ],
             "hint_is_hard_gate": False,
