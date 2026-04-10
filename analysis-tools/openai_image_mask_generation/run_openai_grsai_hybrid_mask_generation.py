@@ -27,7 +27,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--grsai-model", default="nano-banana-fast", help="Nano Banana model")
     p.add_argument("--grsai-image-size", default="1K", help="Nano Banana image size")
     p.add_argument("--grsai-max-side", type=int, default=1024, help="Resize max side for Nano Banana upload")
+    p.add_argument("--grsai-poll-timeout", type=float, default=1800.0, help="Nano Banana poll timeout seconds")
+    p.add_argument("--grsai-stalled-timeout", type=float, default=600.0, help="Nano Banana stalled timeout seconds")
     p.add_argument("--prompt-overrides-json", default=str(DEFAULT_OVERRIDES), help="Optional prompt override JSON for the GRS-AI stage")
+    p.add_argument("--resume", action="store_true", help="Reuse existing stage outputs and task ids when present")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()
 
@@ -91,30 +94,30 @@ def main() -> None:
         "Do not create any large colored region in an area that does not show a real dark dense organoid or a real cystic organoid with a dark continuous wall."
     )
 
-    run_cmd(
-        [
-            sys.executable,
-            str(OPENAI_RUNNER),
-            "--image",
-            str(source_png),
-            "--output-dir",
-            str(openai_dir),
-            "--host",
-            args.openai_host,
-            "--size",
-            openai_size,
-            "--quality",
-            "high",
-            "--background",
-            "opaque",
-            "--prompt-extra",
-            openai_prompt_extra,
-            *( ["--verbose"] if args.verbose else [] ),
-        ],
-        verbose=args.verbose,
-    )
-
     openai_mask = openai_dir / "generated_instance_mask.png"
+    if not (args.resume and openai_mask.exists()):
+        run_cmd(
+            [
+                sys.executable,
+                str(OPENAI_RUNNER),
+                "--image",
+                str(source_png),
+                "--output-dir",
+                str(openai_dir),
+                "--host",
+                args.openai_host,
+                "--size",
+                openai_size,
+                "--quality",
+                "high",
+                "--background",
+                "opaque",
+                "--prompt-extra",
+                openai_prompt_extra,
+                *(["--verbose"] if args.verbose else []),
+            ],
+            verbose=args.verbose,
+        )
     ensure_exists(openai_mask)
 
     grsai_prompt_extra = (
@@ -143,12 +146,18 @@ def main() -> None:
         args.grsai_image_size,
         "--max-side",
         str(args.grsai_max_side),
+        "--poll-timeout",
+        str(args.grsai_poll_timeout),
+        "--stalled-timeout",
+        str(args.grsai_stalled_timeout),
         "--extra-prompt",
         grsai_prompt_extra,
     ]
     override_path = Path(args.prompt_overrides_json)
     if override_path.exists():
         grsai_cmd.extend(["--prompt-overrides-json", str(override_path)])
+    if args.resume:
+        grsai_cmd.append("--resume")
     if args.verbose:
         grsai_cmd.append("--verbose")
     run_cmd(grsai_cmd, verbose=args.verbose)
