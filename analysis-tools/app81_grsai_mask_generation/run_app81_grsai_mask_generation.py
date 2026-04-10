@@ -7,9 +7,11 @@ import argparse
 import base64
 import json
 import os
+import socket
 import sys
 import tempfile
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -31,6 +33,8 @@ PALETTE = [
     (255, 128, 0),
     (160, 64, 255),
 ]
+
+TRANSIENT_HTTP_CODES = {408, 425, 429, 500, 502, 503, 504}
 
 
 def parse_args() -> argparse.Namespace:
@@ -102,13 +106,38 @@ def prepare_upload_image(path: Path, max_side: int) -> tuple[Path, Optional[temp
     return out_path, tmpdir
 
 
-def request_raw(url: str, payload: Dict[str, Any], api_key: str, timeout_s: float = 120.0) -> str:
+def request_raw(
+    url: str,
+    payload: Dict[str, Any],
+    api_key: str,
+    timeout_s: float = 120.0,
+    retries: int = 0,
+    verbose: bool = False,
+    context: str = "request",
+) -> str:
     body = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=body, method="POST")
-    req.add_header("Content-Type", "application/json")
-    req.add_header("Authorization", f"Bearer {api_key}")
-    with urllib.request.urlopen(req, timeout=timeout_s) as resp:
-        return resp.read().decode("utf-8", errors="ignore")
+    last_err: Optional[BaseException] = None
+    for attempt in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, data=body, method="POST")
+            req.add_header("Content-Type", "application/json")
+            req.add_header("Authorization", f"Bearer {api_key}")
+            with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+                return resp.read().decode("utf-8", errors="ignore")
+        except urllib.error.HTTPError as exc:
+            last_err = exc
+            if exc.code not in TRANSIENT_HTTP_CODES or attempt >= retries:
+                raise
+            if verbose:
+                print(f"{context} transient HTTP {exc.code}; retry {attempt+1}/{retries}", flush=True)
+        except (urllib.error.URLError, TimeoutError, socket.timeout) as exc:
+            last_err = exc
+            if attempt >= retries:
+                raise
+            if verbose:
+                print(f"{context} transient {type(exc).__name__}; retry {attempt+1}/{retries}", flush=True)
+        time.sleep(2.0 + attempt * 2.0)
+    raise RuntimeError(f"{context} failed after retries: {last_err}")
 
 
 def parse_json(raw: str) -> Dict[str, Any]:
@@ -157,7 +186,7 @@ def poll_result(
     last_change = start
 
     while True:
-        raw = request_raw(url, payload, api_key, timeout_s=timeout_s)
+        raw = request_raw(url, payload, api_key, timeout_s=timeout_s, retries=4, verbose=verbose, context="poll")
         result = parse_json(raw)
         data = result.get("data") or {}
         status = result.get("status") or data.get("status")
@@ -179,13 +208,81 @@ def poll_result(
         time.sleep(interval)
 
 
-def build_prompt(image_name: str) -> str:
+def analyze_prompt_guidance(image_path: Path) -> Dict[str, Any]:
+    rgb = np.array(Image.open(image_path).convert("RGB"))
+    gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+    mean = cv2.GaussianBlur(gray, (0, 0), 21)
+    sq_mean = cv2.GaussianBlur(gray * gray, (0, 0), 21)
+    std = np.sqrt(np.maximum(sq_mean - mean * mean, 0.0))
+
+    bright_thr = float(np.quantile(gray, 0.45))
+    std_thr = float(np.quantile(std, 0.35))
+    smooth = np.logical_and(gray > bright_thr, std < std_thr).astype(np.uint8)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (31, 31))
+    smooth = cv2.morphologyEx(smooth, cv2.MORPH_CLOSE, kernel, iterations=1)
+    smooth = cv2.morphologyEx(smooth, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)), iterations=1)
+    smooth = cv2.dilate(smooth, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)), iterations=1)
+    smooth = cv2.erode(smooth, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)), iterations=1)
+    smooth = smooth.astype(bool)
+
+    h, w = gray.shape
+    total = float(h * w)
+    num, cc, stats, _ = cv2.connectedComponentsWithStats(smooth.astype(np.uint8), connectivity=8)
+    big_regions = []
+    for lid in range(1, num):
+        area = int(stats[lid, cv2.CC_STAT_AREA])
+        frac = area / total
+        if frac < 0.08:
+            continue
+        x = int(stats[lid, cv2.CC_STAT_LEFT])
+        y = int(stats[lid, cv2.CC_STAT_TOP])
+        ww = int(stats[lid, cv2.CC_STAT_WIDTH])
+        hh = int(stats[lid, cv2.CC_STAT_HEIGHT])
+        border = x <= 8 or y <= 8 or (x + ww) >= (w - 8) or (y + hh) >= (h - 8)
+        big_regions.append(
+            {
+                "area_fraction": round(frac, 6),
+                "bbox": [x, y, ww, hh],
+                "touches_border": border,
+            }
+        )
+
+    has_large_smooth_region = bool(big_regions)
+    touches_border = any(r["touches_border"] for r in big_regions)
+    has_multiple_regions = len(big_regions) >= 2
+    return {
+        "image_shape": [int(h), int(w)],
+        "gray_bright_threshold": round(bright_thr, 6),
+        "gray_std_threshold": round(std_thr, 6),
+        "has_large_smooth_region": has_large_smooth_region,
+        "touches_border": touches_border,
+        "has_multiple_large_smooth_regions": has_multiple_regions,
+        "large_smooth_regions": big_regions,
+    }
+
+
+def build_prompt(image_name: str, guidance: Dict[str, Any] | None = None) -> str:
+    guidance = guidance or {}
+    extra = []
+    if guidance.get("has_large_smooth_region"):
+        extra.append(
+            "This image contains one or more large pale smooth translucent droplet regions. "
+            "These are not organoids. Leave every such large smooth pale droplet interior completely black."
+        )
+    if guidance.get("touches_border"):
+        extra.append(
+            "Ignore any large circular or elliptical boundary touching the image border; border-touching droplet arcs are not organoids."
+        )
+    if guidance.get("has_multiple_large_smooth_regions"):
+        extra.append("There may be several partial droplets at the image edges; do not segment them.")
+    extra_text = " ".join(extra)
     return (
         "Generate only a clean organoid instance mask for this brightfield microscopy image. "
         "Use pure black background (#000000) everywhere outside organoids. "
         "Each true organoid must be one smooth filled solid region with one bright flat color. "
         "Use different colors for neighboring organoids when possible. "
         "Include both small organoids and large fused irregular organoids if they are real organoid tissue. "
+        "Real organoids are darker compact tissue bodies or dark-rim cystic structures, not large pale smooth translucent regions. "
         "Match the visible organoid body accurately and compactly; do not over-expand into surrounding droplet or background, and do not under-fill the real organoid body. "
         "Do not segment the outer droplet, outer circular container, surrounding fluid boundary, well boundary, debris, speckles, halos, scratches, or thin edge fragments. "
         "Do not draw outlines, rings, texture, shading, gradients, labels, arrows, or text. "
@@ -193,6 +290,7 @@ def build_prompt(image_name: str) -> str:
         "Keep separate organoids separate with black gaps unless they are visibly fused into one continuous tissue mass. "
         "Output only the colored mask image, suitable for downstream instance processing. "
         "Preferred colors are bright flat red, green, blue, yellow, cyan, magenta, orange, and purple. "
+        f"{extra_text} "
         f"Source image identifier: {image_name}."
     )
 
@@ -244,6 +342,7 @@ def main() -> None:
     log_dir.mkdir(parents=True, exist_ok=True)
 
     prompt_path = output_dir / "prompt.txt"
+    guidance_path = output_dir / "prompt_guidance.json"
     manifest_path = output_dir / "task_manifest.json"
     mask_path = output_dir / "generated_instance_mask.png"
     flat_mask_path = output_dir / "generated_instance_mask_flat.png"
@@ -252,7 +351,9 @@ def main() -> None:
     raw_response_path = log_dir / "submit_response.raw.txt"
     poll_response_path = log_dir / "poll_response.json"
 
-    prompt = build_prompt(image_path.name)
+    guidance = analyze_prompt_guidance(image_path)
+    guidance_path.write_text(json.dumps(guidance, ensure_ascii=False, indent=2), encoding="utf-8")
+    prompt = build_prompt(image_path.name, guidance)
     prompt_path.write_text(prompt + "\n", encoding="utf-8")
 
     if args.resume and manifest_path.exists() and mask_path.exists() and flat_mask_path.exists():
@@ -288,7 +389,15 @@ def main() -> None:
             last_err: Optional[Exception] = None
             for attempt in range(args.submit_retries + 1):
                 try:
-                    raw = request_raw(url, payload, api_key, timeout_s=args.request_timeout)
+                    raw = request_raw(
+                        url,
+                        payload,
+                        api_key,
+                        timeout_s=args.request_timeout,
+                        retries=2,
+                        verbose=args.verbose,
+                        context="submit",
+                    )
                     raw_response_path.write_text(raw, encoding="utf-8")
                     result = parse_json(raw)
                     break
@@ -310,6 +419,7 @@ def main() -> None:
                 "status": "submitted",
                 "model": args.model,
                 "host": args.host,
+                "prompt_guidance_path": str(guidance_path),
             }
             manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
             if args.verbose:
