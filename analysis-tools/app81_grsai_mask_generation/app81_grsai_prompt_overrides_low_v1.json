@@ -1,5 +1,5 @@
 {
-  "15-十月-2025_10x low_source.png": "There is one large hollow circular ring structure in the lower-left region with a smooth pale interior. That large ring structure is not organoid tissue. Leave the entire large lower-left ring and its interior black. Segment only the smaller dense dark compact organoid bodies nearby.",
+  "15-十月-2025_10x low_source.png": "There is one large hollow circular ring structure in the lower-left region with a smooth pale interior. That large ring structure is not organoid tissue. Leave the entire large lower-left ring and its interior black. Also do not segment the large diffuse merged dark-red region in the center-left; that broad smeared region is not a single organoid. Segment only the smaller dense dark compact organoid bodies nearby as separate small objects.",
   "16-十月-2025_10x low_source.png": "There are two large hollow circular ring structures, one near the top center touching the upper border and one near the lower center. These large ring structures and their pale interiors are not organoid tissue. Leave both of them completely black. Segment only the smaller dense dark compact organoid bodies.",
   "14-十月-2025_10X low_source.png": "Do not segment the large pale smooth oval droplet interior. Keep only compact dark structured organoid bodies."
 }

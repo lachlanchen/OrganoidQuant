@@ -132,7 +132,7 @@ def build_support(mask_rgb: np.ndarray) -> np.ndarray:
     hsv = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2HSV)
     sat = hsv[:, :, 1]
     val = hsv[:, :, 2]
-    fg = np.logical_and(val > 24, sat > 24).astype(np.uint8)
+    fg = np.logical_and(val > 32, sat > 60).astype(np.uint8)
     fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)), iterations=1)
     fg = cv2.morphologyEx(fg, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)), iterations=1)
     fg = ndi.binary_fill_holes(fg > 0).astype(np.uint8)
