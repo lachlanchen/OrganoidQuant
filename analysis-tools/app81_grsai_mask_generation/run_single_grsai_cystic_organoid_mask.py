@@ -18,18 +18,16 @@ DEFAULT_OVERRIDES = REPO_ROOT / "analysis-tools/app81_grsai_mask_generation/app8
 
 
 PROMPT = (
-    "Segment only real medium or large organoids in this brightfield microscopy image. "
+    "Generate only an organoid instance mask for this brightfield microscopy image. "
     "Use pure black background everywhere outside organoids. "
-    "Each kept organoid must be one smooth solid filled flat-colored region. "
-    "A true cystic organoid is a round or slightly irregular biological object with a dark continuous wall and a meaningful interior that may be lighter than the wall. "
-    "If such a cystic organoid is clearly visible, segment it as one filled organoid. "
-    "Also segment darker dense compact organoid tissue when it is clearly real organoid material. "
-    "Do not draw hollow rings, contour-only objects, thin edge traces, or fragmental colored tails. "
-    "Ignore tiny specks, tiny dots, tiny fragments, tiny isolated edge debris, and very small background objects. "
-    "Prefer only medium or large real organoids, and leave small uncertain objects black. "
-    "Do not segment pale transparent droplets, hollow droplet boundaries, large smooth pale circular regions, outer container arcs, fluid boundaries, or border-touching droplet arcs. "
-    "If a large circular structure is pale, transparent, or mostly hollow, leave it black even if it has a visible ring. "
-    "Output only the clean colored organoid mask."
+    "Each organoid must be one smooth solid filled flat-colored instance. "
+    "Include true cystic organoids: round or slightly irregular biological objects with a dark continuous wall and a real interior, even if the interior is lighter than the wall. "
+    "Include darker dense compact organoid tissue when it is clearly real organoid material. "
+    "Do not draw hollow rings, outline-only shapes, thin traces, fragmental edges, debris, specks, or very small objects. "
+    "Ignore small uncertain objects and keep only clear medium or large organoids. "
+    "Do not segment pale transparent droplets, droplet interiors, hollow droplet boundaries, large smooth pale circles, or border-touching droplet arcs. "
+    "If a large circular structure is pale or mostly hollow, leave it black. "
+    "Output only the clean colored mask."
 )
 
 
