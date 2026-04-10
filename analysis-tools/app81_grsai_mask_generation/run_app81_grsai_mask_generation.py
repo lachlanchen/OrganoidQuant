@@ -14,6 +14,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+import cv2
+import numpy as np
 from PIL import Image
 
 
@@ -200,6 +202,23 @@ def save_overlay(source_path: Path, mask_path: Path, overlay_path: Path) -> None
     blended.save(overlay_path)
 
 
+def flatten_instance_mask(raw_mask_path: Path, flat_mask_path: Path, min_area: int = 120) -> None:
+    raw = np.array(Image.open(raw_mask_path).convert("RGB"))
+    fg = (raw.max(axis=2) > 24).astype(np.uint8)
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(fg, connectivity=8)
+    flat = np.zeros_like(raw)
+    for label in range(1, num_labels):
+        area = int(stats[label, cv2.CC_STAT_AREA])
+        if area < min_area:
+            continue
+        mask = labels == label
+        rgb = raw[mask]
+        color = np.median(rgb, axis=0)
+        color = np.clip(color, 32, 255).astype(np.uint8)
+        flat[mask] = color
+    Image.fromarray(flat).save(flat_mask_path)
+
+
 def main() -> None:
     args = parse_args()
     api_key = load_grsai_key()
@@ -216,17 +235,19 @@ def main() -> None:
     prompt_path = output_dir / "prompt.txt"
     manifest_path = output_dir / "task_manifest.json"
     mask_path = output_dir / "generated_instance_mask.png"
+    flat_mask_path = output_dir / "generated_instance_mask_flat.png"
     overlay_path = output_dir / "generated_overlay.png"
+    flat_overlay_path = output_dir / "generated_overlay_flat.png"
     raw_response_path = log_dir / "submit_response.raw.txt"
     poll_response_path = log_dir / "poll_response.json"
 
     prompt = build_prompt(image_path.name)
     prompt_path.write_text(prompt + "\n", encoding="utf-8")
 
-    if args.resume and manifest_path.exists() and mask_path.exists():
+    if args.resume and manifest_path.exists() and mask_path.exists() and flat_mask_path.exists():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         if manifest.get("status") == "succeeded":
-            print(f"Reusing existing result: {mask_path}")
+            print(f"Reusing existing result: {flat_mask_path}")
             return
 
     upload_image_path, tmpdir = prepare_upload_image(image_path, args.max_side)
@@ -293,17 +314,23 @@ def main() -> None:
             raise RuntimeError(f"No result URL in final response: {final}")
 
         download_file(results[0]["url"], mask_path)
+        flatten_instance_mask(mask_path, flat_mask_path)
         save_overlay(image_path, mask_path, overlay_path)
+        save_overlay(image_path, flat_mask_path, flat_overlay_path)
 
         manifest["status"] = "succeeded"
         manifest["result_url"] = results[0]["url"]
         manifest["mask_path"] = str(mask_path)
+        manifest["flat_mask_path"] = str(flat_mask_path)
         manifest["overlay_path"] = str(overlay_path)
+        manifest["flat_overlay_path"] = str(flat_overlay_path)
         manifest["final_response_path"] = str(poll_response_path)
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
         print(f"Saved mask: {mask_path}")
+        print(f"Saved flat mask: {flat_mask_path}")
         print(f"Saved overlay: {overlay_path}")
+        print(f"Saved flat overlay: {flat_overlay_path}")
     finally:
         if tmpdir is not None:
             tmpdir.cleanup()
