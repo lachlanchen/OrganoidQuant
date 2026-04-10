@@ -305,6 +305,8 @@ def build_prompt(image_name: str, guidance: Dict[str, Any] | None = None, extra_
         "Real organoids are darker denser compact tissue bodies or dark-rim cystic structures, not large pale smooth translucent regions. "
         "If a very large object occupies much of the image, only segment it when it is visibly dark, dense, and non-transparent like real tissue. "
         "If a very large circular or elliptical region is pale, smooth, almost transparent, or looks like a droplet interior, do not segment it at all. "
+        "Do not segment hollow circular or elliptical shells with a pale or transparent interior. "
+        "If a ring-like boundary surrounds a mostly empty pale interior, leave both the boundary and the interior black unless the enclosed region is clearly filled with dense dark tissue. "
         "Match the visible organoid body accurately and compactly; do not over-expand into surrounding droplet or background, and do not under-fill the real organoid body. "
         "Do not segment the outer droplet, outer circular container, surrounding fluid boundary, well boundary, debris, speckles, halos, scratches, or thin edge fragments. "
         "Ignore tiny isolated dots unless they are clearly real compact dark organoids. "
@@ -411,11 +413,32 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
         boundary = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))) > 0
         boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
         frac = area / total
+        contours, hierarchy = cv2.findContours(mask.astype(np.uint8), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        holes = 0
+        hole_area = 0.0
+        perimeter = 0.0
+        for contour in contours:
+            perimeter += cv2.arcLength(contour, True)
+        if hierarchy is not None:
+            hierarchy = hierarchy[0]
+            for idx, rel in enumerate(hierarchy):
+                if rel[3] != -1:
+                    holes += 1
+                    hole_area += float(cv2.contourArea(contours[idx]))
+        circularity = (4.0 * np.pi * area) / (perimeter * perimeter) if perimeter > 0 else 0.0
+        hole_frac = hole_area / max(area, 1)
         pale_blob_like = (
             (area < 2500 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.06)
             or (border_touch and area < 2600 and std_mean < 0.02 and boundary_grad < 0.06)
             or (frac < 0.003 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.04)
             or (border_touch and frac < 0.004 and std_mean < 0.015 and boundary_grad < 0.035)
+        )
+        hollow_ring_like = (
+            area >= 3000
+            and holes >= 2
+            and hole_frac > 0.9
+            and circularity < 0.14
+            and dark_mean < 0.62
         )
         small_fragment_like = (
             (area < 180 and (dark_mean < 0.56 or std_mean < max(std_thr, 0.04)))
@@ -428,7 +451,7 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
             or (frac > 0.22 and dark_mean < 0.40 and std_mean < max(std_thr, 0.045))
             or (border_touch and frac > 0.08 and dark_mean < 0.34 and std_mean < std_thr)
         )
-        if droplet_like or small_fragment_like or pale_blob_like:
+        if droplet_like or small_fragment_like or pale_blob_like or hollow_ring_like:
             dropped_components.append(
                 {
                     "label": int(label),
@@ -438,7 +461,18 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
                     "mean_darkness": round(dark_mean, 6),
                     "mean_local_std": round(std_mean, 6),
                     "mean_boundary_grad": round(boundary_grad, 6),
-                    "reason": "droplet_like" if droplet_like else ("pale_blob_like" if pale_blob_like else "small_fragment_like"),
+                    "holes": int(holes),
+                    "hole_fraction": round(hole_frac, 6),
+                    "circularity": round(float(circularity), 6),
+                    "reason": (
+                        "droplet_like"
+                        if droplet_like
+                        else (
+                            "pale_blob_like"
+                            if pale_blob_like
+                            else ("hollow_ring_like" if hollow_ring_like else "small_fragment_like")
+                        )
+                    ),
                 }
             )
             continue
