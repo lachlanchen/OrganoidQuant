@@ -21,11 +21,13 @@ PROMPT = (
     "Generate only an organoid instance mask for this brightfield microscopy image. "
     "Use pure black background everywhere outside organoids. "
     "Each true organoid must be one smooth solid filled flat-colored instance. "
-    "Include true cystic organoids with a dark continuous biological wall and a meaningful interior, even when the interior is lighter than the wall. "
-    "Include dark dense compact organoid tissue and very large dark non-transparent fused organoid masses when they are clearly real tissue. "
-    "A real organoid may range from about one-tenth of the image to nearly the whole image, so decide by biological appearance, not by size alone. "
-    "Do not segment pale or transparent droplets, droplet interiors, hollow droplet rings, large smooth pale circles, border arcs, debris, specks, or very small detached objects. "
-    "Do not draw hollow masks, contour-only shapes, thin traces, ragged fragments, or fragmental edge pieces. "
+    "True organoids in these images look like either cystic organoids with a dark closed biological wall and a lighter interior, or dark dense compact or fused tissue masses with real internal texture. "
+    "Segment those real organoids even when they are small to moderate cystic objects, and also when they are very large dark non-transparent fused masses. "
+    "A real organoid may range from about one-tenth of the image to nearly the whole image, so decide by darkness, texture, and biological wall structure rather than size alone. "
+    "If several real organoids lie inside one large pale transparent droplet, segment only the darker internal organoid bodies and keep the pale droplet, its boundary, and its interior completely black. "
+    "Do not segment pale or transparent droplets, hollow droplet rings, large smooth pale circles, border arcs, debris, specks, tiny detached objects, or fragmental edge pieces. "
+    "Do not draw hollow masks, contour-only shapes, or thin traces. "
+    "Do not merge neighboring organoids when a visible boundary separates them. "
     "Output only the clean colored organoid mask."
 )
 
