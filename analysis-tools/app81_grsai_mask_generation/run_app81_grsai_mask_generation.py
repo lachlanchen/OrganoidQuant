@@ -19,7 +19,7 @@ import numpy as np
 from PIL import Image
 
 
-DEFAULT_HOST = "https://grsai.dakka.com.cn"
+DEFAULT_HOST = "https://grsaiapi.com"
 DEFAULT_MODEL = "nano-banana-fast"
 PALETTE = [
     (255, 0, 0),
@@ -181,26 +181,25 @@ def poll_result(
 
 def build_prompt(image_name: str) -> str:
     return (
-        "Task: Convert this brightfield microscopy image into a clean instance segmentation mask. "
-        "Output ONLY a segmentation-style mask image, not a natural microscopy image. "
-        "Background must be pure black (#000000). "
-        "Every real organoid must be represented by one clean closed region filled with a single solid bright color. "
-        "Different organoids should use clearly different colors whenever possible. "
-        "Use crisp boundaries with no transparency, no gradients, no texture transfer, no internal shading, no highlights, and no labels. "
-        "The mask should look like a polished annotation, not like a painted image. "
-        "Include both small cystic organoids and large fused irregular organoids if they are true organoid tissue. "
-        "Do not miss small dark-rim cysts. Do not miss large dark fused organoids. "
-        "Very important: do NOT segment the outer droplet, outer circular container, well boundary, or any enclosing fluid boundary as an organoid. "
-        "If there is a large droplet surrounding organoids, ignore that droplet boundary entirely and segment only the organoids inside it. "
-        "Also exclude debris, speckles, blur, imaging artifacts, scratches, tiny fragments, and background haze. "
-        "Do not merge separate organoids unless they are physically fused with continuous tissue in the source image. "
-        "Do not create stray color islands, thin fragment tails, fuzzy edge noise, or extra slivers. "
-        "If a boundary is smooth in the source image, draw it smoothly. "
-        "If an organoid is genuinely irregular because of fusion, preserve that true irregular contour but still keep the mask clean and compact. "
-        "Do not add extra protrusions that are not supported by the visible organoid boundary. "
-        "If two nearby organoids are separate in the source image, leave a black gap between them. "
-        "The final image should be suitable for downstream segmentation or direct quantitative mask use. "
-        "Use a stable palette of saturated colors such as red, green, blue, yellow, cyan, magenta, orange, purple, but one flat color per organoid. "
+        "Task: Convert this brightfield microscopy image into a clean organoid instance segmentation mask. "
+        "Return ONLY a segmentation mask image. Do not return a natural-image redraw. "
+        "The entire background must be pure black (#000000) with no gray haze, no vignette, no microscope texture, and no residual image content. "
+        "Each true organoid must be one clean filled region with a flat saturated color. "
+        "Use clearly different colors for neighboring organoids whenever possible. "
+        "Use crisp closed boundaries only. No transparency, no gradients, no glow, no texture transfer, no shading, no labels, no arrows, and no text. "
+        "Include true small cystic organoids and true large fused irregular organoids. "
+        "Do not miss small dark-rim cysts. Do not miss large dark fused masses when they are real organoids. "
+        "Very important: do NOT segment the outer droplet boundary, outer circular container, surrounding fluid boundary, or any enclosing well boundary as an organoid. "
+        "If organoids sit inside a larger droplet, segment only the organoids and leave the droplet itself black. "
+        "Exclude debris, tiny fragments, isolated speckles, halos, scratches, blur, background haze, and thin fragmental edge artifacts. "
+        "Do not create small stray islands or sliver-like colored tails. "
+        "Do not merge nearby organoids unless the tissue is visibly continuous and fused in the source image. "
+        "If an organoid boundary is smooth in the source image, draw it smoothly and compactly. "
+        "If an organoid is truly irregular because of fusion, preserve that real irregular contour, but keep the annotation clean and closed. "
+        "Do not add protrusions or side regions unless they are clearly supported by the visible organoid body. "
+        "Leave a black gap between separate organoids. "
+        "The result should be suitable for downstream instance segmentation refinement. "
+        "Preferred colors are bright flat red, green, blue, yellow, cyan, magenta, orange, and purple, one solid color per organoid. "
         f"Source image identifier: {image_name}."
     )
 
