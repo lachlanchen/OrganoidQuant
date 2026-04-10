@@ -368,6 +368,16 @@ def flatten_instance_mask(raw_mask_path: Path, flat_mask_path: Path, min_area: i
     Image.fromarray(flat).save(flat_mask_path)
 
 
+def dominant_component_color(raw: np.ndarray, comp_mask: np.ndarray) -> np.ndarray:
+    pixels = raw[comp_mask > 0]
+    if pixels.size == 0:
+        return np.array((255, 0, 0), dtype=np.uint8)
+    nonblack = pixels[np.max(pixels, axis=1) > 24]
+    work = nonblack if nonblack.size else pixels
+    unique, counts = np.unique(work, axis=0, return_counts=True)
+    return unique[int(np.argmax(counts))].astype(np.uint8)
+
+
 def source_feature_maps(source_rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     gray = cv2.cvtColor(source_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
     gx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
@@ -480,10 +490,25 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
         kept_component_count += 1
 
     cleaned = np.zeros_like(raw)
-    cleaned[keep > 0] = raw[keep > 0]
+    solidified_component_count = 0
+    num_keep, keep_labels, keep_stats, _ = cv2.connectedComponentsWithStats(keep, connectivity=8)
+    for keep_label in range(1, num_keep):
+        area = int(keep_stats[keep_label, cv2.CC_STAT_AREA])
+        if area < min_area:
+            continue
+        comp = (keep_labels == keep_label).astype(np.uint8)
+        contours, _ = cv2.findContours(comp, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            continue
+        filled = np.zeros_like(comp)
+        cv2.drawContours(filled, contours, -1, 1, thickness=-1)
+        color = dominant_component_color(raw, comp)
+        cleaned[filled > 0] = color
+        solidified_component_count += 1
     Image.fromarray(cleaned).save(mask_path)
     return {
         "kept_component_count": kept_component_count,
+        "solidified_component_count": solidified_component_count,
         "dropped_component_count": len(dropped_components),
         "dropped_components": dropped_components,
         "grad_threshold": round(grad_thr, 6),
