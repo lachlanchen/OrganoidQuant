@@ -56,7 +56,7 @@ def ensure_rgb(path: Path) -> np.ndarray:
     return np.array(Image.open(path).convert("RGB"))
 
 
-def build_seed_labels(mask_rgb: np.ndarray, min_area: int = 120) -> Tuple[np.ndarray, np.ndarray]:
+def build_seed_labels(mask_rgb: np.ndarray, min_area: int = 400) -> Tuple[np.ndarray, np.ndarray]:
     hsv = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2HSV)
     sat = hsv[:, :, 1]
     val = hsv[:, :, 2]
@@ -84,7 +84,7 @@ def build_seed_labels(mask_rgb: np.ndarray, min_area: int = 120) -> Tuple[np.nda
         return np.zeros(fg.shape, dtype=np.uint16), fg
 
     pixels = mask_rgb[fg > 0].astype(np.float32)
-    k = min(6, max(3, len(pixels) // 30000 + 2))
+    k = min(5, max(3, len(pixels) // 50000 + 2))
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.5)
     _compactness, assignments, centers = cv2.kmeans(
         pixels,
@@ -108,7 +108,9 @@ def build_seed_labels(mask_rgb: np.ndarray, min_area: int = 120) -> Tuple[np.nda
             continue
         cluster_mask = cv2.morphologyEx(cluster_mask, cv2.MORPH_CLOSE, kernel, iterations=1)
         cluster_mask = cv2.morphologyEx(cluster_mask, cv2.MORPH_OPEN, kernel, iterations=1)
-        num, cc, stats, _ = cv2.connectedComponentsWithStats(cluster_mask, connectivity=8)
+        eroded = cv2.erode(cluster_mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)), iterations=1)
+        work_mask = eroded if int(eroded.sum()) > 0 else cluster_mask
+        num, cc, stats, _ = cv2.connectedComponentsWithStats(work_mask, connectivity=8)
         for lid in range(1, num):
             area = int(stats[lid, cv2.CC_STAT_AREA])
             if area < min_area:
@@ -120,7 +122,10 @@ def build_seed_labels(mask_rgb: np.ndarray, min_area: int = 120) -> Tuple[np.nda
             touches_border = x <= 0 or y <= 0 or (x + ww) >= fg.shape[1] or (y + hh) >= fg.shape[0]
             if touches_border:
                 continue
-            labels[cc == lid] = next_label
+            comp = (cc == lid).astype(np.uint8)
+            comp = cv2.dilate(comp, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)), iterations=2)
+            comp = np.logical_and(comp > 0, fg > 0)
+            labels[comp] = next_label
             next_label += 1
 
     support = (labels > 0).astype(np.uint8)
