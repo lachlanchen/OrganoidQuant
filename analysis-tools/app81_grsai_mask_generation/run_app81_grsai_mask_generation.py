@@ -41,7 +41,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--model", default=DEFAULT_MODEL, help="Nano Banana model")
     p.add_argument("--aspect", default="auto", help="Aspect ratio")
     p.add_argument("--image-size", default="1K", help="Image size")
-    p.add_argument("--max-side", type=int, default=1536, help="Resize uploaded image max side; 0 disables")
+    p.add_argument("--max-side", type=int, default=1024, help="Resize uploaded image max side; 0 disables")
+    p.add_argument("--request-timeout", type=float, default=300.0, help="HTTP request timeout seconds")
+    p.add_argument("--submit-retries", type=int, default=2, help="Retries for initial submit")
     p.add_argument("--poll-interval", type=float, default=3.0, help="Polling interval seconds")
     p.add_argument("--poll-timeout", type=float, default=900.0, help="Polling timeout seconds")
     p.add_argument("--stalled-timeout", type=float, default=180.0, help="Polling stalled timeout seconds")
@@ -100,12 +102,12 @@ def prepare_upload_image(path: Path, max_side: int) -> tuple[Path, Optional[temp
     return out_path, tmpdir
 
 
-def request_raw(url: str, payload: Dict[str, Any], api_key: str) -> str:
+def request_raw(url: str, payload: Dict[str, Any], api_key: str, timeout_s: float = 120.0) -> str:
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=body, method="POST")
     req.add_header("Content-Type", "application/json")
     req.add_header("Authorization", f"Bearer {api_key}")
-    with urllib.request.urlopen(req, timeout=120) as resp:
+    with urllib.request.urlopen(req, timeout=timeout_s) as resp:
         return resp.read().decode("utf-8", errors="ignore")
 
 
@@ -155,7 +157,7 @@ def poll_result(
     last_change = start
 
     while True:
-        raw = request_raw(url, payload, api_key)
+        raw = request_raw(url, payload, api_key, timeout_s=timeout_s)
         result = parse_json(raw)
         data = result.get("data") or {}
         status = result.get("status") or data.get("status")
@@ -290,9 +292,21 @@ def main() -> None:
             if args.verbose:
                 print(f"Submitting image {upload_image_path.name} ({upload_image_path.stat().st_size} bytes)", flush=True)
             url = args.host.rstrip("/") + "/v1/draw/nano-banana"
-            raw = request_raw(url, payload, api_key)
-            raw_response_path.write_text(raw, encoding="utf-8")
-            result = parse_json(raw)
+            result: Optional[Dict[str, Any]] = None
+            last_err: Optional[Exception] = None
+            for attempt in range(args.submit_retries + 1):
+                try:
+                    raw = request_raw(url, payload, api_key, timeout_s=args.request_timeout)
+                    raw_response_path.write_text(raw, encoding="utf-8")
+                    result = parse_json(raw)
+                    break
+                except Exception as exc:
+                    last_err = exc
+                    if args.verbose:
+                        print(f"submit attempt {attempt+1} failed: {type(exc).__name__}: {exc}", flush=True)
+                    time.sleep(2.0 + attempt * 2.0)
+            if result is None:
+                raise RuntimeError(f"Submission failed after retries: {last_err}")
             task_id = result.get("id") or (result.get("data") or {}).get("id")
             if not task_id:
                 raise RuntimeError(f"Missing task id in response: {result}")
