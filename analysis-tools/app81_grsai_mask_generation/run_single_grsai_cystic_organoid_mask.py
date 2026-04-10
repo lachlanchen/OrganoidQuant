@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--model", default="nano-banana-fast", help="Nano Banana model")
     p.add_argument("--image-size", default="1K", help="Nano Banana image size")
     p.add_argument("--max-side", type=int, default=1024, help="Resize max side for upload")
-    p.add_argument("--min-kept-area-frac", type=float, default=0.0010, help="Minimum kept component area fraction")
+    p.add_argument("--min-kept-area-frac", type=float, default=0.0020, help="Minimum kept component area fraction")
     p.add_argument("--prompt-overrides-json", default=str(DEFAULT_OVERRIDES), help="Optional prompt override JSON")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()

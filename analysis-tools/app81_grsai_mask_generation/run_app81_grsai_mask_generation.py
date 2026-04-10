@@ -420,6 +420,8 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
         area = int(stats[label, cv2.CC_STAT_AREA])
         if area < min_area:
             continue
+        ww = int(stats[label, cv2.CC_STAT_WIDTH])
+        hh = int(stats[label, cv2.CC_STAT_HEIGHT])
         mask = labels == label
         frac = area / total
         ys, xs = np.where(mask)
@@ -427,6 +429,7 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
         dark_mean = float(dark[mask].mean())
         std_mean = float(local_std[mask].mean())
         boundary = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))) > 0
+        boundary_dark = float(dark[boundary].mean()) if boundary.any() else dark_mean
         boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
         frac = area / total
         contours, hierarchy = cv2.findContours(mask.astype(np.uint8), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
@@ -443,6 +446,9 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
                     hole_area += float(cv2.contourArea(contours[idx]))
         circularity = (4.0 * np.pi * area) / (perimeter * perimeter) if perimeter > 0 else 0.0
         hole_frac = hole_area / max(area, 1)
+        fill_ratio = area / max(float(ww * hh), 1.0)
+        core_mask = cv2.erode(mask.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25)), iterations=1) > 0
+        core_dark = float(dark[core_mask].mean()) if core_mask.any() else dark_mean
         pale_blob_like = (
             (area < 2500 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.06)
             or (border_touch and area < 2600 and std_mean < 0.02 and boundary_grad < 0.06)
@@ -467,8 +473,10 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
             (frac > 0.10 and dark_mean < 0.34 and std_mean < std_thr and boundary_grad < grad_thr)
             or (frac > 0.22 and dark_mean < 0.40 and std_mean < max(std_thr, 0.045))
             or (border_touch and frac > 0.08 and dark_mean < 0.34 and std_mean < std_thr)
+            or (frac > 0.004 and area > 18000 and core_dark < 0.30 and (boundary_dark - core_dark) > 0.08)
         )
-        if droplet_like or small_fragment_like or pale_blob_like or hollow_ring_like or below_area_floor:
+        thin_border_arc_like = border_touch and area > 2500 and fill_ratio < 0.10 and circularity < 0.08
+        if droplet_like or small_fragment_like or pale_blob_like or hollow_ring_like or below_area_floor or thin_border_arc_like:
             dropped_components.append(
                 {
                     "label": int(label),
@@ -476,8 +484,11 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
                     "area_px": area,
                     "touches_border": border_touch,
                     "mean_darkness": round(dark_mean, 6),
+                    "mean_boundary_darkness": round(boundary_dark, 6),
+                    "mean_core_darkness": round(core_dark, 6),
                     "mean_local_std": round(std_mean, 6),
                     "mean_boundary_grad": round(boundary_grad, 6),
+                    "fill_ratio": round(fill_ratio, 6),
                     "holes": int(holes),
                     "hole_fraction": round(hole_frac, 6),
                     "circularity": round(float(circularity), 6),
@@ -490,7 +501,11 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
                             else (
                                 "hollow_ring_like"
                                 if hollow_ring_like
-                                else ("below_area_floor" if below_area_floor else "small_fragment_like")
+                                else (
+                                    "below_area_floor"
+                                    if below_area_floor
+                                    else ("thin_border_arc_like" if thin_border_arc_like else "small_fragment_like")
+                                )
                             )
                         )
                     ),
