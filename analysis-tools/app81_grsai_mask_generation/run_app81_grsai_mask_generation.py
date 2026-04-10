@@ -53,6 +53,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--poll-timeout", type=float, default=900.0, help="Polling timeout seconds")
     p.add_argument("--stalled-timeout", type=float, default=180.0, help="Polling stalled timeout seconds")
     p.add_argument("--resume", action="store_true", help="Reuse existing successful task info and outputs")
+    p.add_argument("--prompt-overrides-json", default="", help="Optional JSON file mapping image names to extra prompt guidance")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()
 
@@ -262,7 +263,23 @@ def analyze_prompt_guidance(image_path: Path) -> Dict[str, Any]:
     }
 
 
-def build_prompt(image_name: str, guidance: Dict[str, Any] | None = None) -> str:
+def load_prompt_override(image_name: str, override_path: str) -> str:
+    if not override_path:
+        return ""
+    path = Path(override_path)
+    if not path.exists():
+        return ""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return ""
+    if not isinstance(data, dict):
+        return ""
+    value = data.get(image_name, "")
+    return value if isinstance(value, str) else ""
+
+
+def build_prompt(image_name: str, guidance: Dict[str, Any] | None = None, extra_prompt: str = "") -> str:
     guidance = guidance or {}
     extra = []
     if guidance.get("has_large_smooth_region"):
@@ -276,6 +293,8 @@ def build_prompt(image_name: str, guidance: Dict[str, Any] | None = None) -> str
         )
     if guidance.get("has_multiple_large_smooth_regions"):
         extra.append("There may be several partial droplets at the image edges; do not segment them.")
+    if extra_prompt:
+        extra.append(extra_prompt.strip())
     extra_text = " ".join(extra)
     return (
         "Generate only a clean organoid instance mask for this brightfield microscopy image. "
@@ -463,8 +482,11 @@ def main() -> None:
     poll_response_path = log_dir / "poll_response.json"
 
     guidance = analyze_prompt_guidance(image_path)
+    extra_prompt = load_prompt_override(image_path.name, args.prompt_overrides_json)
+    if extra_prompt:
+        guidance["manual_prompt_override"] = extra_prompt
     guidance_path.write_text(json.dumps(guidance, ensure_ascii=False, indent=2), encoding="utf-8")
-    prompt = build_prompt(image_path.name, guidance)
+    prompt = build_prompt(image_path.name, guidance, extra_prompt=extra_prompt)
     prompt_path.write_text(prompt + "\n", encoding="utf-8")
 
     existing_manifest: Dict[str, Any] = {}
