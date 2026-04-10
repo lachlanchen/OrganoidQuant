@@ -21,6 +21,16 @@ from PIL import Image
 
 DEFAULT_HOST = "https://grsai.dakka.com.cn"
 DEFAULT_MODEL = "nano-banana-fast"
+PALETTE = [
+    (255, 0, 0),
+    (0, 220, 0),
+    (0, 120, 255),
+    (255, 220, 0),
+    (255, 0, 255),
+    (0, 255, 255),
+    (255, 128, 0),
+    (160, 64, 255),
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -207,15 +217,15 @@ def flatten_instance_mask(raw_mask_path: Path, flat_mask_path: Path, min_area: i
     fg = (raw.max(axis=2) > 24).astype(np.uint8)
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(fg, connectivity=8)
     flat = np.zeros_like(raw)
+    palette_idx = 0
     for label in range(1, num_labels):
         area = int(stats[label, cv2.CC_STAT_AREA])
         if area < min_area:
             continue
         mask = labels == label
-        rgb = raw[mask]
-        color = np.median(rgb, axis=0)
-        color = np.clip(color, 32, 255).astype(np.uint8)
+        color = np.array(PALETTE[palette_idx % len(PALETTE)], dtype=np.uint8)
         flat[mask] = color
+        palette_idx += 1
     Image.fromarray(flat).save(flat_mask_path)
 
 
