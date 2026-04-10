@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""Simple instance separation for GRS-AI generated organoid masks.
+
+Method:
+- threshold non-black foreground from generated RGB mask
+- derive stable seeds from dominant hue regions in the generated mask
+- split touching support with watershed inside the mask support
+
+This is intended to stay simple and bounded. It uses the generated mask as the
+source of truth and only separates touching regions geometrically.
+"""
+
+from __future__ import annotations
+
+import argparse
+import colorsys
+import json
+from pathlib import Path
+from typing import Dict, Tuple
+
+import cv2
+import numpy as np
+from PIL import Image
+from scipy import ndimage as ndi
+from skimage.segmentation import watershed
+
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="Separate GRS-AI generated masks into instances.")
+    p.add_argument("--source", required=True, help="Source microscopy image")
+    p.add_argument("--generated-mask", required=True, help="Generated RGB mask image")
+    p.add_argument("--output-dir", required=True, help="Output directory")
+    p.add_argument("--min-seed-area", type=int, default=120, help="Minimum seed area")
+    p.add_argument("--min-final-area", type=int, default=160, help="Minimum final area")
+    return p.parse_args()
+
+
+def ensure_rgb(path: Path) -> np.ndarray:
+    return np.array(Image.open(path).convert("RGB"))
+
+
+def label_to_color(label: int) -> Tuple[int, int, int]:
+    hue = (label * 0.6180339887498949) % 1.0
+    sat = 0.82
+    val = 1.0
+    r, g, b = colorsys.hsv_to_rgb(hue, sat, val)
+    return int(r * 255), int(g * 255), int(b * 255)
+
+
+def render_instance_rgb(labels: np.ndarray) -> np.ndarray:
+    out = np.zeros((labels.shape[0], labels.shape[1], 3), dtype=np.uint8)
+    for lid in [int(x) for x in np.unique(labels) if int(x) > 0]:
+        out[labels == lid] = label_to_color(lid)
+    return out
+
+
+def render_overlay(source_rgb: np.ndarray, labels: np.ndarray) -> np.ndarray:
+    overlay = source_rgb.copy()
+    for lid in [int(x) for x in np.unique(labels) if int(x) > 0]:
+        color = label_to_color(lid)
+        mask = (labels == lid).astype(np.uint8)
+        fill = overlay.copy()
+        fill[mask > 0] = color
+        overlay = cv2.addWeighted(fill, 0.24, overlay, 0.76, 0)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(overlay, contours, -1, color, 2)
+    return overlay
+
+
+def build_support(mask_rgb: np.ndarray) -> np.ndarray:
+    hsv = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2HSV)
+    sat = hsv[:, :, 1]
+    val = hsv[:, :, 2]
+    fg = np.logical_and(val > 24, sat > 24).astype(np.uint8)
+    fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)), iterations=1)
+    fg = cv2.morphologyEx(fg, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)), iterations=1)
+    fg = ndi.binary_fill_holes(fg > 0).astype(np.uint8)
+    return fg
+
+
+def build_hue_seeds(mask_rgb: np.ndarray, support: np.ndarray, min_area: int) -> np.ndarray:
+    hsv = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2HSV)
+    hue = hsv[:, :, 0]
+    sat = hsv[:, :, 1]
+    val = hsv[:, :, 2]
+
+    # Coarse hue bins to collapse anti-aliased shades of the same instance color.
+    hue_bin = ((hue.astype(np.int32) + 7) // 15) % 12
+    labels = np.zeros(hue.shape, dtype=np.uint16)
+    next_label = 1
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+
+    for bin_id in range(12):
+        candidate = np.logical_and.reduce(
+            [
+                support > 0,
+                sat > 40,
+                val > 40,
+                hue_bin == bin_id,
+            ]
+        ).astype(np.uint8)
+        if int(candidate.sum()) == 0:
+            continue
+        candidate = cv2.morphologyEx(candidate, cv2.MORPH_OPEN, kernel, iterations=1)
+        candidate = cv2.morphologyEx(candidate, cv2.MORPH_CLOSE, kernel, iterations=1)
+        eroded = cv2.erode(candidate, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)), iterations=1)
+        work = eroded if int(eroded.sum()) > 0 else candidate
+        num, cc, stats, _ = cv2.connectedComponentsWithStats(work, connectivity=8)
+        for lid in range(1, num):
+            area = int(stats[lid, cv2.CC_STAT_AREA])
+            if area < min_area:
+                continue
+            comp = (cc == lid).astype(np.uint8)
+            labels[comp > 0] = next_label
+            next_label += 1
+
+    # Fallback: if no hue seeds survive, use support connected components.
+    if next_label == 1:
+        num, cc, stats, _ = cv2.connectedComponentsWithStats(support.astype(np.uint8), connectivity=8)
+        for lid in range(1, num):
+            area = int(stats[lid, cv2.CC_STAT_AREA])
+            if area < min_area:
+                continue
+            labels[cc == lid] = next_label
+            next_label += 1
+
+    return labels
+
+
+def separate_instances(mask_rgb: np.ndarray, min_seed_area: int, min_final_area: int) -> Dict[str, np.ndarray]:
+    support = build_support(mask_rgb)
+    seed_labels = build_hue_seeds(mask_rgb, support, min_seed_area)
+    distance = ndi.distance_transform_edt(support)
+    final = watershed(-distance, markers=seed_labels.astype(np.int32), mask=support > 0).astype(np.uint16)
+
+    cleaned = np.zeros_like(final)
+    next_label = 1
+    for lid in [int(x) for x in np.unique(final) if int(x) > 0]:
+        mask = final == lid
+        area = int(mask.sum())
+        if area < min_final_area:
+            continue
+        cleaned[mask] = next_label
+        next_label += 1
+
+    return {
+        "support": support.astype(np.uint8),
+        "seed_labels": seed_labels.astype(np.uint16),
+        "final_labels": cleaned.astype(np.uint16),
+    }
+
+
+def main() -> None:
+    args = parse_args()
+    source_path = Path(args.source)
+    generated_mask_path = Path(args.generated_mask)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    source_rgb = ensure_rgb(source_path)
+    mask_rgb = ensure_rgb(generated_mask_path)
+    if mask_rgb.shape[:2] != source_rgb.shape[:2]:
+        mask_rgb = cv2.resize(mask_rgb, (source_rgb.shape[1], source_rgb.shape[0]), interpolation=cv2.INTER_NEAREST)
+
+    result = separate_instances(mask_rgb, args.min_seed_area, args.min_final_area)
+
+    support_path = output_dir / "support_mask.png"
+    seed_labels_path = output_dir / "seed_labels_16bit.png"
+    seed_instance_path = output_dir / "seed_instance_rgb.png"
+    seed_overlay_path = output_dir / "seed_overlay.png"
+    final_labels_path = output_dir / "simple_instance_labels_16bit.png"
+    final_instance_path = output_dir / "simple_instance_rgb.png"
+    final_overlay_path = output_dir / "simple_instance_overlay.png"
+    summary_path = output_dir / "simple_instance_summary.json"
+
+    Image.fromarray((result["support"] * 255).astype(np.uint8)).save(support_path)
+    Image.fromarray(result["seed_labels"]).save(seed_labels_path)
+    Image.fromarray(render_instance_rgb(result["seed_labels"])).save(seed_instance_path)
+    Image.fromarray(render_overlay(source_rgb, result["seed_labels"])).save(seed_overlay_path)
+    Image.fromarray(result["final_labels"]).save(final_labels_path)
+    Image.fromarray(render_instance_rgb(result["final_labels"])).save(final_instance_path)
+    Image.fromarray(render_overlay(source_rgb, result["final_labels"])).save(final_overlay_path)
+
+    summary = {
+        "source_path": str(source_path),
+        "generated_mask_path": str(generated_mask_path),
+        "seed_count": int(len([x for x in np.unique(result["seed_labels"]) if int(x) > 0])),
+        "final_count": int(len([x for x in np.unique(result["final_labels"]) if int(x) > 0])),
+        "min_seed_area": int(args.min_seed_area),
+        "min_final_area": int(args.min_final_area),
+        "method": "threshold+hue_seeds+watershed",
+    }
+    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(json.dumps(summary, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()
