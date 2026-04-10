@@ -114,11 +114,9 @@ def make_local_branches(source_rgb: np.ndarray, seed_mask: np.ndarray) -> Dict[s
     gray = cv2.cvtColor(source_rgb, cv2.COLOR_RGB2GRAY)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8)).apply(gray)
     soft = cv2.dilate(seed_mask.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (21, 21)), iterations=1)
-    masked_gray = gray.copy()
-    masked_gray[soft == 0] = 0
     masked_clahe = clahe.copy()
     masked_clahe[soft == 0] = 0
-    return {"masked_gray": masked_gray, "masked_clahe": masked_clahe}
+    return {"masked_clahe": masked_clahe}
 
 
 def run_local_cellpose(model: models.CellposeModel, branches: Dict[str, np.ndarray], diameters: List[int]) -> List[np.ndarray]:
@@ -127,7 +125,6 @@ def run_local_cellpose(model: models.CellposeModel, branches: Dict[str, np.ndarr
         for diameter in diameters:
             masks, _flows, _styles = model.eval(
                 image,
-                channels=[0, 0],
                 diameter=diameter,
                 cellprob_threshold=-1.5,
                 flow_threshold=0.4,
@@ -160,7 +157,7 @@ def conservative_refine(source_rgb: np.ndarray, seed_labels: np.ndarray, gpu: bo
         crop_seed = seed_mask[y0:y1, x0:x1]
         seed_area = float(crop_seed.sum())
         eq_diameter = max(20.0, np.sqrt(4.0 * seed_area / np.pi))
-        diameters = sorted({int(max(20, min(360, round(eq_diameter * s)))) for s in (0.85, 1.0, 1.2)})
+        diameters = sorted({int(max(20, min(360, round(eq_diameter * s)))) for s in (1.0, 1.15)})
         branches = make_local_branches(crop_rgb, crop_seed)
         candidates = run_local_cellpose(model, branches, diameters)
         candidate_passes += len(candidates)
