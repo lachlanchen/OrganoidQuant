@@ -83,6 +83,11 @@ def build_hue_seeds(mask_rgb: np.ndarray, support: np.ndarray, min_area: int) ->
     hue = hsv[:, :, 0]
     sat = hsv[:, :, 1]
     val = hsv[:, :, 2]
+    val_blur = cv2.GaussianBlur(val, (5, 5), 0)
+    grad_x = cv2.Sobel(val_blur, cv2.CV_32F, 1, 0, ksize=3)
+    grad_y = cv2.Sobel(val_blur, cv2.CV_32F, 0, 1, ksize=3)
+    grad = cv2.magnitude(grad_x, grad_y)
+    eroded_support = cv2.erode(support.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)), iterations=1)
 
     # Coarse hue bins to collapse anti-aliased shades of the same instance color.
     hue_bin = ((hue.astype(np.int32) + 7) // 15) % 12
@@ -93,9 +98,10 @@ def build_hue_seeds(mask_rgb: np.ndarray, support: np.ndarray, min_area: int) ->
     for bin_id in range(12):
         candidate = np.logical_and.reduce(
             [
-                support > 0,
-                sat > 40,
-                val > 40,
+                eroded_support > 0,
+                sat > 60,
+                val > 70,
+                grad < 18,
                 hue_bin == bin_id,
             ]
         ).astype(np.uint8)
@@ -143,10 +149,13 @@ def separate_instances(mask_rgb: np.ndarray, min_seed_area: int, min_final_area:
         cleaned[mask] = next_label
         next_label += 1
 
+    cleaned_rgb = render_instance_rgb(cleaned)
+
     return {
         "support": support.astype(np.uint8),
         "seed_labels": seed_labels.astype(np.uint16),
         "final_labels": cleaned.astype(np.uint16),
+        "cleaned_rgb": cleaned_rgb,
     }
 
 
@@ -170,6 +179,7 @@ def main() -> None:
     seed_overlay_path = output_dir / "seed_overlay.png"
     final_labels_path = output_dir / "simple_instance_labels_16bit.png"
     final_instance_path = output_dir / "simple_instance_rgb.png"
+    cleaned_mask_path = output_dir / "cleaned_flat_mask.png"
     final_overlay_path = output_dir / "simple_instance_overlay.png"
     summary_path = output_dir / "simple_instance_summary.json"
 
@@ -178,7 +188,8 @@ def main() -> None:
     Image.fromarray(render_instance_rgb(result["seed_labels"])).save(seed_instance_path)
     Image.fromarray(render_overlay(source_rgb, result["seed_labels"])).save(seed_overlay_path)
     Image.fromarray(result["final_labels"]).save(final_labels_path)
-    Image.fromarray(render_instance_rgb(result["final_labels"])).save(final_instance_path)
+    Image.fromarray(result["cleaned_rgb"]).save(cleaned_mask_path)
+    Image.fromarray(result["cleaned_rgb"]).save(final_instance_path)
     Image.fromarray(render_overlay(source_rgb, result["final_labels"])).save(final_overlay_path)
 
     summary = {
