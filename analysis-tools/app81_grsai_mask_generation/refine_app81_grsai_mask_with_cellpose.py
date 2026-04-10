@@ -57,7 +57,29 @@ def ensure_rgb(path: Path) -> np.ndarray:
 
 
 def build_seed_labels(mask_rgb: np.ndarray, min_area: int = 120) -> Tuple[np.ndarray, np.ndarray]:
-    fg = (mask_rgb.max(axis=2) > 24).astype(np.uint8)
+    hsv = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2HSV)
+    sat = hsv[:, :, 1]
+    val = hsv[:, :, 2]
+    fg = np.logical_and(sat > 48, val > 32).astype(np.uint8)
+    if fg.sum() == 0:
+        return np.zeros(fg.shape, dtype=np.uint16), fg
+
+    num_fg, fg_cc, fg_stats, _ = cv2.connectedComponentsWithStats(fg, connectivity=8)
+    cleaned_fg = np.zeros_like(fg)
+    h, w = fg.shape
+    for lid in range(1, num_fg):
+        area = int(fg_stats[lid, cv2.CC_STAT_AREA])
+        if area < min_area:
+            continue
+        x = int(fg_stats[lid, cv2.CC_STAT_LEFT])
+        y = int(fg_stats[lid, cv2.CC_STAT_TOP])
+        ww = int(fg_stats[lid, cv2.CC_STAT_WIDTH])
+        hh = int(fg_stats[lid, cv2.CC_STAT_HEIGHT])
+        touches_border = x <= 0 or y <= 0 or (x + ww) >= w or (y + hh) >= h
+        if touches_border:
+            continue
+        cleaned_fg[fg_cc == lid] = 1
+    fg = cleaned_fg
     if fg.sum() == 0:
         return np.zeros(fg.shape, dtype=np.uint16), fg
 
@@ -90,6 +112,13 @@ def build_seed_labels(mask_rgb: np.ndarray, min_area: int = 120) -> Tuple[np.nda
         for lid in range(1, num):
             area = int(stats[lid, cv2.CC_STAT_AREA])
             if area < min_area:
+                continue
+            x = int(stats[lid, cv2.CC_STAT_LEFT])
+            y = int(stats[lid, cv2.CC_STAT_TOP])
+            ww = int(stats[lid, cv2.CC_STAT_WIDTH])
+            hh = int(stats[lid, cv2.CC_STAT_HEIGHT])
+            touches_border = x <= 0 or y <= 0 or (x + ww) >= fg.shape[1] or (y + hh) >= fg.shape[0]
+            if touches_border:
                 continue
             labels[cc == lid] = next_label
             next_label += 1
