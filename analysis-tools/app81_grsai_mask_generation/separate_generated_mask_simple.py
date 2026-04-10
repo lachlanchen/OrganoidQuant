@@ -96,19 +96,23 @@ def filter_labels_by_source(labels: np.ndarray, source_rgb: np.ndarray, min_area
         std_mean = float(local_std[mask].mean())
         boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
         frac = area / total
+        inner = cv2.erode(mask.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)), iterations=1) > 0
+        inner_dark = float(dark[inner].mean()) if inner.any() else dark_mean
+        inner_std = float(local_std[inner].mean()) if inner.any() else std_mean
         pale_blob_like = (
             (area < 2500 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.06)
             or (border_touch and area < 2600 and std_mean < 0.02 and boundary_grad < 0.06)
             or (frac < 0.003 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.04)
             or (border_touch and frac < 0.004 and std_mean < 0.015 and boundary_grad < 0.035)
         )
+        oversize_pale_region = frac > 0.01 and inner_dark < 0.54 and inner_std < 0.07
         small_fragment_like = (
             (area < 180 and (dark_mean < 0.56 or std_mean < 0.04))
             or (area < 240 and dark_mean < 0.52 and boundary_grad < 0.14)
             or (border_touch and area < 500 and dark_mean < 0.60 and boundary_grad < 0.18)
             or (frac < 0.00025 and dark_mean < 0.54 and (std_mean < 0.06 or boundary_grad < 0.11))
         )
-        if small_fragment_like or pale_blob_like:
+        if small_fragment_like or pale_blob_like or oversize_pale_region:
             continue
         filtered[mask] = next_label
         next_label += 1
