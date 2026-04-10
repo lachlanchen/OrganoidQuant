@@ -54,6 +54,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--stalled-timeout", type=float, default=180.0, help="Polling stalled timeout seconds")
     p.add_argument("--resume", action="store_true", help="Reuse existing successful task info and outputs")
     p.add_argument("--prompt-overrides-json", default="", help="Optional JSON file mapping image names to extra prompt guidance")
+    p.add_argument("--min-kept-area-frac", type=float, default=0.0, help="Optional minimum kept component area fraction after generation cleanup")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()
 
@@ -393,7 +394,7 @@ def source_feature_maps(source_rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray,
     return dark, local_std, grad
 
 
-def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: int = 120) -> dict[str, Any]:
+def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: int = 120, min_kept_area_frac: float = 0.0) -> dict[str, Any]:
     raw = np.array(Image.open(mask_path).convert("RGB"))
     source_rgb = np.array(Image.open(source_path).convert("RGB"))
     if source_rgb.shape[:2] != raw.shape[:2]:
@@ -446,6 +447,7 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
             or (frac < 0.003 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.04)
             or (border_touch and frac < 0.004 and std_mean < 0.015 and boundary_grad < 0.035)
         )
+        below_area_floor = min_kept_area_frac > 0.0 and frac < min_kept_area_frac
         hollow_ring_like = (
             area >= 3000
             and holes >= 2
@@ -464,7 +466,7 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
             or (frac > 0.22 and dark_mean < 0.40 and std_mean < max(std_thr, 0.045))
             or (border_touch and frac > 0.08 and dark_mean < 0.34 and std_mean < std_thr)
         )
-        if droplet_like or small_fragment_like or pale_blob_like or hollow_ring_like:
+        if droplet_like or small_fragment_like or pale_blob_like or hollow_ring_like or below_area_floor:
             dropped_components.append(
                 {
                     "label": int(label),
@@ -483,7 +485,11 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
                         else (
                             "pale_blob_like"
                             if pale_blob_like
-                            else ("hollow_ring_like" if hollow_ring_like else "small_fragment_like")
+                            else (
+                                "hollow_ring_like"
+                                if hollow_ring_like
+                                else ("below_area_floor" if below_area_floor else "small_fragment_like")
+                            )
                         )
                     ),
                 }
@@ -514,6 +520,7 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
         "solidified_component_count": solidified_component_count,
         "dropped_component_count": len(dropped_components),
         "dropped_components": dropped_components,
+        "min_kept_area_fraction": min_kept_area_frac,
         "grad_threshold": round(grad_thr, 6),
         "std_threshold": round(std_thr, 6),
     }
@@ -665,7 +672,7 @@ def main() -> None:
         results = final.get("results") or (final.get("data") or {}).get("results") or []
 
         download_file(results[0]["url"], mask_path)
-        cleanup_report = clean_generated_mask_in_place(mask_path, image_path)
+        cleanup_report = clean_generated_mask_in_place(mask_path, image_path, min_kept_area_frac=args.min_kept_area_frac)
         clean_report_path.write_text(json.dumps(cleanup_report, ensure_ascii=False, indent=2), encoding="utf-8")
         flatten_instance_mask(mask_path, flat_mask_path)
         save_overlay(image_path, mask_path, overlay_path)
