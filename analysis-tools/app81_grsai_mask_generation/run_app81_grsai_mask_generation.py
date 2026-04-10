@@ -328,6 +328,82 @@ def flatten_instance_mask(raw_mask_path: Path, flat_mask_path: Path, min_area: i
     Image.fromarray(flat).save(flat_mask_path)
 
 
+def source_feature_maps(source_rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    gray = cv2.cvtColor(source_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+    gx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
+    gy = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+    grad = cv2.magnitude(gx, gy)
+    mean = cv2.GaussianBlur(gray, (0, 0), 11)
+    sq_mean = cv2.GaussianBlur(gray * gray, (0, 0), 11)
+    local_std = np.sqrt(np.maximum(sq_mean - mean * mean, 0.0))
+    dark = 1.0 - gray
+    return dark, local_std, grad
+
+
+def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: int = 120) -> dict[str, Any]:
+    raw = np.array(Image.open(mask_path).convert("RGB"))
+    source_rgb = np.array(Image.open(source_path).convert("RGB"))
+    if source_rgb.shape[:2] != raw.shape[:2]:
+        source_rgb = cv2.resize(source_rgb, (raw.shape[1], raw.shape[0]), interpolation=cv2.INTER_LINEAR)
+    hsv = cv2.cvtColor(raw, cv2.COLOR_RGB2HSV)
+    sat = hsv[:, :, 1]
+    val = hsv[:, :, 2]
+    fg = np.logical_and(val > 28, sat > 28).astype(np.uint8)
+    fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)), iterations=1)
+    fg = cv2.morphologyEx(fg, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)), iterations=1)
+
+    num, labels, stats, _ = cv2.connectedComponentsWithStats(fg, connectivity=8)
+    keep = np.zeros(fg.shape, dtype=np.uint8)
+    dark, local_std, grad = source_feature_maps(source_rgb)
+    total = float(fg.shape[0] * fg.shape[1])
+    grad_thr = float(np.quantile(grad, 0.55))
+    std_thr = float(np.quantile(local_std, 0.45))
+    dropped_components: list[dict[str, Any]] = []
+    kept_component_count = 0
+    for label in range(1, num):
+        area = int(stats[label, cv2.CC_STAT_AREA])
+        if area < min_area:
+            continue
+        mask = labels == label
+        frac = area / total
+        ys, xs = np.where(mask)
+        border_touch = bool((ys == 0).any() or (ys == fg.shape[0] - 1).any() or (xs == 0).any() or (xs == fg.shape[1] - 1).any())
+        dark_mean = float(dark[mask].mean())
+        std_mean = float(local_std[mask].mean())
+        boundary = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))) > 0
+        boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
+        droplet_like = (
+            (frac > 0.10 and dark_mean < 0.34 and std_mean < std_thr and boundary_grad < grad_thr)
+            or (frac > 0.22 and dark_mean < 0.40 and std_mean < max(std_thr, 0.045))
+            or (border_touch and frac > 0.08 and dark_mean < 0.34 and std_mean < std_thr)
+        )
+        if droplet_like:
+            dropped_components.append(
+                {
+                    "label": int(label),
+                    "area_fraction": round(frac, 6),
+                    "touches_border": border_touch,
+                    "mean_darkness": round(dark_mean, 6),
+                    "mean_local_std": round(std_mean, 6),
+                    "mean_boundary_grad": round(boundary_grad, 6),
+                }
+            )
+            continue
+        keep[mask] = 1
+        kept_component_count += 1
+
+    cleaned = np.zeros_like(raw)
+    cleaned[keep > 0] = raw[keep > 0]
+    Image.fromarray(cleaned).save(mask_path)
+    return {
+        "kept_component_count": kept_component_count,
+        "dropped_component_count": len(dropped_components),
+        "dropped_components": dropped_components,
+        "grad_threshold": round(grad_thr, 6),
+        "std_threshold": round(std_thr, 6),
+    }
+
+
 def main() -> None:
     args = parse_args()
     api_key = load_grsai_key()
@@ -343,6 +419,7 @@ def main() -> None:
 
     prompt_path = output_dir / "prompt.txt"
     guidance_path = output_dir / "prompt_guidance.json"
+    clean_report_path = output_dir / "mask_cleanup_report.json"
     manifest_path = output_dir / "task_manifest.json"
     mask_path = output_dir / "generated_instance_mask.png"
     flat_mask_path = output_dir / "generated_instance_mask_flat.png"
@@ -447,6 +524,8 @@ def main() -> None:
             raise RuntimeError(f"No result URL in final response: {final}")
 
         download_file(results[0]["url"], mask_path)
+        cleanup_report = clean_generated_mask_in_place(mask_path, image_path)
+        clean_report_path.write_text(json.dumps(cleanup_report, ensure_ascii=False, indent=2), encoding="utf-8")
         flatten_instance_mask(mask_path, flat_mask_path)
         save_overlay(image_path, mask_path, overlay_path)
         save_overlay(image_path, flat_mask_path, flat_overlay_path)
@@ -457,6 +536,7 @@ def main() -> None:
         manifest["flat_mask_path"] = str(flat_mask_path)
         manifest["overlay_path"] = str(overlay_path)
         manifest["flat_overlay_path"] = str(flat_overlay_path)
+        manifest["mask_cleanup_report_path"] = str(clean_report_path)
         manifest["final_response_path"] = str(poll_response_path)
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
