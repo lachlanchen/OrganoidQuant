@@ -133,9 +133,33 @@ def build_hue_seeds(mask_rgb: np.ndarray, support: np.ndarray, min_area: int) ->
     return labels
 
 
+def polish_seed_labels(seed_labels: np.ndarray, support: np.ndarray, min_area: int) -> np.ndarray:
+    polished = np.zeros_like(seed_labels, dtype=np.uint16)
+    next_label = 1
+    close_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    open_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    support_mask = support > 0
+
+    for lid in [int(x) for x in np.unique(seed_labels) if int(x) > 0]:
+        mask = (seed_labels == lid).astype(np.uint8)
+        if int(mask.sum()) < min_area:
+            continue
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, close_kernel, iterations=1)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, open_kernel, iterations=1)
+        mask = ndi.binary_fill_holes(mask > 0)
+        mask = np.logical_and(mask, support_mask)
+        if int(mask.sum()) < min_area:
+            continue
+        polished[mask] = next_label
+        next_label += 1
+
+    return polished
+
+
 def separate_instances(mask_rgb: np.ndarray, min_seed_area: int, min_final_area: int) -> Dict[str, np.ndarray]:
     support = build_support(mask_rgb)
     seed_labels = build_hue_seeds(mask_rgb, support, min_seed_area)
+    seed_primary = polish_seed_labels(seed_labels, support, min_final_area)
     distance = ndi.distance_transform_edt(support)
     final = watershed(-distance, markers=seed_labels.astype(np.int32), mask=support > 0).astype(np.uint16)
 
@@ -154,6 +178,7 @@ def separate_instances(mask_rgb: np.ndarray, min_seed_area: int, min_final_area:
     return {
         "support": support.astype(np.uint8),
         "seed_labels": seed_labels.astype(np.uint16),
+        "seed_primary_labels": seed_primary.astype(np.uint16),
         "final_labels": cleaned.astype(np.uint16),
         "cleaned_rgb": cleaned_rgb,
     }
@@ -177,6 +202,9 @@ def main() -> None:
     seed_labels_path = output_dir / "seed_labels_16bit.png"
     seed_instance_path = output_dir / "seed_instance_rgb.png"
     seed_overlay_path = output_dir / "seed_overlay.png"
+    seed_primary_labels_path = output_dir / "seed_primary_labels_16bit.png"
+    seed_primary_instance_path = output_dir / "seed_primary_instance_rgb.png"
+    seed_primary_overlay_path = output_dir / "seed_primary_overlay.png"
     final_labels_path = output_dir / "simple_instance_labels_16bit.png"
     final_instance_path = output_dir / "simple_instance_rgb.png"
     cleaned_mask_path = output_dir / "cleaned_flat_mask.png"
@@ -187,6 +215,9 @@ def main() -> None:
     Image.fromarray(result["seed_labels"]).save(seed_labels_path)
     Image.fromarray(render_instance_rgb(result["seed_labels"])).save(seed_instance_path)
     Image.fromarray(render_overlay(source_rgb, result["seed_labels"])).save(seed_overlay_path)
+    Image.fromarray(result["seed_primary_labels"]).save(seed_primary_labels_path)
+    Image.fromarray(render_instance_rgb(result["seed_primary_labels"])).save(seed_primary_instance_path)
+    Image.fromarray(render_overlay(source_rgb, result["seed_primary_labels"])).save(seed_primary_overlay_path)
     Image.fromarray(result["final_labels"]).save(final_labels_path)
     Image.fromarray(result["cleaned_rgb"]).save(cleaned_mask_path)
     Image.fromarray(result["cleaned_rgb"]).save(final_instance_path)
@@ -196,6 +227,7 @@ def main() -> None:
         "source_path": str(source_path),
         "generated_mask_path": str(generated_mask_path),
         "seed_count": int(len([x for x in np.unique(result["seed_labels"]) if int(x) > 0])),
+        "seed_primary_count": int(len([x for x in np.unique(result["seed_primary_labels"]) if int(x) > 0])),
         "final_count": int(len([x for x in np.unique(result["final_labels"]) if int(x) > 0])),
         "min_seed_area": int(args.min_seed_area),
         "min_final_area": int(args.min_final_area),
