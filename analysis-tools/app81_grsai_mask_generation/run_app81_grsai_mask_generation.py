@@ -391,6 +391,10 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
         std_mean = float(local_std[mask].mean())
         boundary = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))) > 0
         boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
+        pale_blob_like = (
+            (area < 2500 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.06)
+            or (border_touch and area < 2600 and std_mean < 0.02 and boundary_grad < 0.06)
+        )
         small_fragment_like = (
             (area < 180 and (dark_mean < 0.56 or std_mean < max(std_thr, 0.04)))
             or (area < 240 and dark_mean < 0.52 and boundary_grad < max(grad_thr, 0.14))
@@ -401,7 +405,7 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
             or (frac > 0.22 and dark_mean < 0.40 and std_mean < max(std_thr, 0.045))
             or (border_touch and frac > 0.08 and dark_mean < 0.34 and std_mean < std_thr)
         )
-        if droplet_like or small_fragment_like:
+        if droplet_like or small_fragment_like or pale_blob_like:
             dropped_components.append(
                 {
                     "label": int(label),
@@ -411,7 +415,7 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
                     "mean_darkness": round(dark_mean, 6),
                     "mean_local_std": round(std_mean, 6),
                     "mean_boundary_grad": round(boundary_grad, 6),
-                    "reason": "droplet_like" if droplet_like else "small_fragment_like",
+                    "reason": "droplet_like" if droplet_like else ("pale_blob_like" if pale_blob_like else "small_fragment_like"),
                 }
             )
             continue

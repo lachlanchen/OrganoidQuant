@@ -94,12 +94,16 @@ def filter_labels_by_source(labels: np.ndarray, source_rgb: np.ndarray, min_area
         dark_mean = float(dark[mask].mean())
         std_mean = float(local_std[mask].mean())
         boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
+        pale_blob_like = (
+            (area < 2500 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.06)
+            or (border_touch and area < 2600 and std_mean < 0.02 and boundary_grad < 0.06)
+        )
         small_fragment_like = (
             (area < 180 and (dark_mean < 0.56 or std_mean < 0.04))
             or (area < 240 and dark_mean < 0.52 and boundary_grad < 0.14)
             or (border_touch and area < 500 and dark_mean < 0.60 and boundary_grad < 0.18)
         )
-        if small_fragment_like:
+        if small_fragment_like or pale_blob_like:
             continue
         filtered[mask] = next_label
         next_label += 1
