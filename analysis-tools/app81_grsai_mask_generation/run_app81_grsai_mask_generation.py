@@ -48,6 +48,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--max-side", type=int, default=1024, help="Resize uploaded image max side; 0 disables")
     p.add_argument("--request-timeout", type=float, default=300.0, help="HTTP request timeout seconds")
     p.add_argument("--submit-retries", type=int, default=2, help="Retries for initial submit")
+    p.add_argument("--job-retries", type=int, default=2, help="Fresh task resubmissions when the remote job fails")
     p.add_argument("--poll-interval", type=float, default=3.0, help="Polling interval seconds")
     p.add_argument("--poll-timeout", type=float, default=900.0, help="Polling timeout seconds")
     p.add_argument("--stalled-timeout", type=float, default=180.0, help="Polling stalled timeout seconds")
@@ -297,6 +298,20 @@ def build_prompt(image_name: str, guidance: Dict[str, Any] | None = None) -> str
     )
 
 
+def should_resubmit_failed_result(final: Dict[str, Any]) -> bool:
+    data = final.get("data") or {}
+    status = final.get("status") or data.get("status")
+    if status != "failed":
+        return False
+    failure_reason = (final.get("failure_reason") or data.get("failure_reason") or "").strip().lower()
+    error_text = (final.get("error") or data.get("error") or "").strip().lower()
+    if "timeout" in error_text:
+        return True
+    if failure_reason == "error":
+        return True
+    return False
+
+
 def save_overlay(source_path: Path, mask_path: Path, overlay_path: Path) -> None:
     source = Image.open(source_path).convert("RGB")
     mask = Image.open(mask_path).convert("RGB")
@@ -435,9 +450,11 @@ def main() -> None:
     prompt = build_prompt(image_path.name, guidance)
     prompt_path.write_text(prompt + "\n", encoding="utf-8")
 
-    if args.resume and manifest_path.exists() and mask_path.exists() and flat_mask_path.exists():
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if manifest.get("status") == "succeeded":
+    existing_manifest: Dict[str, Any] = {}
+    if manifest_path.exists():
+        existing_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if args.resume and existing_manifest and mask_path.exists() and flat_mask_path.exists():
+        if existing_manifest.get("status") == "succeeded":
             print(f"Reusing existing result: {flat_mask_path}")
             return
 
@@ -454,76 +471,97 @@ def main() -> None:
         if args.image_size:
             payload["imageSize"] = args.image_size
 
+        manifest: Dict[str, Any] = dict(existing_manifest) if existing_manifest else {}
         task_id: Optional[str] = None
-        manifest: Dict[str, Any] = {}
-        if args.resume and manifest_path.exists():
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            task_id = manifest.get("task_id")
+        if args.resume and manifest:
+            if manifest.get("status") in {"submitted", "running"}:
+                task_id = manifest.get("task_id")
 
-        if not task_id:
-            if args.verbose:
-                print(f"Submitting image {upload_image_path.name} ({upload_image_path.stat().st_size} bytes)", flush=True)
-            url = args.host.rstrip("/") + "/v1/draw/nano-banana"
-            result: Optional[Dict[str, Any]] = None
-            last_err: Optional[Exception] = None
-            for attempt in range(args.submit_retries + 1):
-                try:
-                    raw = request_raw(
-                        url,
-                        payload,
-                        api_key,
-                        timeout_s=args.request_timeout,
-                        retries=2,
-                        verbose=args.verbose,
-                        context="submit",
-                    )
-                    raw_response_path.write_text(raw, encoding="utf-8")
-                    result = parse_json(raw)
-                    break
-                except Exception as exc:
-                    last_err = exc
-                    if args.verbose:
-                        print(f"submit attempt {attempt+1} failed: {type(exc).__name__}: {exc}", flush=True)
-                    time.sleep(2.0 + attempt * 2.0)
-            if result is None:
-                raise RuntimeError(f"Submission failed after retries: {last_err}")
-            task_id = result.get("id") or (result.get("data") or {}).get("id")
+        final: Optional[Dict[str, Any]] = None
+        for job_attempt in range(args.job_retries + 1):
             if not task_id:
-                raise RuntimeError(f"Missing task id in response: {result}")
-            manifest = {
-                "image_path": str(image_path),
-                "upload_image_path": str(upload_image_path),
-                "output_dir": str(output_dir),
-                "task_id": task_id,
-                "status": "submitted",
-                "model": args.model,
-                "host": args.host,
-                "prompt_guidance_path": str(guidance_path),
-            }
-            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-            if args.verbose:
-                print(f"Submitted task {task_id}", flush=True)
-        else:
-            if args.verbose:
-                print(f"Resuming task {task_id}", flush=True)
+                if args.verbose:
+                    print(
+                        f"Submitting image {upload_image_path.name} ({upload_image_path.stat().st_size} bytes) "
+                        f"[job attempt {job_attempt+1}/{args.job_retries+1}]",
+                        flush=True,
+                    )
+                url = args.host.rstrip("/") + "/v1/draw/nano-banana"
+                result: Optional[Dict[str, Any]] = None
+                last_err: Optional[Exception] = None
+                for attempt in range(args.submit_retries + 1):
+                    try:
+                        raw = request_raw(
+                            url,
+                            payload,
+                            api_key,
+                            timeout_s=args.request_timeout,
+                            retries=2,
+                            verbose=args.verbose,
+                            context="submit",
+                        )
+                        raw_response_path.write_text(raw, encoding="utf-8")
+                        result = parse_json(raw)
+                        break
+                    except Exception as exc:
+                        last_err = exc
+                        if args.verbose:
+                            print(f"submit attempt {attempt+1} failed: {type(exc).__name__}: {exc}", flush=True)
+                        time.sleep(2.0 + attempt * 2.0)
+                if result is None:
+                    raise RuntimeError(f"Submission failed after retries: {last_err}")
+                task_id = result.get("id") or (result.get("data") or {}).get("id")
+                if not task_id:
+                    raise RuntimeError(f"Missing task id in response: {result}")
+                manifest = {
+                    "image_path": str(image_path),
+                    "upload_image_path": str(upload_image_path),
+                    "output_dir": str(output_dir),
+                    "task_id": task_id,
+                    "status": "submitted",
+                    "model": args.model,
+                    "host": args.host,
+                    "prompt_guidance_path": str(guidance_path),
+                    "job_attempt": job_attempt + 1,
+                }
+                manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+                if args.verbose:
+                    print(f"Submitted task {task_id}", flush=True)
+            else:
+                if args.verbose:
+                    print(f"Resuming task {task_id}", flush=True)
 
-        final = poll_result(
-            args.host,
-            task_id,
-            api_key,
-            args.poll_interval,
-            args.poll_timeout,
-            args.stalled_timeout,
-            args.verbose,
-        )
-        poll_response_path.write_text(json.dumps(final, ensure_ascii=False, indent=2), encoding="utf-8")
+            final = poll_result(
+                args.host,
+                task_id,
+                api_key,
+                args.poll_interval,
+                args.poll_timeout,
+                args.stalled_timeout,
+                args.verbose,
+            )
+            poll_response_path.write_text(json.dumps(final, ensure_ascii=False, indent=2), encoding="utf-8")
 
-        results = final.get("results") or (final.get("data") or {}).get("results") or []
-        if not results or not results[0].get("url"):
+            results = final.get("results") or (final.get("data") or {}).get("results") or []
+            if results and results[0].get("url"):
+                break
+
             manifest["status"] = "failed"
             manifest["final_response_path"] = str(poll_response_path)
             manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+            if job_attempt < args.job_retries and should_resubmit_failed_result(final):
+                if args.verbose:
+                    print(
+                        f"Remote job {task_id} failed without result URL; resubmitting fresh task "
+                        f"({job_attempt+2}/{args.job_retries+1})",
+                        flush=True,
+                    )
+                task_id = None
+                continue
             raise RuntimeError(f"No result URL in final response: {final}")
+
+        assert final is not None
+        results = final.get("results") or (final.get("data") or {}).get("results") or []
 
         download_file(results[0]["url"], mask_path)
         cleanup_report = clean_generated_mask_in_place(mask_path, image_path)
