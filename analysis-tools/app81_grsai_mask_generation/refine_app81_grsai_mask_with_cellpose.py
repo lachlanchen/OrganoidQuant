@@ -182,6 +182,8 @@ def main() -> None:
 
     source_rgb = ensure_rgb(source_path)
     mask_rgb = ensure_rgb(mask_path)
+    if mask_rgb.shape[:2] != source_rgb.shape[:2]:
+        mask_rgb = cv2.resize(mask_rgb, (source_rgb.shape[1], source_rgb.shape[0]), interpolation=cv2.INTER_NEAREST)
 
     seed_labels, support = build_seed_labels(mask_rgb)
     branches = masked_gray_branches(source_rgb, support)
