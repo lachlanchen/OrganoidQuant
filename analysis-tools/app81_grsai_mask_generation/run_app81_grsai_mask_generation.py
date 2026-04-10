@@ -186,6 +186,7 @@ def build_prompt(image_name: str) -> str:
         "Each true organoid must be one smooth filled solid region with one bright flat color. "
         "Use different colors for neighboring organoids when possible. "
         "Include both small organoids and large fused irregular organoids if they are real organoid tissue. "
+        "Match the visible organoid body accurately and compactly; do not over-expand into surrounding droplet or background, and do not under-fill the real organoid body. "
         "Do not segment the outer droplet, outer circular container, surrounding fluid boundary, well boundary, debris, speckles, halos, scratches, or thin edge fragments. "
         "Do not draw outlines, rings, texture, shading, gradients, labels, arrows, or text. "
         "Do not create stray islands or narrow colored tails. "
