@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import argparse
 import base64
-import io
 import json
 import os
 import sys
+import tempfile
 import time
 import urllib.request
 from pathlib import Path
@@ -29,6 +29,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--model", default=DEFAULT_MODEL, help="Nano Banana model")
     p.add_argument("--aspect", default="auto", help="Aspect ratio")
     p.add_argument("--image-size", default="1K", help="Image size")
+    p.add_argument("--max-side", type=int, default=1536, help="Resize uploaded image max side; 0 disables")
     p.add_argument("--poll-interval", type=float, default=3.0, help="Polling interval seconds")
     p.add_argument("--poll-timeout", type=float, default=900.0, help="Polling timeout seconds")
     p.add_argument("--stalled-timeout", type=float, default=180.0, help="Polling stalled timeout seconds")
@@ -66,6 +67,25 @@ def image_to_data_url(path: Path) -> str:
         mime = "image/jpeg"
     data = path.read_bytes()
     return f"data:{mime};base64,{base64.b64encode(data).decode('utf-8')}"
+
+
+def prepare_upload_image(path: Path, max_side: int) -> tuple[Path, Optional[tempfile.TemporaryDirectory[str]]]:
+    if max_side <= 0:
+        return path, None
+
+    image = Image.open(path).convert("RGB")
+    width, height = image.size
+    longest = max(width, height)
+    if longest <= max_side:
+        return path, None
+
+    scale = max_side / float(longest)
+    new_size = (max(1, int(round(width * scale))), max(1, int(round(height * scale))))
+    resized = image.resize(new_size, Image.LANCZOS)
+    tmpdir = tempfile.TemporaryDirectory(prefix="app81_grsai_upload_")
+    out_path = Path(tmpdir.name) / f"{path.stem}_upload.png"
+    resized.save(out_path)
+    return out_path, tmpdir
 
 
 def request_raw(url: str, payload: Dict[str, Any], api_key: str) -> str:
@@ -209,76 +229,84 @@ def main() -> None:
             print(f"Reusing existing result: {mask_path}")
             return
 
-    payload: Dict[str, Any] = {
-        "model": args.model,
-        "urls": [image_to_data_url(image_path)],
-        "prompt": prompt,
-        "aspectRatio": args.aspect,
-        "webHook": "-1",
-        "shutProgress": True,
-    }
-    if args.image_size:
-        payload["imageSize"] = args.image_size
-
-    task_id: Optional[str] = None
-    manifest: Dict[str, Any] = {}
-    if args.resume and manifest_path.exists():
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        task_id = manifest.get("task_id")
-
-    if not task_id:
-        url = args.host.rstrip("/") + "/v1/draw/nano-banana"
-        raw = request_raw(url, payload, api_key)
-        raw_response_path.write_text(raw, encoding="utf-8")
-        result = parse_json(raw)
-        task_id = result.get("id") or (result.get("data") or {}).get("id")
-        if not task_id:
-            raise RuntimeError(f"Missing task id in response: {result}")
-        manifest = {
-            "image_path": str(image_path),
-            "output_dir": str(output_dir),
-            "task_id": task_id,
-            "status": "submitted",
+    upload_image_path, tmpdir = prepare_upload_image(image_path, args.max_side)
+    try:
+        payload: Dict[str, Any] = {
             "model": args.model,
-            "host": args.host,
+            "urls": [image_to_data_url(upload_image_path)],
+            "prompt": prompt,
+            "aspectRatio": args.aspect,
+            "webHook": "-1",
+            "shutProgress": True,
         }
-        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-        if args.verbose:
-            print(f"Submitted task {task_id}", flush=True)
-    else:
-        if args.verbose:
-            print(f"Resuming task {task_id}", flush=True)
+        if args.image_size:
+            payload["imageSize"] = args.image_size
 
-    final = poll_result(
-        args.host,
-        task_id,
-        api_key,
-        args.poll_interval,
-        args.poll_timeout,
-        args.stalled_timeout,
-        args.verbose,
-    )
-    poll_response_path.write_text(json.dumps(final, ensure_ascii=False, indent=2), encoding="utf-8")
+        task_id: Optional[str] = None
+        manifest: Dict[str, Any] = {}
+        if args.resume and manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            task_id = manifest.get("task_id")
 
-    results = final.get("results") or (final.get("data") or {}).get("results") or []
-    if not results or not results[0].get("url"):
-        manifest["status"] = "failed"
+        if not task_id:
+            if args.verbose:
+                print(f"Submitting image {upload_image_path.name} ({upload_image_path.stat().st_size} bytes)", flush=True)
+            url = args.host.rstrip("/") + "/v1/draw/nano-banana"
+            raw = request_raw(url, payload, api_key)
+            raw_response_path.write_text(raw, encoding="utf-8")
+            result = parse_json(raw)
+            task_id = result.get("id") or (result.get("data") or {}).get("id")
+            if not task_id:
+                raise RuntimeError(f"Missing task id in response: {result}")
+            manifest = {
+                "image_path": str(image_path),
+                "upload_image_path": str(upload_image_path),
+                "output_dir": str(output_dir),
+                "task_id": task_id,
+                "status": "submitted",
+                "model": args.model,
+                "host": args.host,
+            }
+            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+            if args.verbose:
+                print(f"Submitted task {task_id}", flush=True)
+        else:
+            if args.verbose:
+                print(f"Resuming task {task_id}", flush=True)
+
+        final = poll_result(
+            args.host,
+            task_id,
+            api_key,
+            args.poll_interval,
+            args.poll_timeout,
+            args.stalled_timeout,
+            args.verbose,
+        )
+        poll_response_path.write_text(json.dumps(final, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        results = final.get("results") or (final.get("data") or {}).get("results") or []
+        if not results or not results[0].get("url"):
+            manifest["status"] = "failed"
+            manifest["final_response_path"] = str(poll_response_path)
+            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+            raise RuntimeError(f"No result URL in final response: {final}")
+
+        download_file(results[0]["url"], mask_path)
+        save_overlay(image_path, mask_path, overlay_path)
+
+        manifest["status"] = "succeeded"
+        manifest["result_url"] = results[0]["url"]
+        manifest["mask_path"] = str(mask_path)
+        manifest["overlay_path"] = str(overlay_path)
         manifest["final_response_path"] = str(poll_response_path)
         manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-        raise RuntimeError(f"No result URL in final response: {final}")
 
-    download_file(results[0]["url"], mask_path)
-    save_overlay(image_path, mask_path, overlay_path)
-
-    manifest["status"] = "succeeded"
-    manifest["result_url"] = results[0]["url"]
-    manifest["mask_path"] = str(mask_path)
-    manifest["overlay_path"] = str(overlay_path)
-    manifest["final_response_path"] = str(poll_response_path)
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    print(f"Saved mask: {mask_path}")
-    print(f"Saved overlay: {overlay_path}")
+        print(f"Saved mask: {mask_path}")
+        print(f"Saved overlay: {overlay_path}")
+    finally:
+        if tmpdir is not None:
+            tmpdir.cleanup()
 
 
 if __name__ == "__main__":
