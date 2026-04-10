@@ -288,8 +288,10 @@ def build_prompt(image_name: str, guidance: Dict[str, Any] | None = None) -> str
         "If a very large circular or elliptical region is pale, smooth, almost transparent, or looks like a droplet interior, do not segment it at all. "
         "Match the visible organoid body accurately and compactly; do not over-expand into surrounding droplet or background, and do not under-fill the real organoid body. "
         "Do not segment the outer droplet, outer circular container, surrounding fluid boundary, well boundary, debris, speckles, halos, scratches, or thin edge fragments. "
+        "Ignore tiny isolated dots unless they are clearly real compact dark organoids. "
+        "Ignore partially clipped edge objects unless most of a real dark organoid body is visible. "
         "Do not draw outlines, rings, texture, shading, gradients, labels, arrows, or text. "
-        "Do not create stray islands or narrow colored tails. "
+        "Do not create stray islands, narrow colored tails, or tiny background fragments. "
         "Keep separate organoids separate with black gaps unless they are visibly fused into one continuous tissue mass. "
         "Output only the colored mask image, suitable for downstream instance processing. "
         "Preferred colors are bright flat red, green, blue, yellow, cyan, magenta, orange, and purple. "
@@ -389,20 +391,27 @@ def clean_generated_mask_in_place(mask_path: Path, source_path: Path, min_area: 
         std_mean = float(local_std[mask].mean())
         boundary = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))) > 0
         boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
+        small_fragment_like = (
+            (area < 180 and (dark_mean < 0.56 or std_mean < max(std_thr, 0.04)))
+            or (area < 240 and dark_mean < 0.52 and boundary_grad < max(grad_thr, 0.14))
+            or (border_touch and area < 500 and dark_mean < 0.60 and boundary_grad < 0.18)
+        )
         droplet_like = (
             (frac > 0.10 and dark_mean < 0.34 and std_mean < std_thr and boundary_grad < grad_thr)
             or (frac > 0.22 and dark_mean < 0.40 and std_mean < max(std_thr, 0.045))
             or (border_touch and frac > 0.08 and dark_mean < 0.34 and std_mean < std_thr)
         )
-        if droplet_like:
+        if droplet_like or small_fragment_like:
             dropped_components.append(
                 {
                     "label": int(label),
                     "area_fraction": round(frac, 6),
+                    "area_px": area,
                     "touches_border": border_touch,
                     "mean_darkness": round(dark_mean, 6),
                     "mean_local_std": round(std_mean, 6),
                     "mean_boundary_grad": round(boundary_grad, 6),
+                    "reason": "droplet_like" if droplet_like else "small_fragment_like",
                 }
             )
             continue

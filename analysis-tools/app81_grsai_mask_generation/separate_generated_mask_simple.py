@@ -67,6 +67,45 @@ def render_overlay(source_rgb: np.ndarray, labels: np.ndarray) -> np.ndarray:
     return overlay
 
 
+def filter_labels_by_source(labels: np.ndarray, source_rgb: np.ndarray, min_area: int) -> np.ndarray:
+    if labels.max() == 0:
+        return labels.astype(np.uint16)
+
+    gray = cv2.cvtColor(source_rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+    dark = 1.0 - gray
+    mean = cv2.GaussianBlur(gray, (0, 0), 11)
+    sq_mean = cv2.GaussianBlur(gray * gray, (0, 0), 11)
+    local_std = np.sqrt(np.maximum(sq_mean - mean * mean, 0.0))
+    grad_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
+    grad_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+    grad = cv2.magnitude(grad_x, grad_y)
+
+    h, w = labels.shape
+    filtered = np.zeros_like(labels, dtype=np.uint16)
+    next_label = 1
+    for lid in [int(x) for x in np.unique(labels) if int(x) > 0]:
+        mask = labels == lid
+        area = int(mask.sum())
+        if area < min_area:
+            continue
+        ys, xs = np.where(mask)
+        border_touch = bool((ys == 0).any() or (ys == h - 1).any() or (xs == 0).any() or (xs == w - 1).any())
+        boundary = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_GRADIENT, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))) > 0
+        dark_mean = float(dark[mask].mean())
+        std_mean = float(local_std[mask].mean())
+        boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
+        small_fragment_like = (
+            (area < 180 and (dark_mean < 0.56 or std_mean < 0.04))
+            or (area < 240 and dark_mean < 0.52 and boundary_grad < 0.14)
+            or (border_touch and area < 500 and dark_mean < 0.60 and boundary_grad < 0.18)
+        )
+        if small_fragment_like:
+            continue
+        filtered[mask] = next_label
+        next_label += 1
+    return filtered
+
+
 def build_support(mask_rgb: np.ndarray) -> np.ndarray:
     hsv = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2HSV)
     sat = hsv[:, :, 1]
@@ -222,7 +261,7 @@ def separate_instances(source_rgb: np.ndarray, mask_rgb: np.ndarray, min_seed_ar
     seed_labels = build_hue_seeds(mask_rgb, filtered_support, min_seed_area)
     seed_primary = polish_seed_labels(seed_labels, filtered_support, min_final_area)
     distance = ndi.distance_transform_edt(filtered_support)
-    final = watershed(-distance, markers=seed_labels.astype(np.int32), mask=filtered_support > 0).astype(np.uint16)
+    final = watershed(-distance, markers=seed_primary.astype(np.int32), mask=filtered_support > 0).astype(np.uint16)
 
     cleaned = np.zeros_like(final)
     next_label = 1
@@ -233,6 +272,11 @@ def separate_instances(source_rgb: np.ndarray, mask_rgb: np.ndarray, min_seed_ar
             continue
         cleaned[mask] = next_label
         next_label += 1
+
+    seed_primary = filter_labels_by_source(seed_primary, source_rgb, min_final_area)
+    cleaned = filter_labels_by_source(cleaned, source_rgb, min_final_area)
+    if len([x for x in np.unique(cleaned) if int(x) > 0]) > len([x for x in np.unique(seed_primary) if int(x) > 0]):
+        cleaned = seed_primary.copy()
 
     cleaned_rgb = render_instance_rgb(cleaned)
 
