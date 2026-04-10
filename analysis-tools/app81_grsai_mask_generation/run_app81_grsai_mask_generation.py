@@ -41,6 +41,7 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Generate App81 instance-color masks via GRS AI.")
     p.add_argument("--image", required=True, help="Path to source microscopy image")
     p.add_argument("--output-dir", required=True, help="Directory for generated outputs")
+    p.add_argument("--reference-image", action="append", default=[], help="Additional reference image(s) to send alongside the source image")
     p.add_argument("--host", default=DEFAULT_HOST, help="GRS AI API host")
     p.add_argument("--model", default=DEFAULT_MODEL, help="Nano Banana model")
     p.add_argument("--aspect", default="auto", help="Aspect ratio")
@@ -54,6 +55,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--stalled-timeout", type=float, default=180.0, help="Polling stalled timeout seconds")
     p.add_argument("--resume", action="store_true", help="Reuse existing successful task info and outputs")
     p.add_argument("--prompt-overrides-json", default="", help="Optional JSON file mapping image names to extra prompt guidance")
+    p.add_argument("--extra-prompt", default="", help="Additional prompt text appended after the default guidance")
     p.add_argument("--min-kept-area-frac", type=float, default=0.0, help="Optional minimum kept component area fraction after generation cleanup")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()
@@ -551,7 +553,13 @@ def main() -> None:
     poll_response_path = log_dir / "poll_response.json"
 
     guidance = analyze_prompt_guidance(image_path)
-    extra_prompt = load_prompt_override(image_path.name, args.prompt_overrides_json)
+    override_prompt = load_prompt_override(image_path.name, args.prompt_overrides_json)
+    prompt_parts = []
+    if override_prompt:
+        prompt_parts.append(override_prompt)
+    if args.extra_prompt.strip():
+        prompt_parts.append(args.extra_prompt.strip())
+    extra_prompt = " ".join(prompt_parts)
     if extra_prompt:
         guidance["manual_prompt_override"] = extra_prompt
     guidance_path.write_text(json.dumps(guidance, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -568,9 +576,14 @@ def main() -> None:
 
     upload_image_path, tmpdir = prepare_upload_image(image_path, args.max_side)
     try:
+        reference_images = [Path(p) for p in args.reference_image]
+        missing_refs = [str(p) for p in reference_images if not p.exists()]
+        if missing_refs:
+            raise FileNotFoundError(f"Missing reference image(s): {missing_refs}")
+        urls = [image_to_data_url(upload_image_path)] + [image_to_data_url(p) for p in reference_images]
         payload: Dict[str, Any] = {
             "model": args.model,
-            "urls": [image_to_data_url(upload_image_path)],
+            "urls": urls,
             "prompt": prompt,
             "aspectRatio": args.aspect,
             "webHook": "-1",
@@ -624,6 +637,7 @@ def main() -> None:
                 manifest = {
                     "image_path": str(image_path),
                     "upload_image_path": str(upload_image_path),
+                    "reference_images": [str(p) for p in reference_images],
                     "output_dir": str(output_dir),
                     "task_id": task_id,
                     "status": "submitted",

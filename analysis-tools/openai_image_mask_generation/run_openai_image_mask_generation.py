@@ -29,6 +29,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--quality", default="high", help="Output quality")
     p.add_argument("--background", default="opaque", help="Background option")
     p.add_argument("--models", nargs="+", default=DEFAULT_MODELS, help="Models to try in order")
+    p.add_argument("--prompt-extra", default="", help="Extra prompt text appended to the default prompt")
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
     return p.parse_args()
 
@@ -53,8 +54,8 @@ def load_openai_key() -> str:
     raise RuntimeError("Missing OPENAI_API_KEY")
 
 
-def build_prompt(image_name: str) -> str:
-    return (
+def build_prompt(image_name: str, extra_prompt: str = "") -> str:
+    prompt = (
         "Edit this brightfield microscopy image into only an instance segmentation mask. "
         "Use pure black background everywhere outside organoids. "
         "Segment only true organoids. "
@@ -69,6 +70,9 @@ def build_prompt(image_name: str) -> str:
         "Output only the colored mask image and nothing else. "
         f"Source image identifier: {image_name}."
     )
+    if extra_prompt.strip():
+        prompt += " " + extra_prompt.strip()
+    return prompt
 
 
 def save_overlay(source_path: Path, mask_path: Path, overlay_path: Path) -> None:
@@ -153,7 +157,7 @@ def main() -> None:
     overlay_path = output_dir / "generated_overlay.png"
     meta_path = output_dir / "run_manifest.json"
 
-    prompt = build_prompt(image_path.name)
+    prompt = build_prompt(image_path.name, extra_prompt=args.prompt_extra)
     prompt_path.write_text(prompt + "\n", encoding="utf-8")
 
     last_error = None
