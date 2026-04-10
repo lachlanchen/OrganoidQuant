@@ -106,6 +106,19 @@ def filter_labels_by_source(labels: np.ndarray, source_rgb: np.ndarray, min_area
     return filtered
 
 
+def label_connected_support(support: np.ndarray, min_area: int) -> np.ndarray:
+    num, cc, stats, _ = cv2.connectedComponentsWithStats(support.astype(np.uint8), connectivity=8)
+    labels = np.zeros_like(support, dtype=np.uint16)
+    next_label = 1
+    for lid in range(1, num):
+        area = int(stats[lid, cv2.CC_STAT_AREA])
+        if area < min_area:
+            continue
+        labels[cc == lid] = next_label
+        next_label += 1
+    return labels
+
+
 def build_support(mask_rgb: np.ndarray) -> np.ndarray:
     hsv = cv2.cvtColor(mask_rgb, cv2.COLOR_RGB2HSV)
     sat = hsv[:, :, 1]
@@ -260,32 +273,46 @@ def separate_instances(source_rgb: np.ndarray, mask_rgb: np.ndarray, min_seed_ar
     filtered_support, dropped = remove_droplet_like_support(support, source_rgb)
     seed_labels = build_hue_seeds(mask_rgb, filtered_support, min_seed_area)
     seed_primary = polish_seed_labels(seed_labels, filtered_support, min_final_area)
-    distance = ndi.distance_transform_edt(filtered_support)
-    final = watershed(-distance, markers=seed_primary.astype(np.int32), mask=filtered_support > 0).astype(np.uint16)
+    support_labels = label_connected_support(filtered_support, min_final_area)
 
-    cleaned = np.zeros_like(final)
+    final = np.zeros_like(support_labels, dtype=np.uint16)
     next_label = 1
-    for lid in [int(x) for x in np.unique(final) if int(x) > 0]:
-        mask = final == lid
-        area = int(mask.sum())
-        if area < min_final_area:
-            continue
-        cleaned[mask] = next_label
-        next_label += 1
+    for comp_id in [int(x) for x in np.unique(support_labels) if int(x) > 0]:
+        comp_mask = support_labels == comp_id
+        comp_seed = seed_primary.copy()
+        comp_seed[~comp_mask] = 0
+        seed_ids = [int(x) for x in np.unique(comp_seed) if int(x) > 0]
+        if len(seed_ids) >= 2:
+            distance = ndi.distance_transform_edt(comp_mask)
+            split = watershed(-distance, markers=comp_seed.astype(np.int32), mask=comp_mask).astype(np.uint16)
+            for lid in [int(x) for x in np.unique(split) if int(x) > 0]:
+                mask = split == lid
+                if int(mask.sum()) < min_final_area:
+                    continue
+                final[mask] = next_label
+                next_label += 1
+        else:
+            final[comp_mask] = next_label
+            next_label += 1
 
     seed_primary = filter_labels_by_source(seed_primary, source_rgb, min_final_area)
-    cleaned = filter_labels_by_source(cleaned, source_rgb, min_final_area)
-    if len([x for x in np.unique(cleaned) if int(x) > 0]) > len([x for x in np.unique(seed_primary) if int(x) > 0]):
-        cleaned = seed_primary.copy()
+    final = filter_labels_by_source(final, source_rgb, min_final_area)
+    support_primary = filter_labels_by_source(support_labels, source_rgb, min_final_area)
+    if len([x for x in np.unique(seed_primary) if int(x) > 0]) == 0:
+        seed_primary = support_primary.copy()
+    if len([x for x in np.unique(final) if int(x) > 0]) == 0:
+        final = support_primary.copy()
+    if len([x for x in np.unique(seed_primary) if int(x) > 0]) > len([x for x in np.unique(final) if int(x) > 0]):
+        final = seed_primary.copy()
 
-    cleaned_rgb = render_instance_rgb(cleaned)
+    cleaned_rgb = render_instance_rgb(final)
 
     return {
         "support": support.astype(np.uint8),
         "filtered_support": filtered_support.astype(np.uint8),
         "seed_labels": seed_labels.astype(np.uint16),
         "seed_primary_labels": seed_primary.astype(np.uint16),
-        "final_labels": cleaned.astype(np.uint16),
+        "final_labels": final.astype(np.uint16),
         "cleaned_rgb": cleaned_rgb,
         "dropped_support_components": dropped,
     }
