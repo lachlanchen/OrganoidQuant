@@ -81,6 +81,7 @@ def filter_labels_by_source(labels: np.ndarray, source_rgb: np.ndarray, min_area
     grad = cv2.magnitude(grad_x, grad_y)
 
     h, w = labels.shape
+    total = float(h * w)
     filtered = np.zeros_like(labels, dtype=np.uint16)
     next_label = 1
     for lid in [int(x) for x in np.unique(labels) if int(x) > 0]:
@@ -94,14 +95,18 @@ def filter_labels_by_source(labels: np.ndarray, source_rgb: np.ndarray, min_area
         dark_mean = float(dark[mask].mean())
         std_mean = float(local_std[mask].mean())
         boundary_grad = float(grad[boundary].mean()) if boundary.any() else 0.0
+        frac = area / total
         pale_blob_like = (
             (area < 2500 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.06)
             or (border_touch and area < 2600 and std_mean < 0.02 and boundary_grad < 0.06)
+            or (frac < 0.003 and dark_mean < 0.55 and std_mean < 0.02 and boundary_grad < 0.04)
+            or (border_touch and frac < 0.004 and std_mean < 0.015 and boundary_grad < 0.035)
         )
         small_fragment_like = (
             (area < 180 and (dark_mean < 0.56 or std_mean < 0.04))
             or (area < 240 and dark_mean < 0.52 and boundary_grad < 0.14)
             or (border_touch and area < 500 and dark_mean < 0.60 and boundary_grad < 0.18)
+            or (frac < 0.00025 and dark_mean < 0.54 and (std_mean < 0.06 or boundary_grad < 0.11))
         )
         if small_fragment_like or pale_blob_like:
             continue
