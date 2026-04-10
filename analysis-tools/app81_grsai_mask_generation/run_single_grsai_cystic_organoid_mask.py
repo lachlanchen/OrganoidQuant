@@ -20,14 +20,13 @@ DEFAULT_OVERRIDES = REPO_ROOT / "analysis-tools/app81_grsai_mask_generation/app8
 PROMPT = (
     "Generate only an organoid instance mask for this brightfield microscopy image. "
     "Use pure black background everywhere outside organoids. "
-    "Each organoid must be one smooth solid filled flat-colored instance. "
-    "Include true cystic organoids: round or slightly irregular biological objects with a dark continuous wall and a real interior, even if the interior is lighter than the wall. "
-    "Include darker dense compact organoid tissue when it is clearly real organoid material. "
-    "Do not draw hollow rings, outline-only shapes, thin traces, fragmental edges, debris, specks, or very small objects. "
-    "Ignore small uncertain objects and keep only clear medium or large organoids. "
-    "Do not segment pale transparent droplets, droplet interiors, hollow droplet boundaries, large smooth pale circles, or border-touching droplet arcs. "
-    "If a large circular structure is pale or mostly hollow, leave it black. "
-    "Output only the clean colored mask."
+    "Each true organoid must be one smooth solid filled flat-colored instance. "
+    "Include true cystic organoids with a dark continuous biological wall and a meaningful interior, even when the interior is lighter than the wall. "
+    "Include dark dense compact organoid tissue and very large dark non-transparent fused organoid masses when they are clearly real tissue. "
+    "A real organoid may range from about one-tenth of the image to nearly the whole image, so decide by biological appearance, not by size alone. "
+    "Do not segment pale or transparent droplets, droplet interiors, hollow droplet rings, large smooth pale circles, border arcs, debris, specks, or very small detached objects. "
+    "Do not draw hollow masks, contour-only shapes, thin traces, ragged fragments, or fragmental edge pieces. "
+    "Output only the clean colored organoid mask."
 )
 
 
