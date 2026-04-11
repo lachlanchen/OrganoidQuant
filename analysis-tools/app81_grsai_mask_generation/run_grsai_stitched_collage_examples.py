@@ -129,13 +129,14 @@ def build_prompt(source_pngs: list[Path], override_path: Path) -> str:
         "Treat each panel independently. "
         "Generate one colored organoid instance mask aligned to the collage. "
         "Use pure black background everywhere outside organoids, and keep all black gutters and the blank panel black. "
-        "Each true organoid must be one smooth solid filled flat-colored instance. "
-        "Include all apparent real organoids. Do not miss obvious organoids. Be careful: you may otherwise miss some apparent organoids. "
+        "Each true organoid must be one smooth solid completely filled flat-colored instance. "
+        "Never output a hollow ring, outline-only shell, or contour-only mask. Fill the full organoid interior. "
+        "Be exhaustive and search carefully for all apparent real organoids in every panel. Do not miss obvious organoids. "
         "A real organoid can be a dark-rim cystic object with a lighter lumen, a dense dark compact body, or a dark fused irregular mass. "
-        "Keep adjacent organoids separate when each has its own visible wall, lumen, neck, or center. "
+        "Keep adjacent organoids separate when each has its own visible wall, lumen, neck, center, or even a faint separating boundary. "
         "Do not mask pale smooth translucent droplets, hollow droplet boundaries, empty pale interiors, faint circular arcs, debris, specks, or tiny detached fragments. "
         "If a large circular or oval structure is pale and translucent, keep it black. If it is dark dense real tissue, mask it. "
-        "Do not draw outlines or hollow masks. "
+        "Do not draw outlines, hollow masks, or merged blobs when two neighboring organoids are visibly distinct. "
         "Panel-specific guidance follows."
     )
     panel_lines = []
