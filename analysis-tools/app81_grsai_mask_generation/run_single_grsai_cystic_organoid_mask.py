@@ -23,12 +23,13 @@ PROMPT = (
     "Each true organoid must be one smooth solid filled flat-colored instance. "
     "Mask all dense textured multicellular organoid structures, from small developing cysts and moderate round cystic organoids to large complex lobular masses. "
     "True organoids usually show granular internal texture, thick dark high-contrast cellular walls, dense darker tissue, or real internal cavities or lumens enclosed by biological walls. "
+    "Also keep moderate round cystic organoids when they have a clear dark biological rim even if their interior is pale or less textured. "
     "A real organoid may range from about one-tenth of the image to nearly the whole image, so decide by texture, dark biological wall, and cellular structure rather than size alone. "
     "If several real organoids lie inside one large pale transparent droplet, segment only the darker internal organoid bodies and keep the pale droplet, its thin faint boundary, and its smooth interior completely black. "
     "Only treat a round pale structure as droplet when it is large, smooth, transparent, low-texture, or mostly hollow, with only a thin faint boundary and no true dark biological wall. "
     "Do not segment pale transparent hydrogel or Matrigel domes, hollow droplet rings, thin low-contrast enclosing ovals, border arcs, smooth textureless transparent regions, debris, specks, tiny detached objects, or fragmental edge pieces. "
     "Do not draw hollow masks, contour-only shapes, or thin traces. "
-    "Do not merge neighboring organoids when a visible boundary separates them. "
+    "Do not merge neighboring organoids when each has its own dark rim, its own center, or a visible neck or boundary separates them. "
     "Output only the clean colored organoid mask."
 )
 
