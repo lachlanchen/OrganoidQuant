@@ -125,16 +125,16 @@ def build_collage(source_pngs: list[Path], collage_path: Path, gap: int = 48) ->
 
 def build_prompt(source_pngs: list[Path], override_path: Path) -> str:
     intro = (
-        "This is one stitched collage containing five separate brightfield microscopy panels, with thick black gutters between panels and one blank black panel. "
+        "This is one stitched collage of five separate brightfield microscopy panels plus one blank black panel. "
         "Treat each panel independently. "
         "Generate one colored organoid instance mask aligned to the collage. "
-        "Use pure black background everywhere outside organoids and keep the gutters and blank panel black. "
+        "Use pure black background everywhere outside organoids, and keep all black gutters and the blank panel black. "
         "Each true organoid must be one smooth solid filled flat-colored instance. "
-        "Mask true organoids only: dark-rim cystic organoids with a closed biological wall and lighter lumen, dense dark compact organoids, and dark fused irregular tissue masses. "
-        "Do not mask pale smooth transparent droplets, hollow droplet boundaries, empty pale interiors, faint circular arcs, debris, specks, or tiny detached fragments. "
-        "If a large circular structure is pale and translucent, keep it black. "
-        "If a large structure is dark dense real tissue, mask it. "
-        "Keep adjacent organoids separate when each has its own visible wall, lumen, or center. "
+        "Include all apparent real organoids. Do not miss obvious organoids. Be careful: you may otherwise miss some apparent organoids. "
+        "A real organoid can be a dark-rim cystic object with a lighter lumen, a dense dark compact body, or a dark fused irregular mass. "
+        "Keep adjacent organoids separate when each has its own visible wall, lumen, neck, or center. "
+        "Do not mask pale smooth translucent droplets, hollow droplet boundaries, empty pale interiors, faint circular arcs, debris, specks, or tiny detached fragments. "
+        "If a large circular or oval structure is pale and translucent, keep it black. If it is dark dense real tissue, mask it. "
         "Do not draw outlines or hollow masks. "
         "Panel-specific guidance follows."
     )
