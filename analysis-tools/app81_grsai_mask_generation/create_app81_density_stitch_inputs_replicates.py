@@ -28,10 +28,15 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--source-root", default="DEO/DEO App81 P8", help="App81 source root")
     p.add_argument("--output-root", required=True, help="Output folder for stitched collages and manifest")
     p.add_argument("--gap", type=int, default=48, help="Black gutter size in pixels")
+    p.add_argument(
+        "--fill-missing-from-replicate1",
+        action="store_true",
+        help="For replicate_02 and above, fill missing date slots with the replicate_01 image from the same date/density/batch",
+    )
     return p.parse_args()
 
 
-def build_manifest_text(records: list[dict[str, Any]]) -> str:
+def build_manifest_text(records: list[dict[str, Any]], fill_missing_from_replicate1: bool) -> str:
     lines = [
         "# App81 Density Stitch Manifest V2",
         "",
@@ -44,7 +49,11 @@ def build_manifest_text(records: list[dict[str, Any]]) -> str:
         "- each batch has 8 date slots and 1 forced blank slot",
         "- replicate iteration was applied per density per batch",
         "- replicate 1 uses the first ranked candidate from each date, replicate 2 uses the second ranked candidate, and so on",
-        "- if a date has fewer candidates than the replicate index, that slot is left black",
+        (
+            "- if a date has fewer candidates than the replicate index, that slot is backfilled from replicate_01 for the same date/density/batch"
+            if fill_missing_from_replicate1
+            else "- if a date has fewer candidates than the replicate index, that slot is left black"
+        ),
         "",
     ]
     for record in records:
@@ -54,14 +63,14 @@ def build_manifest_text(records: list[dict[str, Any]]) -> str:
             f"- plain collage: [{record['plain_path']}]({record['plain_path']})",
             f"- labeled preview: [{record['preview_path']}]({record['preview_path']})",
             "",
-            "| Slot | Date | Replicate Index | Selected Source | Candidate Count | Candidates |",
-            "| --- | --- | --- | --- | --- | --- |",
+            "| Slot | Date | Replicate Index | Selection Mode | Selected Source | Candidate Count | Candidates |",
+            "| --- | --- | --- | --- | --- | --- | --- |",
         ])
         for slot in record["slots"]:
             selected = slot["selected_source"] or "BLANK"
             candidates = "<br>".join(slot["candidate_sources"]) if slot["candidate_sources"] else "BLANK"
             lines.append(
-                f"| {slot['slot']} | {slot['date']} | {slot['replicate_index']} | {selected} | {slot['candidate_count']} | {candidates} |"
+                f"| {slot['slot']} | {slot['date']} | {slot['replicate_index']} | {slot['selection_mode']} | {selected} | {slot['candidate_count']} | {candidates} |"
             )
         lines.append("")
     return "\n".join(lines)
@@ -87,11 +96,18 @@ def main() -> None:
                 for slot_idx, date_name in enumerate(dates, start=1):
                     candidates = date_candidates[date_name]
                     selected = candidates[rep_idx] if rep_idx < len(candidates) else None
+                    selection_mode = "replicate_match"
+                    if selected is None and rep_idx > 0 and args.fill_missing_from_replicate1 and candidates:
+                        selected = candidates[0]
+                        selection_mode = "backfill_from_replicate_01"
+                    if selected is None:
+                        selection_mode = "blank"
                     selected_paths.append(selected)
                     slot_records.append({
                         "slot": slot_idx,
                         "date": date_name,
                         "replicate_index": rep_idx + 1,
+                        "selection_mode": selection_mode,
                         "selected_source": str(selected) if selected else "",
                         "candidate_count": len(candidates),
                         "candidate_sources": [str(p) for p in candidates],
@@ -103,6 +119,7 @@ def main() -> None:
                         "slot": slot_idx,
                         "date": "BLANK",
                         "replicate_index": rep_idx + 1,
+                        "selection_mode": "forced_blank",
                         "selected_source": "",
                         "candidate_count": 0,
                         "candidate_sources": [],
@@ -132,7 +149,7 @@ def main() -> None:
                 manifest_records.append(record)
                 json_records.append(record)
 
-    manifest_md = build_manifest_text(manifest_records)
+    manifest_md = build_manifest_text(manifest_records, args.fill_missing_from_replicate1)
     manifest_path = output_root / "app81_density_stitch_manifest_replicates.md"
     manifest_path.write_text(manifest_md + "\n", encoding="utf-8")
     write_json(output_root / "app81_density_stitch_manifest_replicates.json", json_records)
