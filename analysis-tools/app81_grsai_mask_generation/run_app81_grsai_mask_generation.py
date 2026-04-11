@@ -590,12 +590,19 @@ def main() -> None:
             return
 
     upload_image_path, tmpdir = prepare_upload_image(image_path, args.max_side)
+    ref_tmpdirs: list[tempfile.TemporaryDirectory[str]] = []
     try:
         reference_images = [Path(p) for p in args.reference_image]
         missing_refs = [str(p) for p in reference_images if not p.exists()]
         if missing_refs:
             raise FileNotFoundError(f"Missing reference image(s): {missing_refs}")
-        urls = [image_to_data_url(upload_image_path)] + [image_to_data_url(p) for p in reference_images]
+        prepared_reference_images: list[Path] = []
+        for ref_path in reference_images:
+            prepared_ref_path, ref_tmpdir = prepare_upload_image(ref_path, args.max_side)
+            prepared_reference_images.append(prepared_ref_path)
+            if ref_tmpdir is not None:
+                ref_tmpdirs.append(ref_tmpdir)
+        urls = [image_to_data_url(upload_image_path)] + [image_to_data_url(p) for p in prepared_reference_images]
         payload: Dict[str, Any] = {
             "model": args.model,
             "urls": urls,
@@ -653,6 +660,7 @@ def main() -> None:
                     "image_path": str(image_path),
                     "upload_image_path": str(upload_image_path),
                     "reference_images": [str(p) for p in reference_images],
+                    "upload_reference_images": [str(p) for p in prepared_reference_images],
                     "output_dir": str(output_dir),
                     "task_id": task_id,
                     "status": "submitted",
@@ -724,6 +732,8 @@ def main() -> None:
     finally:
         if tmpdir is not None:
             tmpdir.cleanup()
+        for ref_tmpdir in ref_tmpdirs:
+            ref_tmpdir.cleanup()
 
 
 if __name__ == "__main__":
