@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from run_app81_grsai_mask_generation import flatten_instance_mask, save_overlay
+from run_app81_grsai_mask_generation import save_overlay
 
 
 def parse_args() -> argparse.Namespace:
@@ -18,6 +18,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--source-image", required=True, help="Original stitched source image")
     p.add_argument("--base-mask", required=True, help="Base stitched mask to preserve")
     p.add_argument("--donor-mask", required=True, help="Donor stitched mask containing the better panel")
+    p.add_argument("--base-flat-mask", default="", help="Optional base flat mask to preserve outside the replaced panel")
+    p.add_argument("--donor-flat-mask", default="", help="Optional donor flat mask for the replaced panel")
     p.add_argument("--output-dir", required=True, help="Output directory")
     p.add_argument("--rows", type=int, default=3, help="Grid row count")
     p.add_argument("--cols", type=int, default=3, help="Grid column count")
@@ -42,11 +44,17 @@ def main() -> None:
     source = np.array(Image.open(source_path).convert("RGB"))
     base = np.array(Image.open(base_mask_path).convert("RGB"))
     donor = np.array(Image.open(donor_mask_path).convert("RGB"))
+    base_flat = np.array(Image.open(Path(args.base_flat_mask or args.base_mask)).convert("RGB"))
+    donor_flat = np.array(Image.open(Path(args.donor_flat_mask or args.donor_mask)).convert("RGB"))
 
     if base.shape[:2] != source.shape[:2]:
         base = np.array(Image.fromarray(base).resize((source.shape[1], source.shape[0]), Image.NEAREST))
     if donor.shape[:2] != source.shape[:2]:
         donor = np.array(Image.fromarray(donor).resize((source.shape[1], source.shape[0]), Image.NEAREST))
+    if base_flat.shape[:2] != source.shape[:2]:
+        base_flat = np.array(Image.fromarray(base_flat).resize((source.shape[1], source.shape[0]), Image.NEAREST))
+    if donor_flat.shape[:2] != source.shape[:2]:
+        donor_flat = np.array(Image.fromarray(donor_flat).resize((source.shape[1], source.shape[0]), Image.NEAREST))
     if not (1 <= args.row <= args.rows and 1 <= args.col <= args.cols):
         raise RuntimeError("Panel row/col out of range")
 
@@ -63,6 +71,8 @@ def main() -> None:
 
     merged = base.copy()
     merged[y0:y1, x0:x1] = donor[y0:y1, x0:x1]
+    merged_flat = base_flat.copy()
+    merged_flat[y0:y1, x0:x1] = donor_flat[y0:y1, x0:x1]
 
     merged_mask_path = output_dir / "merged_instance_mask.png"
     merged_flat_mask_path = output_dir / "merged_instance_mask_flat.png"
@@ -72,8 +82,8 @@ def main() -> None:
     manifest_path = output_dir / "merge_manifest.json"
 
     Image.fromarray(merged).save(merged_mask_path)
+    Image.fromarray(merged_flat).save(merged_flat_mask_path)
     Image.fromarray(merged[y0:y1, x0:x1]).save(panel_crop_path)
-    flatten_instance_mask(merged_mask_path, merged_flat_mask_path)
     save_overlay(source_path, merged_mask_path, merged_overlay_path)
     save_overlay(source_path, merged_flat_mask_path, merged_flat_overlay_path)
 
@@ -83,6 +93,8 @@ def main() -> None:
             "source_image": str(source_path),
             "base_mask": str(base_mask_path),
             "donor_mask": str(donor_mask_path),
+            "base_flat_mask": str(Path(args.base_flat_mask or args.base_mask)),
+            "donor_flat_mask": str(Path(args.donor_flat_mask or args.donor_mask)),
             "output_dir": str(output_dir),
             "rows": args.rows,
             "cols": args.cols,
