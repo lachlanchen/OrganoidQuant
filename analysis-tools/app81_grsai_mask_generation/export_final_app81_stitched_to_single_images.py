@@ -56,6 +56,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--stitch-manifest", default=str(DEFAULT_STITCH_MANIFEST), help="Stitch manifest JSON")
     p.add_argument("--v5-results-root", default=str(DEFAULT_V5_RESULTS), help="4x stitched results root")
     p.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Output directory")
+    p.add_argument("--save-overlays", action="store_true", help="Also save overlay PNGs")
+    p.add_argument("--save-source-png", action="store_true", help="Also save a PNG copy of the original TIFF")
     return p.parse_args()
 
 
@@ -140,6 +142,16 @@ def save_overlay(source_rgb: np.ndarray, mask_rgb: np.ndarray, out_path: Path, a
     Image.fromarray(overlay).save(out_path)
 
 
+def ensure_symlink(src: Path, dest: Path) -> None:
+    if dest.exists() or dest.is_symlink():
+        dest.unlink()
+    try:
+        dest.symlink_to(src)
+    except OSError:
+        # Fall back to a small text pointer if symlinks are unavailable.
+        dest.write_text(str(src) + "\n", encoding="utf-8")
+
+
 def export_single_panel(
     output_root: Path,
     source_root: Path,
@@ -148,6 +160,8 @@ def export_single_panel(
     raw_mask_path: Path,
     flat_mask_path: Path,
     slot: dict[str, Any],
+    save_overlays: bool,
+    save_source_png: bool,
 ) -> dict[str, Any]:
     selected_source = Path(slot["selected_source"]).resolve()
     rel_source = selected_source.relative_to(source_root)
@@ -162,6 +176,7 @@ def export_single_panel(
     flat_mask_rgb = crop_resize_rgb(flat_mask_path, slot["bbox"], output_size)
     labels = rgb_mask_to_labels(raw_mask_rgb)
 
+    source_link_path = usage_dir / "source_original.tif"
     source_png_path = usage_dir / "source_original.png"
     raw_mask_out = usage_dir / "instance_mask_rgb.png"
     flat_mask_out = usage_dir / "instance_mask_flat.png"
@@ -170,12 +185,15 @@ def export_single_panel(
     overlay_flat_out = usage_dir / "overlay_flat.png"
     metadata_out = usage_dir / "panel_export_metadata.json"
 
-    source_image.save(source_png_path)
+    ensure_symlink(selected_source, source_link_path)
+    if save_source_png:
+        source_image.save(source_png_path)
     Image.fromarray(raw_mask_rgb).save(raw_mask_out)
     Image.fromarray(flat_mask_rgb).save(flat_mask_out)
     cv2.imwrite(str(labels_out), labels)
-    save_overlay(source_rgb, raw_mask_rgb, overlay_out)
-    save_overlay(source_rgb, flat_mask_rgb, overlay_flat_out)
+    if save_overlays:
+        save_overlay(source_rgb, raw_mask_rgb, overlay_out)
+        save_overlay(source_rgb, flat_mask_rgb, overlay_flat_out)
 
     row, col = panel_row_col(int(slot["slot"]))
     metadata = {
@@ -196,6 +214,7 @@ def export_single_panel(
         "source_size": [int(output_size[1]), int(output_size[0])],
         "label_count": int(labels.max()),
         "exports": {
+            "source_original_tif": str(source_link_path.resolve()) if source_link_path.is_symlink() else str(source_link_path),
             "source_original_png": str(source_png_path.resolve()),
             "instance_mask_rgb_png": str(raw_mask_out.resolve()),
             "instance_mask_flat_png": str(flat_mask_out.resolve()),
@@ -204,6 +223,11 @@ def export_single_panel(
             "overlay_flat_png": str(overlay_flat_out.resolve()),
         },
     }
+    if not save_source_png:
+        metadata["exports"]["source_original_png"] = None
+    if not save_overlays:
+        metadata["exports"]["overlay_png"] = None
+        metadata["exports"]["overlay_flat_png"] = None
     write_json(metadata_out, metadata)
     return metadata
 
@@ -248,6 +272,8 @@ def main() -> None:
                     raw_mask_path=raw_mask_path,
                     flat_mask_path=flat_mask_path,
                     slot=slot,
+                    save_overlays=args.save_overlays,
+                    save_source_png=args.save_source_png,
                 )
             )
 
