@@ -44,9 +44,9 @@ def main() -> None:
     donor = np.array(Image.open(donor_mask_path).convert("RGB"))
 
     if base.shape[:2] != source.shape[:2]:
-        raise RuntimeError("Base mask size does not match source image")
+        base = np.array(Image.fromarray(base).resize((source.shape[1], source.shape[0]), Image.NEAREST))
     if donor.shape[:2] != source.shape[:2]:
-        raise RuntimeError("Donor mask size does not match source image")
+        donor = np.array(Image.fromarray(donor).resize((source.shape[1], source.shape[0]), Image.NEAREST))
     if not (1 <= args.row <= args.rows and 1 <= args.col <= args.cols):
         raise RuntimeError("Panel row/col out of range")
 
