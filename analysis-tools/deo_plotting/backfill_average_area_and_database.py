@@ -64,6 +64,13 @@ def fmt_float(value: float | None) -> str:
     return repr(float(value))
 
 
+def detect_group_field(fieldnames: list[str]) -> str:
+    for name in ["condition", "concentration"]:
+        if name in fieldnames:
+            return name
+    raise KeyError(f"Cannot find grouping field in {fieldnames}")
+
+
 def backup_file(path: Path) -> Path:
     backup = path.with_name(path.stem + "_before_average_area_backfill" + path.suffix)
     if not backup.exists():
@@ -116,16 +123,19 @@ def add_average_area_to_daily(
         idx = fieldnames.index(insert_after) + 1 if insert_after in fieldnames else len(fieldnames)
         fieldnames = fieldnames[:idx] + needed + fieldnames[idx:]
 
+    daily_group_field = detect_group_field(fieldnames)
+    per_group_field = detect_group_field(list(per_image_rows[0].keys())) if per_image_rows else daily_group_field
+
     by_group: dict[tuple[str, str], list[float]] = defaultdict(list)
     for row in per_image_rows:
         avg = maybe_float(row.get("average_area_px"))
         if avg is None:
             continue
-        by_group[(row["condition"], row["relative_day"])].append(avg)
+        by_group[(row[per_group_field], row["relative_day"])].append(avg)
 
     out_rows: list[dict[str, str]] = []
     for row in rows:
-        key = (row["condition"], row["relative_day"])
+        key = (row[daily_group_field], row["relative_day"])
         mean, std, sem = compute_group_stats(by_group.get(key, []))
         new_row = dict(row)
         new_row["average_area_px_mean"] = fmt_float(mean)
@@ -137,6 +147,9 @@ def add_average_area_to_daily(
 
 def build_database_rows(root: Path, per_rows: list[dict[str, str]]) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
+    if not per_rows:
+        return out
+    group_field = detect_group_field(list(per_rows[0].keys()))
     for row in per_rows:
         stats_path = row.get("stats_path", "")
         metric_path = ""
@@ -146,7 +159,10 @@ def build_database_rows(root: Path, per_rows: list[dict[str, str]]) -> list[dict
             {
                 "source_tif": row.get("source_tif", ""),
                 "image_name": row.get("image_name", ""),
+                "group_field": group_field,
+                "group_value": row.get(group_field, ""),
                 "condition": row.get("condition", ""),
+                "concentration": row.get("concentration", ""),
                 "date_key": row.get("date_key", ""),
                 "date_label": row.get("date_label", ""),
                 "relative_day": row.get("relative_day", ""),
