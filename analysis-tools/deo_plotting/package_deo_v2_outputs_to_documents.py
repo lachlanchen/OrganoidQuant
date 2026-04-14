@@ -35,6 +35,8 @@ METRIC_CSVS = {
     },
 }
 
+APP81_ARCHIVED_EXPORTS = Path('/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_density_stitched/app81_density_stitched_cellpose_v5_final_single_exports_v2')
+
 
 def copy_tree(src: Path, dst: Path) -> None:
     if dst.exists():
@@ -71,6 +73,25 @@ def copy_full_overlays() -> dict[str, object]:
                 shutil.copy2(src, dst_dir / src.name)
                 count += 1
         copied_counts[dataset] = count
+
+    # App81 final overlays are preserved in the archived stitched single-export tree.
+    # Flatten the last "from_*" folder into the filename to avoid one extra nesting level.
+    app81_root = root / 'app81'
+    if app81_root.exists():
+        shutil.rmtree(app81_root)
+    app81_root.mkdir(parents=True, exist_ok=True)
+    app81_count = 0
+    if APP81_ARCHIVED_EXPORTS.exists():
+        for src in APP81_ARCHIVED_EXPORTS.glob('*/*/from_*/overlay.png'):
+            date_dir = src.parents[2].name
+            image_dir = src.parents[1].name
+            from_dir = src.parents[0].name
+            dst_dir = app81_root / date_dir / image_dir
+            dst_dir.mkdir(parents=True, exist_ok=True)
+            dst_name = f'{from_dir}_overlay.png'
+            shutil.copy2(src, dst_dir / dst_name)
+            app81_count += 1
+    copied_counts['app81'] = app81_count
     return {
         'root': str(root),
         'counts': copied_counts,
