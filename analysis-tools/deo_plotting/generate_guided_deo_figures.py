@@ -7,6 +7,7 @@ import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
+from itertools import combinations
 
 import matplotlib
 matplotlib.use('Agg')
@@ -42,6 +43,7 @@ class DatasetConfig:
     full_metrics: tuple[MetricSpec, ...]
     focused: tuple[FocusSpec, ...]
     enable_stats: bool
+    show_plot_stats: bool
     infer_name_tokens: tuple[str, ...]
 
 
@@ -51,32 +53,33 @@ CONFIGS: tuple[DatasetConfig, ...] = (
         group_field='condition',
         group_order=('low', 'middle', 'high'),
         group_labels={'low': 'Low density', 'middle': 'Middle density', 'high': 'High density'},
-        group_colors={'low': '#2C6FB7', 'middle': '#3FA7A3', 'high': '#C73832'},
+        group_colors={'low': '#2C6FB7', 'middle': '#222222', 'high': '#C73832'},
         group_markers={'low': 'o', 'middle': 's', 'high': 'D'},
         primary_metrics=(
-            MetricSpec('average_area_px', 'Average area (px)'),
+            MetricSpec('total_area_px', 'Total area (px)'),
             MetricSpec('organoid_darkness_p90', 'Darkness P90'),
-            MetricSpec('normalized_edge_over_count_curvature', 'Normalized edge / (count * curvature)'),
+            MetricSpec('peripheral_over_central', 'Peripheral / Central'),
         ),
         supportive_metrics=(
+            MetricSpec('average_area_px', 'Average area (px)'),
             MetricSpec('average_perimeter_px', 'Average perimeter (px)'),
-            MetricSpec('total_area_px', 'Total area (px)'),
             MetricSpec('roundness_deviation_norm', 'Roundness deviation (norm)'),
-            MetricSpec('peripheral_over_central', 'Peripheral / Central'),
+            MetricSpec('normalized_edge_over_count_curvature', 'Normalized edge / (count * curvature)'),
             MetricSpec('roundness', 'Roundness'),
         ),
         full_metrics=(
+            MetricSpec('total_area_px', 'Total area (px)'),
             MetricSpec('average_area_px', 'Average area (px)'),
             MetricSpec('average_perimeter_px', 'Average perimeter (px)'),
-            MetricSpec('total_area_px', 'Total area (px)'),
             MetricSpec('organoid_darkness_p90', 'Darkness P90'),
+            MetricSpec('peripheral_over_central', 'Peripheral / Central'),
             MetricSpec('roundness_deviation_norm', 'Roundness deviation (norm)'),
             MetricSpec('roundness', 'Roundness'),
             MetricSpec('normalized_edge_over_count_curvature', 'Normalized edge / (count * curvature)'),
-            MetricSpec('peripheral_over_central', 'Peripheral / Central'),
         ),
         focused=(),
-        enable_stats=False,
+        enable_stats=True,
+        show_plot_stats=False,
         infer_name_tokens=('app81_density_stitched_cellpose_v5_final_metrics_v1', 'app81'),
     ),
     DatasetConfig(
@@ -88,13 +91,13 @@ CONFIGS: tuple[DatasetConfig, ...] = (
         group_markers={'No': 'o', '0.02% Alginate': 's', '0.05% Alginate': 'D'},
         primary_metrics=(
             MetricSpec('average_perimeter_px', 'Average perimeter (px)'),
-            MetricSpec('average_area_px', 'Average area (px)'),
-            MetricSpec('organoid_darkness_p90', 'Darkness P90'),
+            MetricSpec('wall_darkness_p90', 'Wall darkness P90'),
             MetricSpec('peripheral_over_central', 'Peripheral / Central'),
         ),
         supportive_metrics=(
+            MetricSpec('average_area_px', 'Average area (px)'),
             MetricSpec('total_area_px', 'Total area (px)'),
-            MetricSpec('wall_darkness_p90', 'Wall darkness P90'),
+            MetricSpec('organoid_darkness_p90', 'Darkness P90'),
             MetricSpec('wall_darkness_mean', 'Wall darkness mean'),
             MetricSpec('core_darkness_mean', 'Core darkness mean'),
             MetricSpec('normalized_edge_over_count_curvature', 'Normalized edge / (count * curvature)'),
@@ -114,9 +117,10 @@ CONFIGS: tuple[DatasetConfig, ...] = (
             FocusSpec(6, 'average_perimeter_px', 'Growth D6'),
             FocusSpec(7, 'average_area_px', 'Growth D7'),
             FocusSpec(6, 'peripheral_over_central', 'Fusion D6'),
-            FocusSpec(11, 'organoid_darkness_p90', 'Differentiation D11'),
+            FocusSpec(11, 'wall_darkness_p90', 'Differentiation D11'),
         ),
         enable_stats=True,
+        show_plot_stats=True,
         infer_name_tokens=('app65_alginate_v3_direct_brightfield', 'app65'),
     ),
     DatasetConfig(
@@ -127,12 +131,12 @@ CONFIGS: tuple[DatasetConfig, ...] = (
         group_colors={'No': '#222222', '10uM': '#2C6FB7', '20uM': '#3FA7A3', '50uM': '#D97706', '100uM': '#C73832'},
         group_markers={'No': 'o', '10uM': 's', '20uM': '^', '50uM': 'D', '100uM': 'P'},
         primary_metrics=(
-            MetricSpec('average_perimeter_px', 'Average perimeter (px)'),
             MetricSpec('average_area_px', 'Average area (px)'),
             MetricSpec('organoid_darkness_p90', 'Darkness P90'),
             MetricSpec('center_weighted_edge_sum', 'Center-weighted edge sum'),
         ),
         supportive_metrics=(
+            MetricSpec('average_perimeter_px', 'Average perimeter (px)'),
             MetricSpec('total_area_px', 'Total area (px)'),
             MetricSpec('peripheral_over_central', 'Peripheral / Central'),
             MetricSpec('normalized_edge_over_count_curvature', 'Normalized edge / (count * curvature)'),
@@ -155,6 +159,7 @@ CONFIGS: tuple[DatasetConfig, ...] = (
             FocusSpec(7, 'organoid_darkness_p90', 'Differentiation D7'),
         ),
         enable_stats=True,
+        show_plot_stats=True,
         infer_name_tokens=('app80_all_concentrations_multiscale_large_recovery', 'app80'),
     ),
 )
@@ -163,6 +168,7 @@ CONFIGS: tuple[DatasetConfig, ...] = (
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description='Generate guidance-driven standard and polished DEO figures.')
     p.add_argument('--root', type=Path, required=True)
+    p.add_argument('--suffix', default='v2')
     return p.parse_args()
 
 
@@ -273,6 +279,29 @@ def pairwise_vs_control(df: pd.DataFrame, cfg: DatasetConfig, metric: str, day: 
     return rows
 
 
+def pairwise_all_groups(df: pd.DataFrame, cfg: DatasetConfig, metric: str, day: int) -> list[dict[str, object]]:
+    if not cfg.enable_stats:
+        return []
+    rows: list[dict[str, object]] = []
+    for group_a, group_b in combinations(cfg.group_order, 2):
+        vals_a = df.loc[(df[cfg.group_field] == group_a) & (df['relative_day'] == day), metric].dropna().to_numpy(dtype=float)
+        vals_b = df.loc[(df[cfg.group_field] == group_b) & (df['relative_day'] == day), metric].dropna().to_numpy(dtype=float)
+        p_value = math.nan
+        if day > 1 and len(vals_a) >= 2 and len(vals_b) >= 2:
+            p_value = float(ttest_ind(vals_a, vals_b, equal_var=False, nan_policy='omit').pvalue)
+        rows.append({
+            'metric': metric,
+            'relative_day': int(day),
+            'group_a': group_a,
+            'group_b': group_b,
+            'p_value': p_value,
+            'stars': star_text(p_value),
+            'n_group_a': int(len(vals_a)),
+            'n_group_b': int(len(vals_b)),
+        })
+    return rows
+
+
 def x_mapping(df: pd.DataFrame) -> tuple[list[int], dict[int, int], list[str]]:
     days = sorted(int(v) for v in df['relative_day'].dropna().unique().tolist())
     xpos = {day: idx for idx, day in enumerate(days)}
@@ -282,7 +311,10 @@ def x_mapping(df: pd.DataFrame) -> tuple[list[int], dict[int, int], list[str]]:
 
 def apply_common_axis(ax: plt.Axes, tick_positions: list[int], tick_labels: list[str], polished: bool) -> None:
     ax.set_xticks(tick_positions)
-    ax.set_xticklabels(tick_labels)
+    if len(tick_labels) > 10:
+        ax.set_xticklabels(tick_labels, rotation=35, ha='right', fontsize=8)
+    else:
+        ax.set_xticklabels(tick_labels, rotation=0, fontsize=9)
     ax.grid(False)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -349,16 +381,16 @@ def plot_timecourse(df: pd.DataFrame, cfg: DatasetConfig, metrics: Iterable[Metr
                 capsize=3,
                 label=cfg.group_labels[group],
             )
-        add_global_stars(ax, summary, tests, spec.key, xpos)
+        if cfg.show_plot_stats:
+            add_global_stars(ax, summary, tests, spec.key, xpos)
         if not polished:
             ax.set_title(spec.label, fontsize=11, pad=8)
-        ax.set_xlabel('Day')
         ax.set_ylabel(spec.label)
         apply_common_axis(ax, tick_positions, labels, polished=polished)
         maybe_sci(ax, spec.key)
     handles, labels_ = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels_, loc='upper center', ncol=min(len(cfg.group_order), 5), frameon=False, bbox_to_anchor=(0.5, 1.02))
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.legend(handles, labels_, loc='upper right', ncol=1, frameon=False, bbox_to_anchor=(0.98, 0.98))
+    fig.tight_layout(rect=(0, 0, 0.96, 0.95))
     fig.savefig(out_png, dpi=240, bbox_inches='tight')
     fig.savefig(out_pdf, bbox_inches='tight')
     plt.close(fig)
@@ -396,13 +428,19 @@ def plot_full_metrics(df: pd.DataFrame, cfg: DatasetConfig, out_png: Path, out_p
                 capsize=2.5,
             )
         ax.set_title(spec.label, fontsize=10, pad=6)
-        ax.set_xlabel('Day')
         ax.set_ylabel(spec.label)
         apply_common_axis(ax, tick_positions, labels, polished=False)
         maybe_sci(ax, spec.key)
+    handles = []
+    labels_ = []
+    for group in cfg.group_order:
+        h, = axes[0].plot([], [], color=cfg.group_colors[group], marker=cfg.group_markers[group], linewidth=1.6, label=cfg.group_labels[group])
+        handles.append(h)
+        labels_.append(cfg.group_labels[group])
     for ax in axes[n:]:
         ax.axis('off')
-    fig.tight_layout()
+    fig.legend(handles, labels_, loc='upper right', ncol=1, frameon=False, bbox_to_anchor=(0.98, 0.98))
+    fig.tight_layout(rect=(0, 0, 0.96, 1))
     fig.savefig(out_png, dpi=220, bbox_inches='tight')
     fig.savefig(out_pdf, bbox_inches='tight')
     plt.close(fig)
@@ -453,7 +491,7 @@ def plot_focused(df: pd.DataFrame, cfg: DatasetConfig, out_png: Path, out_pdf: P
             ax.scatter(np.full(len(vals), idx) + jitter, vals, s=18, color=cfg.group_colors[group], alpha=0.82, zorder=3)
         pair_stats = pairwise_vs_control(df, cfg, spec.metric, spec.day)
         stats_rows.extend([{**row, 'focus_label': spec.label} for row in pair_stats])
-        if cfg.enable_stats and pair_stats:
+        if cfg.show_plot_stats and pair_stats:
             ymax = max(maxima) if maxima else 1.0
             ymin = min(maxima) if maxima else 0.0
             span = (ymax - ymin) if ymax > ymin else 1.0
@@ -489,28 +527,38 @@ def write_df(df: pd.DataFrame, path: Path) -> None:
 
 
 def generate(root: Path) -> dict[str, object]:
+    return generate_with_suffix(root, 'v2')
+
+
+def generate_with_suffix(root: Path, suffix: str) -> dict[str, object]:
     cfg = infer_config(root)
     df = load_df(root, cfg)
 
-    fig_root = ensure_dir(root / 'figures-guided')
-    polished_root = ensure_dir(root / 'figures-polished-guided')
+    fig_root = ensure_dir(root / f'figures-guided-{suffix}')
+    polished_root = ensure_dir(root / f'figures-polished-guided-{suffix}')
     stats_root = ensure_dir(fig_root / 'statistics_tables')
 
     primary_tests = global_tests(df, cfg, cfg.primary_metrics)
     supportive_tests = global_tests(df, cfg, cfg.supportive_metrics)
+    primary_pairwise_vs_control_rows: list[dict[str, object]] = []
+    primary_pairwise_all_rows: list[dict[str, object]] = []
+    for spec in cfg.primary_metrics:
+        for day in sorted(int(v) for v in df['relative_day'].dropna().unique().tolist()):
+            primary_pairwise_vs_control_rows.extend(pairwise_vs_control(df, cfg, spec.key, day))
+            primary_pairwise_all_rows.extend(pairwise_all_groups(df, cfg, spec.key, day))
 
     primary_summary = plot_timecourse(
         df, cfg, cfg.primary_metrics,
         ensure_dir(fig_root / 'main_primary_metrics') / f'{cfg.key}_primary_metrics_timecourse_guided.png',
         ensure_dir(fig_root / 'main_primary_metrics') / f'{cfg.key}_primary_metrics_timecourse_guided.pdf',
-        primary_tests,
+        primary_tests if cfg.show_plot_stats else pd.DataFrame(),
         polished=False,
     )
     supportive_summary = plot_timecourse(
         df, cfg, cfg.supportive_metrics,
         ensure_dir(fig_root / 'supportive_timecourse') / f'{cfg.key}_supportive_metrics_timecourse_guided.png',
         ensure_dir(fig_root / 'supportive_timecourse') / f'{cfg.key}_supportive_metrics_timecourse_guided.pdf',
-        supportive_tests,
+        supportive_tests if cfg.show_plot_stats else pd.DataFrame(),
         polished=False,
     )
     full_summary = plot_full_metrics(
@@ -529,14 +577,14 @@ def generate(root: Path) -> dict[str, object]:
         df, cfg, cfg.primary_metrics,
         ensure_dir(polished_root / 'main_primary_metrics') / f'{cfg.key}_primary_metrics_timecourse_polished_guided.png',
         ensure_dir(polished_root / 'main_primary_metrics') / f'{cfg.key}_primary_metrics_timecourse_polished_guided.pdf',
-        primary_tests if cfg.enable_stats else pd.DataFrame(),
+        primary_tests if cfg.show_plot_stats else pd.DataFrame(),
         polished=True,
     )
     polished_supportive = plot_timecourse(
         df, cfg, cfg.supportive_metrics,
         ensure_dir(polished_root / 'supportive_timecourse') / f'{cfg.key}_supportive_metrics_timecourse_polished_guided.png',
         ensure_dir(polished_root / 'supportive_timecourse') / f'{cfg.key}_supportive_metrics_timecourse_polished_guided.pdf',
-        supportive_tests if cfg.enable_stats else pd.DataFrame(),
+        supportive_tests if cfg.show_plot_stats else pd.DataFrame(),
         polished=True,
     )
     polished_focus_stats = plot_focused(
@@ -551,6 +599,8 @@ def generate(root: Path) -> dict[str, object]:
     write_df(full_summary, stats_root / 'full_metric_summary.csv')
     write_df(primary_tests, stats_root / 'primary_same_day_global_tests.csv')
     write_df(supportive_tests, stats_root / 'supportive_same_day_global_tests.csv')
+    write_df(pd.DataFrame(primary_pairwise_vs_control_rows), stats_root / 'primary_pairwise_vs_control.csv')
+    write_df(pd.DataFrame(primary_pairwise_all_rows), stats_root / 'primary_pairwise_all_groups.csv')
     write_df(focus_stats, stats_root / 'focused_pairwise_vs_control.csv')
     write_df(polished_focus_stats, stats_root / 'focused_pairwise_vs_control_polished.csv')
 
@@ -560,6 +610,7 @@ def generate(root: Path) -> dict[str, object]:
         'group_field': cfg.group_field,
         'group_order': list(cfg.group_order),
         'enable_stats': cfg.enable_stats,
+        'show_plot_stats': cfg.show_plot_stats,
         'primary_metrics': [m.key for m in cfg.primary_metrics],
         'supportive_metrics': [m.key for m in cfg.supportive_metrics],
         'full_metrics': [m.key for m in cfg.full_metrics],
@@ -571,6 +622,8 @@ def generate(root: Path) -> dict[str, object]:
             'polished_panel_titles': False,
             'polished_overall_titles': False,
             'black_significance_only': True,
+            'x_axis_title': False,
+            'long_day_tick_rotation_deg': 35,
         },
         'outputs': {
             'figures_guided': str(fig_root),
@@ -585,7 +638,7 @@ def generate(root: Path) -> dict[str, object]:
 
 def main() -> None:
     args = parse_args()
-    manifest = generate(args.root.resolve())
+    manifest = generate_with_suffix(args.root.resolve(), args.suffix)
     print(json.dumps(manifest, indent=2, ensure_ascii=False))
 
 
