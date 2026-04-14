@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import csv
 import json
 import shutil
 from pathlib import Path
@@ -19,11 +20,61 @@ SOURCE_DIRS = {
 
 OVERLAY_SRC = Path('/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_density_stitched/app81_density_stitched_cellpose_v5_final_selected_overlays_v1_compressed_review_v1/overlays')
 
+METRIC_CSVS = {
+    'app81': {
+        'csv': Path('/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app81_density_stitched_cellpose_v5_final_metrics_v1/profiling/quantification/per_image_metrics.csv'),
+        'group_field': 'condition',
+    },
+    'app65': {
+        'csv': Path('/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app65_alginate_v3_direct_brightfield/profiling/quantification/per_image_metrics.csv'),
+        'group_field': 'condition',
+    },
+    'app80': {
+        'csv': Path('/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/profiling/quantification/per_image_metrics.csv'),
+        'group_field': 'concentration',
+    },
+}
+
 
 def copy_tree(src: Path, dst: Path) -> None:
     if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(src, dst)
+
+
+def copy_full_overlays() -> dict[str, object]:
+    root = DOC_ROOT / 'segmentation_overlays_full_by_dataset'
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True, exist_ok=True)
+
+    copied_counts: dict[str, int] = {}
+    for dataset, spec in METRIC_CSVS.items():
+        csv_path = spec['csv']
+        group_field = spec['group_field']
+        dataset_root = root / dataset
+        dataset_root.mkdir(parents=True, exist_ok=True)
+        count = 0
+        with csv_path.open('r', encoding='utf-8-sig', newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                overlay = row.get('overlay_path', '').strip()
+                if not overlay:
+                    continue
+                src = Path(overlay)
+                if not src.exists():
+                    continue
+                group = row.get(group_field, 'unknown').strip() or 'unknown'
+                date_key = row.get('date_key', 'unknown_date').strip() or 'unknown_date'
+                dst_dir = dataset_root / group / date_key
+                dst_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst_dir / src.name)
+                count += 1
+        copied_counts[dataset] = count
+    return {
+        'root': str(root),
+        'counts': copied_counts,
+    }
 
 
 def main() -> None:
@@ -46,12 +97,15 @@ def main() -> None:
             shutil.copy2(src, overlay_dst / src.name)
             overlay_count += 1
 
+    full_overlay_info = copy_full_overlays()
+
     manifest = {
         'documents_root': str(DOC_ROOT),
         'copied_dirs': copied,
         'overlay_src': str(OVERLAY_SRC),
         'overlay_dst': str(overlay_dst),
         'overlay_count': overlay_count,
+        'full_overlays': full_overlay_info,
     }
     (DOC_ROOT / 'manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     print(json.dumps(manifest, indent=2, ensure_ascii=False))
