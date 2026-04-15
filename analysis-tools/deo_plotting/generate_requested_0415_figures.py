@@ -100,16 +100,6 @@ CONFIGS_0415: tuple[DatasetConfig, ...] = (
 NO_ERRORBARS_DATASETS = {'app81'}
 
 
-SPLIT_PANEL_NOTES = {
-    'total_area_px': 'Growth',
-    'average_area_px': 'Growth',
-    'average_perimeter_px': 'Growth',
-    'organoid_darkness_p90': 'Differentiation',
-    'wall_darkness_p90': 'Differentiation',
-    'peripheral_over_central': 'Fusion',
-    'center_weighted_edge_sum': 'Fusion',
-}
-
 
 @dataclass(frozen=True)
 class LegendPolicy:
@@ -221,30 +211,6 @@ def save_png_pdf(fig: plt.Figure, png: Path, pdf: Path) -> None:
     fig.savefig(pdf, bbox_inches='tight')
 
 
-def add_panel_note(ax: plt.Axes, metric_key: str) -> None:
-    note = SPLIT_PANEL_NOTES.get(metric_key, '')
-    if not note:
-        return
-    ax.text(
-        0.03,
-        0.97,
-        note,
-        transform=ax.transAxes,
-        ha='left',
-        va='top',
-        fontsize=10,
-        fontweight='bold',
-        color='black',
-        bbox={
-            'boxstyle': 'round,pad=0.22',
-            'facecolor': 'white',
-            'edgecolor': 'black',
-            'linewidth': 0.8,
-            'alpha': 0.9,
-        },
-        zorder=10,
-    )
-
 
 def plot_primary_split(df: pd.DataFrame, cfg: DatasetConfig, out_dir: Path, tests: pd.DataFrame, polished: bool, suffix: str) -> pd.DataFrame:
     days, xpos, labels = x_mapping(df)
@@ -270,7 +236,6 @@ def plot_primary_split(df: pd.DataFrame, cfg: DatasetConfig, out_dir: Path, test
         ax.set_ylabel(spec.label)
         apply_common_axis(ax, tick_positions, labels, polished=polished)
         maybe_sci(ax, spec.key)
-        add_panel_note(ax, spec.key)
         handles, labels_ = ax.get_legend_handles_labels()
         fig.legend(handles, labels_, loc='upper left', ncol=1, frameon=False, bbox_to_anchor=(0.81, 0.98), borderaxespad=0.0)
         fig.tight_layout(rect=(0, 0, 0.79, 0.95))
@@ -283,11 +248,9 @@ def plot_primary_split(df: pd.DataFrame, cfg: DatasetConfig, out_dir: Path, test
         rows.append({
             'metric': spec.key,
             'label': spec.label,
-            'panel_note': SPLIT_PANEL_NOTES.get(spec.key, ''),
             'png': str(png),
             'pdf': str(pdf),
             'legend_location': 'outside_right_margin',
-            'panel_note_location': 'inside_top_left_box',
         })
     return pd.DataFrame(rows)
 
@@ -476,6 +439,7 @@ def generate(root: Path, suffix: str) -> dict[str, object]:
             'x_tick_labels': 'D{relative_day}',
             'equal_day_spacing': True,
             'grid': False,
+            'split_panel_note': False,
         },
         'outputs': {
             'figures_guided': str(fig_root),
