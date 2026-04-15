@@ -100,6 +100,17 @@ CONFIGS_0415: tuple[DatasetConfig, ...] = (
 NO_ERRORBARS_DATASETS = {'app81'}
 
 
+SPLIT_PANEL_NOTES = {
+    'total_area_px': 'Growth',
+    'average_area_px': 'Growth',
+    'average_perimeter_px': 'Growth',
+    'organoid_darkness_p90': 'Differentiation',
+    'wall_darkness_p90': 'Differentiation',
+    'peripheral_over_central': 'Fusion',
+    'center_weighted_edge_sum': 'Fusion',
+}
+
+
 @dataclass(frozen=True)
 class LegendPolicy:
     rect_right: float
@@ -208,6 +219,77 @@ def place_legend(fig: plt.Figure, axes: list[plt.Axes], cfg: DatasetConfig) -> N
 def save_png_pdf(fig: plt.Figure, png: Path, pdf: Path) -> None:
     fig.savefig(png, dpi=240, bbox_inches='tight')
     fig.savefig(pdf, bbox_inches='tight')
+
+
+def add_panel_note(ax: plt.Axes, metric_key: str) -> None:
+    note = SPLIT_PANEL_NOTES.get(metric_key, '')
+    if not note:
+        return
+    ax.text(
+        0.03,
+        0.97,
+        note,
+        transform=ax.transAxes,
+        ha='left',
+        va='top',
+        fontsize=10,
+        fontweight='bold',
+        color='black',
+        bbox={
+            'boxstyle': 'round,pad=0.22',
+            'facecolor': 'white',
+            'edgecolor': 'black',
+            'linewidth': 0.8,
+            'alpha': 0.9,
+        },
+        zorder=10,
+    )
+
+
+def plot_primary_split(df: pd.DataFrame, cfg: DatasetConfig, out_dir: Path, tests: pd.DataFrame, polished: bool, suffix: str) -> pd.DataFrame:
+    days, xpos, labels = x_mapping(df)
+    tick_positions = [xpos[d] for d in days]
+    with_errorbars = cfg.key not in NO_ERRORBARS_DATASETS
+    summaries = []
+    rows = []
+    for spec in cfg.primary_metrics:
+        fig, ax = plt.subplots(1, 1, figsize=(6.6, 4.8))
+        summary = summarize_metric(df, cfg, spec.key)
+        summary['metric'] = spec.key
+        summaries.append(summary)
+        for group in cfg.group_order:
+            sub = summary.loc[summary[cfg.group_field] == group].sort_values('relative_day')
+            if sub.empty:
+                continue
+            x = [xpos[int(d)] for d in sub['relative_day']]
+            draw_series(ax, cfg, group, sub, x, with_errorbars=with_errorbars)
+        if cfg.show_plot_stats:
+            add_global_stars(ax, summary, tests, spec.key, xpos)
+        if not polished:
+            ax.set_title(spec.label, fontsize=11, pad=8)
+        ax.set_ylabel(spec.label)
+        apply_common_axis(ax, tick_positions, labels, polished=polished)
+        maybe_sci(ax, spec.key)
+        add_panel_note(ax, spec.key)
+        handles, labels_ = ax.get_legend_handles_labels()
+        fig.legend(handles, labels_, loc='upper left', ncol=1, frameon=False, bbox_to_anchor=(0.81, 0.98), borderaxespad=0.0)
+        fig.tight_layout(rect=(0, 0, 0.79, 0.95))
+        tag = slug(spec.key)
+        kind = 'polished_guided' if polished else 'guided'
+        png = out_dir / f'{cfg.key}_{tag}_{kind}_{suffix}.png'
+        pdf = out_dir / f'{cfg.key}_{tag}_{kind}_{suffix}.pdf'
+        save_png_pdf(fig, png, pdf)
+        plt.close(fig)
+        rows.append({
+            'metric': spec.key,
+            'label': spec.label,
+            'panel_note': SPLIT_PANEL_NOTES.get(spec.key, ''),
+            'png': str(png),
+            'pdf': str(pdf),
+            'legend_location': 'outside_right_margin',
+            'panel_note_location': 'inside_top_left_box',
+        })
+    return pd.DataFrame(rows)
 
 
 def plot_primary(df: pd.DataFrame, cfg: DatasetConfig, out_png: Path, out_pdf: Path, tests: pd.DataFrame, polished: bool) -> pd.DataFrame:
@@ -332,6 +414,21 @@ def generate(root: Path, suffix: str) -> dict[str, object]:
         polished=True,
     )
 
+    split_summary = plot_primary_split(
+        df, cfg,
+        ensure_dir(fig_root / 'split_primary_individual'),
+        primary_tests if cfg.show_plot_stats else pd.DataFrame(),
+        polished=False,
+        suffix=suffix,
+    )
+    polished_split_summary = plot_primary_split(
+        df, cfg,
+        ensure_dir(polished_root / 'split_primary_individual'),
+        primary_tests if cfg.show_plot_stats else pd.DataFrame(),
+        polished=True,
+        suffix=suffix,
+    )
+
     focus_rows = []
     polished_focus_rows = []
     if cfg.focused:
@@ -361,6 +458,8 @@ def generate(root: Path, suffix: str) -> dict[str, object]:
 
     write_df(primary_summary, stats_root / f'primary_metric_summary_{suffix}.csv')
     write_df(primary_tests, stats_root / f'primary_same_day_global_tests_{suffix}.csv')
+    write_df(split_summary, stats_root / f'primary_split_outputs_{suffix}.csv')
+    write_df(polished_split_summary, stats_root / f'primary_split_outputs_polished_{suffix}.csv')
     write_df(focus_df, stats_root / f'focused_pairwise_vs_control_{suffix}.csv')
     write_df(polished_focus_df, stats_root / f'focused_pairwise_vs_control_polished_{suffix}.csv')
 
@@ -381,6 +480,8 @@ def generate(root: Path, suffix: str) -> dict[str, object]:
         'outputs': {
             'figures_guided': str(fig_root),
             'figures_polished_guided': str(polished_root),
+            'split_primary_guided': str(fig_root / 'split_primary_individual'),
+            'split_primary_polished_guided': str(polished_root / 'split_primary_individual'),
             'statistics_tables': str(stats_root),
         },
     }
