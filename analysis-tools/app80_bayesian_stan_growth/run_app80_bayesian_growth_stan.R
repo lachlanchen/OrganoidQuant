@@ -295,7 +295,7 @@ base_theme <- theme_classic(base_size = 12) +
     strip.text = element_text(face = "bold")
   )
 
-growth_plot <- ggplot() +
+growth_plot_base <- ggplot() +
   geom_point(
     data = data,
     aes(x = relative_day, y = average_area_px, color = concentration),
@@ -315,16 +315,29 @@ growth_plot <- ggplot() +
   ) +
   scale_color_manual(values = group_colors) +
   scale_fill_manual(values = group_colors) +
-  scale_y_continuous(labels = comma) +
   scale_x_continuous(breaks = sort(unique(data$relative_day))) +
+  guides(fill = "none") +
+  base_theme
+
+growth_plot <- growth_plot_base +
+  scale_y_continuous(labels = comma) +
   labs(
     title = "App80 Bayesian posterior growth curves",
     x = "Relative day",
     y = "Average organoid area (px)"
-  ) +
-  base_theme
+  )
 
 save_plot(growth_plot, "app80_bayesian_posterior_growth_curves")
+
+growth_log_plot <- growth_plot_base +
+  scale_y_log10(labels = comma) +
+  labs(
+    title = "App80 Bayesian posterior growth curves, log scale",
+    x = "Relative day",
+    y = "Average organoid area (px, log scale)"
+  )
+
+save_plot(growth_log_plot, "app80_bayesian_posterior_growth_curves_log_y")
 
 difference_plot <- ggplot(difference_summary, aes(x = relative_day, color = concentration, fill = concentration)) +
   geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.45, color = "grey35") +
@@ -338,6 +351,7 @@ difference_plot <- ggplot(difference_summary, aes(x = relative_day, color = conc
     x = "Relative day",
     y = "log2(concentration / No)"
   ) +
+  guides(fill = "none") +
   base_theme
 
 save_plot(difference_plot, "app80_bayesian_log2_difference_from_no")
@@ -368,6 +382,7 @@ rate_density_plot <- ggplot(growth_rate_diff_draws, aes(x = growth_rate_differen
     x = "Growth-rate difference, log(area) per day",
     y = "Posterior density"
   ) +
+  guides(fill = "none") +
   base_theme
 
 save_plot(rate_density_plot, "app80_bayesian_growth_rate_difference_posteriors")
@@ -451,6 +466,7 @@ readme <- c(
   "Key outputs:",
   "",
   "- `figures/app80_bayesian_posterior_growth_curves.png`",
+  "- `figures/app80_bayesian_posterior_growth_curves_log_y.png`",
   "- `figures/app80_bayesian_log2_difference_from_no.png`",
   "- `figures/app80_bayesian_probability_smaller_than_no.png`",
   "- `figures/app80_bayesian_growth_rate_difference_posteriors.png`",
