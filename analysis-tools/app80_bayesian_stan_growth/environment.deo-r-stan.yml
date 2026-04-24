@@ -1,0 +1,16 @@
+name: deo-r-stan
+channels:
+  - conda-forge
+dependencies:
+  - r-base
+  - r-cmdstanr
+  - cmdstan
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-posterior
+  - r-jsonlite
+  - r-tidyr
+  - r-stringr
+  - r-scales
+  - r-tibble
