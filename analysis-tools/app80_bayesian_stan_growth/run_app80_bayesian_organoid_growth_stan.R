@@ -345,6 +345,33 @@ growth_log_plot <- growth_plot_base +
 
 save_plot(growth_log_plot, "app80_organoid_level_bayesian_posterior_growth_curves_log_y")
 
+growth_lines_only <- ggplot(growth_summary, aes(x = relative_day, color = concentration, fill = concentration)) +
+  geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.18, linewidth = 0) +
+  geom_line(aes(y = median), linewidth = 1.25) +
+  scale_color_manual(values = group_colors) +
+  scale_fill_manual(values = group_colors) +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(breaks = sort(unique(data$relative_day))) +
+  labs(
+    title = "App80 organoid-level posterior growth curves, model only",
+    x = "Relative day",
+    y = "Single-organoid area (px)"
+  ) +
+  guides(fill = "none") +
+  base_theme
+
+save_plot(growth_lines_only, "app80_organoid_level_bayesian_posterior_growth_curves_lines_only")
+
+growth_lines_only_log <- growth_lines_only +
+  scale_y_log10(labels = comma) +
+  labs(
+    title = "App80 organoid-level posterior growth curves, model only, log scale",
+    x = "Relative day",
+    y = "Single-organoid area (px, log scale)"
+  )
+
+save_plot(growth_lines_only_log, "app80_organoid_level_bayesian_posterior_growth_curves_lines_only_log_y")
+
 difference_plot <- ggplot(difference_summary, aes(x = relative_day, color = concentration, fill = concentration)) +
   geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.45, color = "grey35") +
   geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.16, linewidth = 0) +
@@ -480,6 +507,8 @@ readme <- c(
   "",
   "- `figures/app80_organoid_level_bayesian_posterior_growth_curves.png`",
   "- `figures/app80_organoid_level_bayesian_posterior_growth_curves_log_y.png`",
+  "- `figures/app80_organoid_level_bayesian_posterior_growth_curves_lines_only.png`",
+  "- `figures/app80_organoid_level_bayesian_posterior_growth_curves_lines_only_log_y.png`",
   "- `figures/app80_organoid_level_bayesian_log2_difference_from_no.png`",
   "- `figures/app80_organoid_level_bayesian_probability_smaller_than_no.png`",
   "- `figures/app80_organoid_level_bayesian_growth_rate_difference_posteriors.png`",
