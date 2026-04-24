@@ -142,7 +142,8 @@ data <- data %>%
 
 write_csv(data, file.path(output_dir, "data", "app80_growth_model_input.csv"))
 write_csv(excluded, file.path(output_dir, "data", "excluded_rows.csv"))
-file.copy(stan_path, file.path(output_dir, "stan", basename(stan_path)), overwrite = TRUE)
+output_stan_path <- file.path(output_dir, "stan", basename(stan_path))
+file.copy(stan_path, output_stan_path, overwrite = TRUE)
 
 stan_data <- list(
   N = nrow(data),
@@ -153,8 +154,8 @@ stan_data <- list(
   day_sd = day_sd
 )
 
-message("Compiling Stan model: ", stan_path)
-model <- cmdstan_model(stan_path)
+message("Compiling Stan model: ", output_stan_path)
+model <- cmdstan_model(output_stan_path)
 
 csv_dir <- file.path(output_dir, "diagnostics", "cmdstan_csv")
 dir.create(csv_dir, recursive = TRUE, showWarnings = FALSE)
@@ -413,7 +414,8 @@ manifest <- list(
   created_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
   input_metrics = input_path,
   output_dir = output_dir,
-  stan_file = stan_path,
+  stan_file_source = stan_path,
+  stan_file = output_stan_path,
   environment = list(
     conda_env = "deo-r-stan",
     r_version = R.version.string,
