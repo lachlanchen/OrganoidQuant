@@ -1,0 +1,268 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+  \setmainfont{Noto Serif CJK SC}
+  \setsansfont{DejaVu Sans}
+  \setmonofont{DejaVu Sans Mono}
+  \IfFileExists{xeCJK.sty}{%
+    \usepackage{xeCJK}
+    \setCJKmainfont{Noto Serif CJK SC}
+    \setCJKsansfont{Noto Sans CJK SC}
+  }{}
+  \IfFileExists{ucharclasses.sty}{%
+    \usepackage{ucharclasses}
+    \newfontfamily\CJKfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold}]
+    \setTransitionsForCJK{\CJKfont}{\rmfamily}
+  }{}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\usepackage[normalem]{ulem}
+% Avoid problems with \sout in headers with hyperref
+\pdfstringdefDisableCommands{\renewcommand{\sout}{}}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\author{}
+\date{}
+
+\begin{document}
+
+\textbf{\sout{Droplet-engineered appendix-derived gut organoids enable controlled growth, differentiation and fusion}}
+
+\textbf{AI segmentation reveals droplet-engineered appendix-derived gut organoids enable controlled growth, differentiation, and fusion}
+
+\textbf{Human-in-the-loop agent}
+
+\emph{Zhengyu Wu\textsuperscript{1, 3}, Rongzhou Chen \textsuperscript{2,3}, Wanlong Wang\textsuperscript{1}, Chuqian Ruan\textsuperscript{1}, Haotian Sun\textsuperscript{1}, Edmund Y. Lam\textsuperscript{2}, Shaohua Ma\textsuperscript{1,4}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Institute of Biopharmaceutical and Health Engineering (iBHE), Tsinghua Shenzhen International Graduate School (SIGS), Tsinghua University, Shenzhen 518055, China
+\item
+  Department of Electrical and Computer Engineering, University of Hong Kong, Pokfulam, Hong Kong SAR, China
+\item
+  These authors contributed equally
+\item
+  Corresponding Email: ma.shaohua@sz.tsinghua.edu.cn
+\end{enumerate}
+
+\textbf{Abstract}
+
+\sout{Human intestinal organoid culture is strongly influenced by physical and biochemical parameters that shape epithelial growth, differentiation and fusion. Here, we established a droplet-engineered organoid (DEO) platform using human appendix-derived gut organoids and evaluated the effects of seeding density, alginate incorporation, and ROCK inhibition with Y-27632. Appendix-derived organoids were stably established and used to generate DEOs. Our results show that seeding density regulated growth kinetics and fusion behavior, with middle to high density providing more balanced growth pattern. Alginate-containing DEOs maintained cystic morphology for longer and showed delayed thickened epithelial walls and darker appearances compared to Matrigel controls, which was supported by RNA sequencing with delayed differentiation in alginate-containing DEOs. Inhibition of cytoskeletal tension using Y-27632 enhanced DEO fusion in a dose-dependent manner while preserving a more cystic morphology. Our findings establish a practical framework for DEO optimization and provide a standardized basis for future applications in intestinal epithelial biology and disease modeling.}
+
+Human intestinal organoid culture is strongly influenced by physical and biochemical parameters that govern epithelial growth, differentiation, and fusion. However, deciphering these regulatory cues remains challenging without quantitative assessment of culture conditions and phenotypic outcomes. Here, we establish a droplet-engineered organoid (DEO) platform using human appendix-derived gut organoids and systematically evaluate the effects of seeding density, alginate incorporation, and ROCK inhibition with Y-27632. We employ AI-based segmentation to quantify organoid growth outcomes and classify phenotypic responses. Appendix-derived organoids were robustly established and used to generate DEOs. Our results show that seeding density regulates growth kinetics and fusion behavior, with middle to high density providing more balanced growth pattern. Alginate-incorporated DEOs maintain cystic morphology longer and exhibit delayed epithelial wall thickening and reduced darkening compared to Matrigel controls, corroborated by RNA sequencing showing delayed differentiation. Y-27632 enhances DEO fusion in a dose-dependent manner while preserving cystic morphology. Collectively, our findings provide a practical framework for DEO optimization. When combined with AI-based segmentation and organoid feature extraction, this platform may offer a standardized foundation for advancing organoid technology toward translational applications in intestinal epithelial biology and disease modeling.
+
+\textbf{AI agent}
+
+\textbf{Keywords}
+
+Droplet-engineered organoids; alginate; Y-27632; epithelial differentiation; fusion
+
+\textbf{Introduction}
+
+Human intestinal organoids are widely used as experimental models for epithelial biology, disease modeling, and regenerative studies because they recapitulate key structural and functional features of the intestinal epithelium {[}1-6{]}. However, conventional dome-based organoid cultures still face several limitations including substantial variability in size, morphology, and batch-to-batch difference, making quantitative and standardized comparisons difficult across different experiment conditions {[}7, 8{]}. These limitations are particularly relevant when organoids are intended for downstream applications that require structural reproducibility and precise control of epithelial state.
+
+Droplet-engineered organoid culture offers a more promising strategy to improve organoid standardization. By incorporating organoid cells within microdroplets, droplet-engineered organoids (DEOs) can reduce matrix usage, increase throughput, and exert space regulations that may influence organoid growth, cell-cell contact, differentiation and fusion {[}9-11{]}. In addition, matrix composition is likely to influence these processes. Matrigel is widely used for epithelial growth, but its degradability and softness may allow organoids to expand in a less constrained manner {[}12{]}. In such systems, culture parameters are expected to play an important role in determining epithelial behavior, yet their effects have not been systematically evaluated.
+
+The development of a useful DEO platform requires not only efficient organoid formation, but also controlled regulation of epithelial growth, lineage differentiation, and fusion-related tissue remodeling {[}13-16{]}. Growth determines the efficiency and reproducibility of organoid expansion, whereas differentiation status defines the maturity of the epithelial state. In addition, fusion behavior is particularly relevant in DEO systems, as spatial restriction may change organoid-organoid interactions and promote the formation of larger integrated epithelial structures {[}14{]}. Therefore, understanding how culture parameters influence these organoid properties is essential for establishing a stable and controllable DEO platform for downstream applications.
+
+In this study, we established a DEO platform using human appendix-derived gut organoids and examined how seeding density, alginate incorporation, and ROCK inhibition with Y-27632 influence organoid growth, differentiation and fusion. We further performed bulk RNA sequencing to characterize the transcriptomic changes associated with alginate-containing DEOs. These results showed practical conditions for DEO optimization and support the use of this platform for controlled intestinal organoid culture.
+
+可能需要加一段AI了
+
+\textbf{Results}
+
+\textbf{Establishment of appendix-derived organoids and DEO platform}
+
+Appendix-derived gut organoids were successfully established from human tissues using nonengineered manual pipetting method (Figure 1A). These organoids served as the source material for DEO generation. To establish DEOs, organoid-derived crypts were embedded within Matrigel (Figure 1B). The continuous flow provided by uniform 0.56 mm inner diameter PTFE tubing supported stable droplet production, and droplets remained in same distance after formation at the T-junction. This method produced confined DEOs usually consisted of a single microdroplet with approximately 500 µm diameter and a volume of \textasciitilde0.1 µL. However, conventional organoid culture used the manual pipetting dome method, this may require use of a 50 µL Matrigel dome per well for the establishment of appendix-derived organoids. Thus, the droplet-engineering strategy can increase experimental throughput by more than two orders of magnitude while substantially reducing variability associated with manual handling. Also, the distinct geometric constraints of the DEO system are very likely to affect biological behavior {[}17, 18{]}. In DEOs, these cells are confined within a limited distance from the droplet center, promoting closer cell-cell distributions compared to conventional methods (Figure S1).
+
+\textbf{Initial seeding density determines DEO growth kinetics}
+
+To examine the impact of initial cell density on organoid growth in DEOs, DEOs were generated using low, middle, and high-density crypt suspensions and monitored the brightfield morphology from day 0 to day 16 (Figure 2A and Figure S2). Low-density DEOs developed slowly, with small cystic structures apparently around day 8 (Figure 2A and 2B). The increased distance between organoids likely limited contact-dependent interactions, and fusion events were less found in low-density group. In contrast, middle-density DEOs formed organoids of moderate size by day 5 and continued to expand while largely preserving cystic morphology (Figure 2A). Fusion events emerged later, becoming more obvious between days 11 and 15 (Figure 2D). High-density DEOs exhibited the most rapid growth, with moderate-sized organoids visible by day 3 (Figure 2A). However, close interacting in this condition accelerated both organoid fusion and the morphologies of thickened epithelial walls, budded-like and darker appearances (Figure 2A and 2C), suggesting earlier onset of differentiation-like morphology. Based on these observations which showed slower growth and delayed differentiation at low density, along with enhanced cell-cell interactions and increased fusion events at middle and high densities. Middle to high-density DEOs were selected for subsequent experiments.
+
+\textbf{Alginate incorporation delays differentiation-like morphology in DEOs}
+
+Matrigel can provide a permissive extracellular matrix that supports cell adhesion, outward migration, and matrix remodeling due to its high degradability {[}19{]}. In our previous studies, we have demonstrated that volumetric compression using alginate can modulate brain organoids development without affecting their viability and may even promote tissue growth {[}20, 21{]}. These compressive environments have been shown to affect organoid morphogenesis rather than inhibit growth. Based on these results, alginate was incorporated into DEOs to investigate whether organoid growth dynamics and fusion behavior could be regulated through mechanical modulation. DEOs were generated in Matrigel alone or in Matrigel containing low (0.02\%) or high (0.05\%) concentrations of sodium alginate.
+
+In control DEOs without alginate, thicker epithelial walls became apparent at approximately day 8, indicating progression toward a more differentiated morphology (Figure 3A and 3C). By contrast, alginate-containing DEOs remained cystic structures until around day 10 (Figure 3A and Figure S3). Although growth appeared modestly slower during the first several days in the presence of alginate, overall organoid expansion was maintained (Figure 3B). Differentiation was significantly increased in the control group relative to the alginate-treated groups after day 11 (Figure 3C). Specifically, both the low and high alginate groups showed significantly lower differentiation than the control group on days 11 and 13 (p \textless{} 0.01), while the high alginate group also differed significantly from the control group on day 12 (p \textless{} 0.01).
+
+Analysis of fusion behavior further showed that control DEOs displayed more evident and larger fused structures by day 6, whereas alginate-containing DEOs exhibited smaller fusion events and remained more confined within the droplet matrix (Figure 3D-3F). Statistical analysis showed that the control group exhibited significantly greater fusion than both the low alginate group (p \textless{} 0.01) and the high alginate group (p \textless{} 0.05). By day 11, control cultures did not show an additional increase in fusion, whereas signs of differentiation became more evident. At this time point, differentiation in the control group was significantly higher than that in both the low alginate (p \textless{} 0.01) and high alginate groups (p \textless{} 0.01) (Figure 3E and 3G). Together, these findings indicate that alginate modifies the physical microenvironment of DEOs in a way that delays differentiation-like changes and alters the extent of organoid fusion.
+
+\textbf{Alginate-dependent transcriptomic remodeling reveals altered epithelial state and delayed differentiation program}
+
+To define the molecular basis of alginate-associated phenotypes, bulk RNA sequencing was performed on DEOs cultured under no-alginate, low-alginate, and high-alginate conditions. A Venn diagram summarizes the overlap of differentially expressed genes (DEGs) identified in comparisons including the no-alginate group compared to low-alginate group and no-alginate group compared to high-alginate group (Figure 4A). Differential expression analysis identified 676 genes in the no-alginate versus low-alginate comparison, including 454 upregulated and 222 downregulated transcripts, whereas the no-alginate versus high-alginate comparison revealed 1,354 differentially expressed genes, including 342 upregulated and 1,012 downregulated genes (Figure 4B). Pearson correlation analysis demonstrated high similarity across samples, with correlation coefficients of at least 0.977 (Figure 4C).
+
+Pathway analysis indicated that alginate incorporation was associated with marked changes in adhesion and junction-related gene programs (Figure 4D). Within the cell adhesion molecules pathway, CLDN2 expression was increased in alginate containing DEOs. Genes involved in focal adhesion, including FLNA, FN1, and ITGA8, showed progressively increased expression from control to low alginate and further to high alginate. Additional upregulated genes in tight junction and gap junction pathways included CLDN10, CDK4, and TUBA1A. Enrichment analysis further identified pathways related to DNA replication, cell division, and cell cycle regulation (Figure 4E and 4F), suggesting that alginate affects both structural organization and proliferative state.
+
+To evaluate epithelial identity and maturation, representative marker genes were examined (Figure 4G). These genes included LGR5 for intestinal stem cell marker, KI67 for transient-amplifying (TA) cells, EpCAM for epithelial cells, TFF3 for goblet cells, KRT20 and FABP2 for mature enterocytes. LGR5 and KI67 were downregulated in the no-alginate control group compared with both alginate groups, with the high-alginate group maintaining higher expression levels than the low-alginate group, showed the increase of stem related gene expressions in alginate-containing group. Conversely, expression of epithelial and differentiation markers, including EpCAM, TFF3, KRT20, and FABP2 was reduced following alginate incorporation in a concentration dependent manner, indicated a decrease of differentiation gene expressions in alginate-containing group. Together, these transcriptomic findings are consistent with the imaging-based observation that alginate delays or attenuates epithelial differentiation within DEOs.
+
+\textbf{ROCK inhibition with Y-27632 enhances DEO fusion efficiency}
+
+Although alginate reduced organoid differentiation, the extent of organoid fusion remained limited. Y-27632 is a Rho-associated kinase (ROCK) inhibitor which has been reported to accelerate cellular fusion. Ongenae et al {[}22{]} reported that the presence of Y-27632 was related to faster fusion of human periosteum-derived cell spheroids. We therefore examined whether ROCK inhibition could further enhance structural fusion in our system.
+
+DEOs were cultured in the presence of five concentrations of Y-27632 (0, 10, 20, 50, and 100 µM), with the inhibitor maintained in the medium throughout the culture period and refreshed at each medium change. Over 7 days of culture periods, organoids gradually aggregated and fused between day 3 and day 5 (Figure 5A). No obvious differences in overall growth were observed among the groups (Figure 5B) whereas the control group without Y-27632 showed relatively early signs of differentiation-like wall thickening (Figure 5C). Increasing Y-27632 concentration was associated with maintenance of a more cystic DEO morphology. This effect was particularly evident in the 50 and 100 μM groups, which exhibited the most marked reduction in differentiation-like changes (Figure 5C and 5D).
+
+Importantly, Y-27632 enhanced organoid fusion in a dose-dependent manner with significantly difference on day 4-6 (Figure 5D). On day 4, the 50 μM Y-27632 group showed significantly greater fusion than the control group (p \textless{} 0.001). On day 5, fusion was also significantly increased in the 100 μM group relative to the control group (p \textless{} 0.01). Representative images from day 6 further showed that control DEOs exhibited only limited fusion, whereas both the number and extent of fused structures increased with increasing Y-27632 concentration. This effect was most evident in the 20 and 100 μM groups, which displayed significantly greater fusion than the control group (p \textless{} 0.05). (Figure 5E and 5F). These findings indicate that cytoskeletal modulation through ROCK inhibition is an effective strategy for increasing DEO fusion while also maintaining a less differentiated cystic state.
+
+\textbf{Discussion}
+
+In this study, we established a DEO platform using human appendix-derived gut organoids and evaluated how different culture parameters influence organoid growth, fusion, and differentiation. Our results show that initial seeding density, matrix modification by alginate, and ROCK inhibition by Y-27632 can affect DEO behavior in different ways. Together, these findings support the idea that DEO culture is not a simple mini version of conventional dome culture, but a result of tunable interactions between spatial confinement, matrix composition, and cytoskeletal regulation.
+
+Among the variables tested, seeding density primarily governed growth kinetics and the timing of organoid fusion. Low density limited organoid interaction and delayed expansion, whereas middle to high density promoted rapid growth and early fusion but also shortened the time before differentiation like morphology appeared. This result indicates that density does not merely determine the number of cells in each droplet but also influences how rapidly organoids enter specific morphological states. From a practical perspective, this finding is important because it identifies seeding density as a critical variable for standardizing DEO culture outcomes.
+
+Alginate incorporation altered DEO morphology and delayed differentiation. At the phenotypic level, alginate delayed thickened epithelial walls, budded-like, darker appearances and helped maintain cystic morphology. At the molecular level, RNA sequencing showed that alginate-containing DEOs adopted a distinct transcriptional state characterized by altered adhesion, junction, and proliferative programs. The coordinated upregulation of adhesion and junction associated genes together with retention of stemness, proliferation markers and reduced epithelial maturation markers, suggests that alginate delays epithelial differentiation and helps maintain DEOs in a less mature state. These results also highlight that physical features of the culture system can directly influence the biological property of organoids.
+
+The Y-27632 experiments provided an additional means of tuning DEO fusion structure. Increasing Y-27632 concentrations enhanced fusion in a dose-dependent manner and preserved a more cystic and less differentiated morphology. These findings are consistent with the role of ROCK signaling in cytoskeletal tension and cell rearrangement {[}22{]}. In the DEO system, organoids are generated in close proximity and frequently undergo physical contact. Modulation of ROCK activity is likely to have a particularly strong impact on structural behavior. Accordingly, Y-27632 may serve as a useful tool for enhancing structural integration in DEOs, particularly relevant for applications that require larger, fused epithelial structures or a prolonged cystic growth phase.
+
+DEO systems are also beginning to attract interest beyond epithelial morphology and become useful tools in immunology-focused studies. Recent work from our group has shown that droplet-engineered tumor organoids can support endogenous tumor-infiltrating lymphocytes in a standardized 3D format {[}23{]}, indicating that immune-compatible droplet systems are feasible. In this paper, ROCK pathway manipulation also influenced immune performance within the droplet culture environment. Although immune cell assays were not included in the present work, our findings that Y-27632 strongly affect DEO fusion and morphology suggest that careful control of ROCK signaling may be important if DEOs are later adapted for immune related studies.
+
+Despite these findings, our study has several limitations. Transcriptomic analysis was only performed for the alginate experiments, density and Y-27632 associated phenotypes were interpreted primarily from morphology. In addition, the current analyses primarily rely on brightfield imaging and bulk RNA sequencing. Although a quantitative brightfield image analysis pipeline was established and the transcriptional changes were broadly consistent with the observed morphological phenotypes, these approaches provide only limited mechanistic resolution. Future studies incorporating RNA sequencing or targeted molecular validation at the protein or cellular level would help establish a more complete mechanistic framework. Another limitation is that this study does not directly measure the physical properties of the matrix including stiffness and viscoelasticity, so the effects of alginate on the DEO microenvironment were inferred indirectly from morphological and transcriptional changes. Future studies including rheology tests would be important for clarifying how alginate changes the physical environment of DEOs and how these changes are sensed by the epithelium as similarly shown by previous work from our group {[}20{]}. Moreover, fusion was quantified morphologically, but whether all observed fusion events reflect functional epithelial integration remains unclear. Also, whether enhanced fusion ultimately improves organoid use for downstream applications remains to be tested directly. Furthermore, the current DEO model represents a simplified epithelial system that lacks stromal cells, vasculature, immune components, microbiota-derived signals, and physiological flow conditions, which may limit its physiological complexity and translational relevance. Future integration of mesenchymal cells and immune components would help to improve the physiological relevance of the platform and broaden its applications {[}3-5, 24, 25{]}. It will also be important to evaluate the performance of this optimized DEO system in downstream settings, including disease modeling, drug screening, and immune coculture systems.
+
+Figures
+
+\includegraphics[width=6.35874in,height=5.04483in]{figures/main_figure_01.png}
+
+DEO的那个图稍微改一下，没有显示出是DEO
+
+Figure 1. Schematic overview of establishment of appendix-derived organoids and droplet-engineered organoid (DEO) platform. (A) Schematic diagram of establishment of appendix-derived organoids from human tissues. (B) Schematic illustration of DEO generation from appendix-derived organoids.
+
+\includegraphics[width=6.37441in,height=5.03791in]{figures/main_figure_02.png}
+
+Figure 2. Effects of initial cell density on the growth of DEOs. (A) Representative brightfield images showing longitudinal development of low, middle, and high density DEOs from day 0 to day15. (B-D) Quantification of growth dynamics (B), differentiation(C), and fusion (D). Scale bars are 100 μm.
+
+\textbf{图的大小一致,字体调整对应 Arial 12号字体，legend单独一个文件，不放在图里}
+
+\includegraphics[width=6.09722in,height=8.64929in]{figures/main_figure_03.png}
+
+Figure 3. Alginate incorporation DEOs delayed differentiation. (A) Representative brightfield images of DEOs in Matrigel alone(control) or Matrigel adding sodium alginate at final concentrations of 0.02\% (low alginate) or 0.05\% (high alginate). Representative images were chosen from day 0 to day 12. (B-D) Quantification of growth dynamics (B), differentiation (C) and fusion behavior (D). Statistical significance was determined by one-way ANOVA followed by a multiple-comparisons test: *P \textless{} 0.05, **P \textless{} 0.01, ***P \textless{} 0.001 and ****P \textless{} 0.0001. Error bars represent mean ± SD. (E) Representative picture at day 6 showing fusion and day 11 showing differentiation during culture. (F-G) Quantification of fusion on day 6 (F) and differentiation on day 11 (G). Statistical significance was determined by one-way ANOVA followed by a multiple-comparisons test: *P \textless{} 0.05, **P \textless{} 0.01. Scale bars are 100 μm.
+
+纵坐标要有单位
+
+\textbf{图的大小一致,字体调整对应 Arial 12号字体，legend单独一个文件，不放在图里}
+
+不要写Low 和high alginate，写0.02\%和0.05\%
+
+把low替换成0.02\%，high 替换成0.05\%
+
+\includegraphics[width=6.38117in,height=7.18834in]{figures/main_figure_04.png}
+
+Figure 4. Transcriptomic analysis of DEOs cultured with or without alginate. (A) Venn diagram showing the overlap of DEGs between low\_alg/no\_alg and high\_alg/no\_alg. (B) Bar plots showed the number of upregulated and downregulated DEGs identified in n low\_alg/no\_alg and high\_alg/no\_alg groups. (C) Pearson correlation heatmap among RNA-Seq samples. (D) Heatmap of DEGs associated with pathways including cell adhesion molecules pathway (KEGG 04514), focal adhesion (KEGG 04510), tight junction (KEGG 04540) and gap junction (KEGG 04520) pathways. (E) Kyoto Encyclopedia of Genes and Genomes (KEGG) pathway enrichment analysis of DEGs between low\_alg/no\_alg and high\_alg/no\_alg groups. (F) Gene Ontology Biological Process (GOBP) enrichment analysis of DEGs between low\_alg/no\_alg and high\_alg/no\_alg groups. (G) Expression analysis of representative differentiation-related marker genes, including LGR5, KI67, EpCAM, TFF3, KRT20, and FABP2. TPM, transcripts per million..
+
+不要写Low 和high alginate，写0.02和0.05
+
+\includegraphics[width=6.36458in,height=9in]{figures/main_figure_05.png}
+
+Figure 5. ROCK inhibition with Y-27632 enhances DEO fusion efficiency and preserves cystic morphology. (A) Representative brightfield images across Y-27632 concentrations from day 0 to day 7. (B-D) Quantification of growth dynamics (B), differentiation (C) and fusion behavior (D). Statistical significance was determined by one-way ANOVA followed by a multiple-comparisons test: *P \textless{} 0.05, **P \textless{} 0.01, and ***P \textless{} 0.001. Error bars represent mean ± SD. (E) Representative images of DEOs on day 6. (F) Quantification of fusion on day 6. Statistical significance was determined by one-way ANOVA followed by a multiple-comparisons test: *P \textless{} 0.05. Scale bars are 100 μm.
+
+纵坐标要有单位
+
+\textbf{Method}
+
+\textbf{Establishment of appendix-derived organoids}
+
+Human appendix tissue samples were collected with informed consent from Zhangzhou Municipal Hospital of Fujian Province. The study was approved by the Ethics Committees of Tsinghua Shenzhen International Graduate School (Refs. 202171 and 202295) and Zhangzhou Municipal Hospital of Fujian Province (Ref. 2022KYB277).
+
+Appendix tissues were processed to isolate epithelial crypts, which were embedded in Matrigel and cultured in organoid growth medium. Established organoids were serially passaged and used as the source material for DEO generation. Briefly, human appendix tissue was opened longitudinally, washed with ice-cold PBS, and the mucosal layer was isolated and minced. Tissue fragments were incubated in Gentle Cell Dissociation Reagent (STEMCELL, 100-0485) for 30 minutes on ice, followed by centrifugation and mechanical dissociation in Dulbecco's modified Eagle medium/F12 medium (Gibco, C11330500BT) containing 1\% Bovine Serum Albumin (Sigma-Aldrich, A1933-100G) to release intestinal crypts. The suspension was filtered through a 70 μm cell strainer, and erythrocytes were removed by red blood cell lysis (BioLegend, 420302). Cells were then collected by centrifugation and counted using Trypan Blue (Sigma-Aldrich, T8154). Crypts were resuspended in DMEM/F-12 containing 1\% BSA, mixed 1:1 with growth factor-reduced Matrigel (Corning, 356231), and plated as 50 μL domes in 24-well plates. After solidification at 37°C, cultures were maintained in Human IntestiCult Organoid Growth Medium (OGM, STEMCELL, 06010) supplemented with 50 µg/mL gentamicin (Gibco, 15750060) and 100 µg/mL Primocin (InvivoGen, ant-pm-05). 10 μM Y-27632 (STEMCELL, 72302) was added during initial establishment of primary cultures to improve cell survival. Medium was changed using complete OGM every 2--3 days.
+
+\textbf{Microfluidic generation of DEOs}
+
+Droplet engineered organoids were generated using a microfluidic droplet formation platform established previously in our laboratory {[}9-11{]}. Briefly, organoid domes were incubated in GCDR on ice for 10minutes. Organoid suspensions were centrifuged at 290 g for 5 minutes. Pelleted organoids were resuspended in DMEM/F-12 containing 1\% BSA and mechanically dissociated into smaller crypts by pipetting up and down. Dissociated organoid cells were resuspended in Matrigel (Corning, 356234) to form the aqueous phase, while Engineered Fluid (3M, Novec 7000) served as the oil phase. The two phases were connected to a custom T-junction PDMS and connected to microfluidic device (lead fluid) through microfluidic PTFE tubing (Woer, 24T). 1 mL syringe was used for aqueous phase and 10 mL syringe for oil phase. The controlled flow conditions were set as oil phase at 140 μL/min and the aqueous phase at 8 μL/min. All reagents and device components for aqueous phase were maintained in 4°C refrigerator throughout droplet generation. Following solidification at 37°C for 30 min, droplets were transferred into OGM and residual oil was removed before plating. The droplets were then maintained in ultra-low-attachment 12 well plates (LV-ULA002-12W) at 37°C 5\% CO\textsubscript{2}. For density experiments, low, middle and high-density suspensions were prepared before droplet generation. Droplet morphology and structural integrity were checked by microscopy.
+
+\textbf{Alginate-based DEO generation}
+
+Alginate-based DEOs were generated using a modified microfluidic protocol adapted from our previous method {[}21{]}. Sodium alginate powder (MACKLIN, S817374) was dissolved in sterile physiological saline to obtain a 1\% (w/v) stock solution, which was subsequently diluted to 0.5\% and 0.2\% (w/v). All alginate solutions were sterilized by passing through 0.22 μm membrane filters. Calcium chloride (CaCl\textsubscript{2}, Sigma-Aldrich, C5670) was dissolved in deionized water to prepare a 1\% (w/v) solution and similarly sterilized by filtration. Microfluidic setup and droplet generation were performed as described for Matrigel-based DEOs with indicated difference in aqueous phase components. Cells were resuspended in cold Matrigel, followed by adding diluted alginate solution to make final alginate concentrations of 0.05\% or 0.02\% (w/v). The cell--matrix mixture was then put into the microfluidic device for droplet generation. After droplet formation, DEOs were incubated at 37°C to let Matrigel solidification. The DEOs were then pumped out of the PTFE tube by using a syringe and immediately transferred into CaCl\textsubscript{2} solution for 5 minutes to induce alginate crosslinking. After crosslinking, DEOs were washed three times using sterile physiological saline to remove excess calcium ions followed by a final wash in Dulbecco's phosphate-buffered saline (DPBS, Servicebio, G4200) and then maintained in complete OGM in ultra-low-attachment 12 well plates until further use. DEOs cultured in Matrigel without alginate served as controls.
+
+\textbf{Y-27632 treatment}
+
+The powder of Y-27632 (STEMCELL, 72302) was resuspended in 624 µL of PBS to make a 5 mM stock solution. Stock solution diluted into 0, 10, 20, 50, or 100 μM Y-27632 culture medium was added to DEOs grown in OGM. Culture medium was carefully removed without interrupting the DEOs, then replenished every 2 days using fresh medium. Morphology and fusion behavior were recorded by brightfield microscopy.
+
+\textbf{RNA sequencing analysis}
+
+Total RNA was extracted from alginate-based DEOs (no-alginate, low-alginate, and high-alginate) using TRIzol reagent (Invitrogen, 15596026) according to the manufacturer's instructions. Organoids were disrupted by repeated pipetting to obtain a homogeneous lysate. RNA quality and concentration were evaluated prior to library construction. Poly(A)+ mRNA libraries were prepared using the mRNA Library Kit (BGI, Shenzhen, China). In brief, mRNA sequencing libraries were constructed using the mRNA Library Kit (BGI, Shenzhen, China). RNA samples were denatured followed by mRNA enrichment using oligo(dT)-conjugated magnetic beads. The enriched mRNA was then fragmented. First-strand cDNA synthesis was performed with random hexamer primers, and second-strand cDNA was subsequently synthesized to generate double-stranded cDNA. After that, the cDNA underwent end repair, and a single deoxyadenosine (A) nucleotide was added to the 3' ends of the blunt-ended fragments. The adaptors were ligated to the A-tailed cDNA, and the final library was amplified by PCR. And the final PCR products were circularized to form single-stranded DNA circles. After digesting linear molecules, the circularized DNA underwent rolling circle amplification (RCA) to produce DNA nanoballs (DNBs). Finally, the DNBs needed to load into a patterned nanoarray and sequenced on the DNBSEQ platform to generate PE150 bases reads. Later RNA-seq data processing and analysis were conducted using an integrated RNA-seq analysis system Dr. Tom platform provided by BGI.
+
+\textbf{Image segmentation and quantitative analysis of DEO morphology}
+
+Brightfield images were analyzed using a custom DEO segmentation and quantification pipeline developed for the experimental workflows. Briefly, raw TIFF images were converted to grayscale and processed to generate a hybrid signal image, followed by support-mask extraction, multiscale Cellpose-based instance segmentation, signal-based recovery of large, fused structures, and overlap-aware candidate merging (Figure S4). The final label maps and signal images were then used for downstream quantification of growth, fusion, and differentiation-related phenotypes (Table S1). The metric framework included growth-related measures based on segmented instance geometry, fusion-related measures based on redistribution of edge structure from the organoid periphery toward the interior, and differentiation-related measures based on roundness, darkness, and wall/core morphology. Representative segmentation outputs for the density, alginate, and Y-27632 experiments are shown in Figures S5, S6, and S7, respectively.
+
+In the density experiments, growth was quantified using total segmented area, which is defined in the pipeline as the sum of all segmented instance areas and serves as the principal segmentation-based growth proxy. Differentiation was quantified using organoid darkness P90, an upper-quantile darkness metric designed to capture darker and more differentiated epithelial morphologies. Fusion was quantified using the peripheral-to-central internal edge ratio, because the fusion framework implemented in the pipeline is based on the premise that stronger fusion redistributes edge structure from the outer boundary toward the organoid interior; accordingly, this metric provides a sensitive readout of fusion-associated spatial reorganization. Representative segmentation results for this analysis are shown in Figure S5.
+
+In the alginate experiments, growth was quantified using average perimeter, which is implemented in the pipeline as the mean perimeter of segmented organoid instances and was used here as a morphology-sensitive measure of organoid expansion. Differentiation was quantified using wall darkness P90, as the darkness-and-wall-thickening metrics in the pipeline were specifically designed to capture darker, thickened epithelial walls associated with more differentiated states. Fusion was again quantified using the peripheral-to-central internal edge ratio, because this metric reflects the relative redistribution of edge signal from peripheral regions to the interior during organoid fusion. Representative segmentation results for this analysis are shown in Figure S6.
+
+In the Y-27632 experiments, growth was summarized using mean organoid area derived from the segmented instance areas. This summary was selected to reflect changes in organoid size while reducing confounding from fusion-dependent changes in organoid number. Differentiation was quantified using organoid darkness P90. Fusion was quantified using the center-weighted edge sum, as this metric applies an exponential centrality weighting to emphasize interior edge structure and is therefore particularly suitable for detecting fusion-associated structural integration within DEOs. Representative segmentation results for this analysis are shown in Figure S7.
+
+\textbf{Statistical analysis}
+
+Statistical analyses were performed as follows. Normality of data distribution was first assessed for each dataset using the Shapiro-Wilk test. For comparisons among multiple groups at individual time points, normally distributed data was analyzed by one-way ANOVA followed by Dunnett's multiple-comparisons test against the control group. Data are presented as mean ± SD unless otherwise indicated. Statistical significance was defined as probability (P) value of less than 0.05. Significant differences are shown in the figures as follows: *P \textless{} 0.05, **P \textless{} 0.01, ***P \textless{} 0.001 and ****P \textless{} 0.001.
+
+\textbf{Acknowledgments}
+
+The work was supported by XXXX.
+
+\textbf{Author Contribution}
+
+Z.W. contributed to conceptualization, methodology, data analysis, visualization, and writing of the original draft. R.C. contributed to brightfield image quantification and data analysis. W.W. participated in experiments involving alginate-containing production. C.R. and H.S. provided experimental materials and technical support. S.M. supervised the study, provided administrative support, and acquired funding. All authors reviewed and edited the manuscript and contributed to the revision process.
+
+\textbf{Data availability}
+
+The data supporting the results of this study can be obtained from the corresponding author upon reasonable request.
+
+\textbf{References}
+
+1. Almeqdadi, M., et al., \emph{Gut organoids: mini-tissues in culture to study intestinal physiology and disease.} Am J Physiol Cell Physiol, 2019. \textbf{317}(3): p. C405-c419.2. Corrò, C., L. Novellasdemunt, and V.S.W. Li, \emph{A brief history of organoids.} Am J Physiol Cell Physiol, 2020. \textbf{319}(1): p. C151-c165.3. Dedhia, P.H., et al., \emph{Organoid Models of Human Gastrointestinal Development and~Disease.} Gastroenterology, 2016. \textbf{150}(5): p. 1098-1112.4. Günther, C., et al., \emph{Organoids in gastrointestinal diseases: from experimental models to clinical translation.} Gut, 2022. \textbf{71}(9): p. 1892-1908.5. Taelman, J., M. Diaz, and J. Guiu, \emph{Human Intestinal Organoids: Promise and Challenge.} Front Cell Dev Biol, 2022. \textbf{10}: p. 854740.6. Zhao, Z., et al., \emph{Organoids.} Nat Rev Methods Primers, 2022. \textbf{2}.7. Phipson, B., et al., \emph{Evaluation of variability in human kidney organoids.} Nat Methods, 2019. \textbf{16}(1): p. 79-87.8. Rosenbluth, J.M., et al., \emph{Organoid cultures from normal and cancer-prone human breast tissues preserve complex epithelial lineages.} Nat Commun, 2020. \textbf{11}(1): p. 1711.9. Jiang, S., et al., \emph{An Automated Organoid Platform with Inter-organoid Homogeneity and Inter-patient Heterogeneity.} Cell Rep Med, 2020. \textbf{1}(9): p. 100161.10. Li, J., et al., \emph{Microdroplet-Engineered Skeletal Muscle Organoids from Primary Tissue Recapitulate Parental Physiology with High Reproducibility.} Research (Wash D C), 2025. \textbf{8}: p. 0699.11. Yang, H., et al., \emph{Ultra-small tissue-compatible organoid printer for rapid and controllable modeling of respiratory organoids.} Device, 2024. \textbf{2}(8): p. 100420.12. Orkin, R.W., et al., \emph{A murine tumor producing a matrix of basement membrane.} J Exp Med, 1977. \textbf{145}(1): p. 204-20.13. Fujii, M., et al., \emph{Human Intestinal Organoids Maintain Self-Renewal Capacity and Cellular Diversity in Niche-Inspired Culture Condition.} Cell Stem Cell, 2018. \textbf{23}(6): p. 787-793.e6.14. Sachs, N., et al., \emph{Intestinal epithelial organoids fuse to form self-organizing tubes in floating collagen gels.} Development, 2017. \textbf{144}(6): p. 1107-1112.15. Sato, T., et al., \emph{Single Lgr5 stem cells build crypt-villus structures in vitro without a mesenchymal niche.} Nature, 2009. \textbf{459}(7244): p. 262-5.16. Zhao, H., et al., \emph{Droplet-engineered organoids recapitulate parental tissue transcriptome with inter-organoid homogeneity and inter-tumor cell heterogeneity.} Fundam Res, 2024. \textbf{4}(6): p. 1506-1514.17. Francis, K. and B.O. Palsson, \emph{Effective intercellular communication distances are determined by the relative time constants for cyto/chemokine secretion and diffusion.} Proc Natl Acad Sci U S A, 1997. \textbf{94}(23): p. 12258-62.18. Hofer, M. and M.P. Lutolf, \emph{Engineering organoids.} Nat Rev Mater, 2021. \textbf{6}(5): p. 402-420.19. Capeling, M.M., et al., \emph{Nonadhesive Alginate Hydrogels Support Growth of Pluripotent Stem Cell-Derived Intestinal Organoids.} Stem Cell Reports, 2019. \textbf{12}(2): p. 381-394.20. Tang, X., et al., \emph{Volumetric compression by heterogeneous scaffold embedding promotes cerebral organoid maturation and does not impede growth.} Cell Syst, 2023. \textbf{14}(10): p. 872-882.e3.21. Wang, Z., et al., \emph{Protocol to encapsulate cerebral organoids with alginate hydrogel shell to induce volumetric compression.} STAR Protoc, 2024. \textbf{5}(2): p. 102952.22. Ongenae, S., et al., \emph{Active foam dynamics of tissue spheroid fusion.} Nat Commun, 2025. \textbf{16}(1): p. 10467.23. Zhou, X., et al., \emph{High-throughput engineered tumor organoids reveal ROCK signaling as an immunotherapeutic target in triple-negative breast cancer.} Cell Rep, 2026. \textbf{45}(2): p. 116987.24. Bar-Ephraim, Y.E., K. Kretzschmar, and H. Clevers, \emph{Organoids in immunological research.} Nat Rev Immunol, 2020. \textbf{20}(5): p. 279-293.25. Harter, M.F., T. Recaldin, and N. Gjorevski, \emph{Organoids as models of immune-organ interaction.} Cell Rep, 2025. \textbf{44}(9): p. 116214.
+
+\end{document}

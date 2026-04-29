@@ -1,0 +1,182 @@
+[
+  {
+    "document": "main",
+    "index": 1,
+    "source_docx_media_name": "image1.tif",
+    "png": "figures/main_figure_01.png",
+    "pdf": "figures/main_figure_01.pdf",
+    "width_px": 2481,
+    "height_px": 3508,
+    "source_mode": "CMYK",
+    "source_format": "TIFF",
+    "dpi": [
+      300.0,
+      300.0
+    ]
+  },
+  {
+    "document": "main",
+    "index": 2,
+    "source_docx_media_name": "image2.tif",
+    "png": "figures/main_figure_02.png",
+    "pdf": "figures/main_figure_02.pdf",
+    "width_px": 2481,
+    "height_px": 3508,
+    "source_mode": "CMYK",
+    "source_format": "TIFF",
+    "dpi": [
+      300.0,
+      300.0
+    ]
+  },
+  {
+    "document": "main",
+    "index": 3,
+    "source_docx_media_name": "image3.tif",
+    "png": "figures/main_figure_03.png",
+    "pdf": "figures/main_figure_03.pdf",
+    "width_px": 2481,
+    "height_px": 3662,
+    "source_mode": "CMYK",
+    "source_format": "TIFF",
+    "dpi": [
+      300.0,
+      300.0
+    ]
+  },
+  {
+    "document": "main",
+    "index": 4,
+    "source_docx_media_name": "image4.tif",
+    "png": "figures/main_figure_04.png",
+    "pdf": "figures/main_figure_04.pdf",
+    "width_px": 2481,
+    "height_px": 3508,
+    "source_mode": "CMYK",
+    "source_format": "TIFF",
+    "dpi": [
+      300.0,
+      300.0
+    ]
+  },
+  {
+    "document": "main",
+    "index": 5,
+    "source_docx_media_name": "image5.tif",
+    "png": "figures/main_figure_05.png",
+    "pdf": "figures/main_figure_05.pdf",
+    "width_px": 2481,
+    "height_px": 3508,
+    "source_mode": "CMYK",
+    "source_format": "TIFF",
+    "dpi": [
+      300.0,
+      300.0
+    ]
+  },
+  {
+    "document": "sm",
+    "index": 1,
+    "source_docx_media_name": "image1.tiff",
+    "png": "figures/sm_figure_01.png",
+    "pdf": "figures/sm_figure_01.pdf",
+    "width_px": 1269,
+    "height_px": 1795,
+    "source_mode": "RGB",
+    "source_format": "TIFF",
+    "dpi": [
+      220.0,
+      220.0
+    ]
+  },
+  {
+    "document": "sm",
+    "index": 2,
+    "source_docx_media_name": "image2.jpeg",
+    "png": "figures/sm_figure_02.png",
+    "pdf": "figures/sm_figure_02.pdf",
+    "width_px": 1269,
+    "height_px": 1795,
+    "source_mode": "RGB",
+    "source_format": "JPEG",
+    "dpi": [
+      220.0,
+      220.0
+    ]
+  },
+  {
+    "document": "sm",
+    "index": 3,
+    "source_docx_media_name": "image3.jpeg",
+    "png": "figures/sm_figure_03.png",
+    "pdf": "figures/sm_figure_03.pdf",
+    "width_px": 1269,
+    "height_px": 1874,
+    "source_mode": "RGB",
+    "source_format": "JPEG",
+    "dpi": [
+      220.0,
+      220.0
+    ]
+  },
+  {
+    "document": "sm",
+    "index": 4,
+    "source_docx_media_name": "image4.png",
+    "png": "figures/sm_figure_04.png",
+    "pdf": "figures/sm_figure_04.pdf",
+    "width_px": 2126,
+    "height_px": 556,
+    "source_mode": "RGB",
+    "source_format": "PNG",
+    "dpi": [
+      96.012,
+      96.012
+    ]
+  },
+  {
+    "document": "sm",
+    "index": 5,
+    "source_docx_media_name": "image5.jpg",
+    "png": "figures/sm_figure_05.png",
+    "pdf": "figures/sm_figure_05.pdf",
+    "width_px": 2200,
+    "height_px": 1578,
+    "source_mode": "RGB",
+    "source_format": "JPEG",
+    "dpi": [
+      300.0,
+      300.0
+    ]
+  },
+  {
+    "document": "sm",
+    "index": 6,
+    "source_docx_media_name": "image6.jpeg",
+    "png": "figures/sm_figure_06.png",
+    "pdf": "figures/sm_figure_06.pdf",
+    "width_px": 1260,
+    "height_px": 896,
+    "source_mode": "RGB",
+    "source_format": "JPEG",
+    "dpi": [
+      220.0,
+      220.0
+    ]
+  },
+  {
+    "document": "sm",
+    "index": 7,
+    "source_docx_media_name": "image7.jpeg",
+    "png": "figures/sm_figure_07.png",
+    "pdf": "figures/sm_figure_07.pdf",
+    "width_px": 1260,
+    "height_px": 896,
+    "source_mode": "RGB",
+    "source_format": "JPEG",
+    "dpi": [
+      220.0,
+      220.0
+    ]
+  }
+]
