@@ -83,9 +83,9 @@
 
 \textbf{\sout{Droplet-engineered appendix-derived gut organoids enable controlled growth, differentiation and fusion}}
 
-\textbf{AI segmentation reveals droplet-engineered appendix-derived gut organoids enable controlled growth, differentiation, and fusion}
+\textbf{Agentic analysis of droplet-engineered gut organoid growth, differentiation, and fusion with AAPS}
 
-\textbf{Human-in-the-loop agent}
+\textbf{AAPS Organoid Agent with human-in-the-loop analysis}
 
 \emph{Zhengyu Wu\textsuperscript{1, 3}, Rongzhou Chen \textsuperscript{2,3}, Wanlong Wang\textsuperscript{1}, Chuqian Ruan\textsuperscript{1}, Haotian Sun\textsuperscript{1}, Edmund Y. Lam\textsuperscript{2}, Shaohua Ma\textsuperscript{1,4}}
 
@@ -243,15 +243,64 @@ The powder of Y-27632 (STEMCELL, 72302) was resuspended in 624 µL of PBS to mak
 
 Total RNA was extracted from alginate-based DEOs (no-alginate, low-alginate, and high-alginate) using TRIzol reagent (Invitrogen, 15596026) according to the manufacturer's instructions. Organoids were disrupted by repeated pipetting to obtain a homogeneous lysate. RNA quality and concentration were evaluated prior to library construction. Poly(A)+ mRNA libraries were prepared using the mRNA Library Kit (BGI, Shenzhen, China). In brief, mRNA sequencing libraries were constructed using the mRNA Library Kit (BGI, Shenzhen, China). RNA samples were denatured followed by mRNA enrichment using oligo(dT)-conjugated magnetic beads. The enriched mRNA was then fragmented. First-strand cDNA synthesis was performed with random hexamer primers, and second-strand cDNA was subsequently synthesized to generate double-stranded cDNA. After that, the cDNA underwent end repair, and a single deoxyadenosine (A) nucleotide was added to the 3' ends of the blunt-ended fragments. The adaptors were ligated to the A-tailed cDNA, and the final library was amplified by PCR. And the final PCR products were circularized to form single-stranded DNA circles. After digesting linear molecules, the circularized DNA underwent rolling circle amplification (RCA) to produce DNA nanoballs (DNBs). Finally, the DNBs needed to load into a patterned nanoarray and sequenced on the DNBSEQ platform to generate PE150 bases reads. Later RNA-seq data processing and analysis were conducted using an integrated RNA-seq analysis system Dr. Tom platform provided by BGI.
 
-\textbf{Image segmentation and quantitative analysis of DEO morphology}
+\textbf{AAPS Organoid Agent for image segmentation and quantitative morphology}
 
-Brightfield images were analyzed using a custom DEO segmentation and quantification pipeline developed for the experimental workflows. Briefly, raw TIFF images were converted to grayscale and processed to generate a hybrid signal image, followed by support-mask extraction, multiscale Cellpose-based instance segmentation, signal-based recovery of large, fused structures, and overlap-aware candidate merging (Figure S4). The final label maps and signal images were then used for downstream quantification of growth, fusion, and differentiation-related phenotypes (Table S1). The metric framework included growth-related measures based on segmented instance geometry, fusion-related measures based on redistribution of edge structure from the organoid periphery toward the interior, and differentiation-related measures based on roundness, darkness, and wall/core morphology. Representative segmentation outputs for the density, alginate, and Y-27632 experiments are shown in Figures S5, S6, and S7, respectively.
+Brightfield image analysis was implemented as a harnessed AAPS Organoid Agent workflow rather than a single fixed segmentation script. The goal of the harness was to make agentic image analysis reproducible: each run registered the source image path, experiment branch, date, condition or concentration, replicate, magnification, output mask, overlay, metric JSON, and summary CSV in a persistent file database. The final analysis roots were \texttt{app81\_density\_stitched\_cellpose\_v5\_final\_metrics\_v1} for density experiments, \texttt{app65\_alginate\_v3\_direct\_brightfield} for alginate experiments, and \texttt{app80\_all\_concentrations\_multiscale\_large\_recovery} for Y-27632 experiments. The database layer included \texttt{source\_image\_database.csv}, per-image metric tables, daily summary tables, and manifest files. The AAPS harness therefore separated the biological experiment design from low-level image-processing choices and preserved the provenance required to audit each final measurement.
 
-In the density experiments, growth was quantified using total segmented area, which is defined in the pipeline as the sum of all segmented instance areas and serves as the principal segmentation-based growth proxy. Differentiation was quantified using organoid darkness P90, an upper-quantile darkness metric designed to capture darker and more differentiated epithelial morphologies. Fusion was quantified using the peripheral-to-central internal edge ratio, because the fusion framework implemented in the pipeline is based on the premise that stronger fusion redistributes edge structure from the outer boundary toward the organoid interior; accordingly, this metric provides a sensitive readout of fusion-associated spatial reorganization. Representative segmentation results for this analysis are shown in Figure S5.
+The AAPS workflow followed a register--inspect--route--segment--verify--quantify pattern. First, images were registered from the raw experiment folders and converted into a canonical metadata table. Second, the image was inspected for modality, magnification, object density, expected object scale, and image quality. Third, the harness routed the image to the most appropriate segmentation branch. This routing was necessary because the three experiments had different image priors: density images contained stitched 10x panels with variable organoid counts, alginate images included many directly acquired brightfield fields, and Y-27632 images contained concentration-dependent large fused organoids. The final segmentation branch could therefore combine multiscale Cellpose, deterministic thresholding, signal-based large-object recovery, and, for selected difficult App81 panels, image-generation-assisted mask refinement using Nano Banana 2.
 
-In the alginate experiments, growth was quantified using average perimeter, which is implemented in the pipeline as the mean perimeter of segmented organoid instances and was used here as a morphology-sensitive measure of organoid expansion. Differentiation was quantified using wall darkness P90, as the darkness-and-wall-thickening metrics in the pipeline were specifically designed to capture darker, thickened epithelial walls associated with more differentiated states. Fusion was again quantified using the peripheral-to-central internal edge ratio, because this metric reflects the relative redistribution of edge signal from peripheral regions to the interior during organoid fusion. Representative segmentation results for this analysis are shown in Figure S6.
+For deterministic preprocessing, each raw TIFF image was converted to an 8-bit grayscale image \(I(x)\). Contrast-limited adaptive histogram equalization was applied, followed by a small Gaussian blur \(F(x)\) and a larger background blur \(B(x)\). The AAPS signal image was defined as a weighted combination of inverted foreground intensity and background-subtracted residual:
+\[
+S(x)=0.45\,\operatorname{norm}(255-F(x))+0.55\,\operatorname{norm}(B(x)-F(x)),
+\]
+where \(\operatorname{norm}(\cdot)\) denotes min--max normalization to 0--255. A support mask was generated by combining Otsu thresholding with a percentile floor:
+\[
+T_{\mathrm{sup}}=\max\{T_{\mathrm{Otsu}}(S),Q_{0.58}(S)\}, \qquad M_{\mathrm{sup}}(x)=\mathbf{1}[S(x)\geq T_{\mathrm{sup}}],
+\]
+followed by morphological opening and closing. This support mask was not treated as the final segmentation; it served as an image prior for candidate filtering, large-object recovery, and quality control.
 
-In the Y-27632 experiments, growth was summarized using mean organoid area derived from the segmented instance areas. This summary was selected to reflect changes in organoid size while reducing confounding from fusion-dependent changes in organoid number. Differentiation was quantified using organoid darkness P90. Fusion was quantified using the center-weighted edge sum, as this metric applies an exponential centrality weighting to emphasize interior edge structure and is therefore particularly suitable for detecting fusion-associated structural integration within DEOs. Representative segmentation results for this analysis are shown in Figure S7.
+For multiscale instance segmentation, Cellpose was run at several candidate diameters instead of assuming one organoid size. App65 used a direct brightfield branch with diameters of 220, 320, 420, 520, and 700 pixels. App80 used date- and morphology-aware diameter schedules, with larger diameters routed to later fused stages. App81 density images were first analyzed as stitched 3-by-3 collages to exploit repeated panel context; multiple Cellpose diameter settings were tested, and selected panel-level outputs from 1x, 2x, and 4x diameter runs were merged when one setting better recovered a local field. Candidate objects from Cellpose and signal-threshold recovery were scored by support overlap, mean signal, edge strength, fill ratio, size, and stage prior. Overlapping candidates were merged using overlap-aware rules based on intersection-over-union and overlap over the smaller mask. The final output for each image was an integer instance label image \(L(x)\in\{0,1,\ldots,K\}\), with zero denoting background and labels \(1,\ldots,K\) denoting organoid instances.
+
+For App81 density data, the AAPS harness included a human-in-the-loop quality-control step because several stitched panels contained large organoids that were missed by the most stable Cellpose setting. In these selected panels, Nano Banana 2 was provided with the original stitched image and the current Cellpose color-mask overlay, then prompted to preserve the existing correct segmentation while adding or correcting the missed organoid instance. The generated masks were not accepted automatically. They were visually reviewed, merged only into targeted panels, exported back from stitched coordinates to single-image masks, and then backfilled into the same per-image database as the pure Cellpose outputs. In the final App81 metric table, 63 canonical source images were retained and 49 duplicate exports were ignored by the database backfill step.
+
+\textbf{AAPS metric design and mathematical definitions}
+
+Metric selection was performed by the AAPS Organoid Agent using the experiment design and then finalized by human-in-the-loop review. The agent selected one primary growth, differentiation, and fusion readout per experiment, while also retaining auxiliary metrics for audit and sensitivity checks. Let \(\Omega\) be the image domain and let \(\Omega_k=\{x:L(x)=k\}\) be organoid instance \(k\). Let \(A_k=|\Omega_k|\), \(P_k\) be its perimeter, and \(K\) be the instance count. The total segmented area and mean instance area were defined as
+\[
+A_{\mathrm{tot}}=\sum_{k=1}^{K}A_k, \qquad \bar{A}=K^{-1}\sum_{k=1}^{K}A_k,
+\]
+and the mean perimeter was
+\[
+\bar{P}=K^{-1}\sum_{k=1}^{K}P_k.
+\]
+The density experiment used \(A_{\mathrm{tot}}\) as the growth readout because the biological question concerned total organoid expansion within each droplet field. The alginate experiment used \(\bar{P}\) because perimeter was more sensitive to morphology and epithelial expansion under matrix modification. The Y-27632 experiment used \(\bar{A}\) because fusion changed object number and total area alone could confound growth with fusion-associated merging.
+
+Differentiation-like morphology was quantified using darkness metrics designed to capture dark, thickened, or budded epithelial structures. A background median \(b\) was estimated from the complement of a dilated union mask. Pixel darkness was defined as
+\[
+D(x)=\operatorname{clip}\left(\frac{b-I(x)}{\max(b,1)},0,1\right).
+\]
+Organoid darkness P90 was the 90th percentile of \(D(x)\) over all segmented organoid pixels. For wall-specific darkness, each instance was split into an adaptive wall and core. The equivalent radius was \(r_k=\sqrt{A_k/\pi}\), the wall thickness was \(t_k=\operatorname{clip}(\operatorname{round}(0.12r_k),5,30)\) pixels, and the core was obtained by eroding \(\Omega_k\) by \(t_k\). Wall darkness P90 was the 90th percentile of \(D(x)\) over the wall pixels. Density and Y-27632 experiments used organoid darkness P90, whereas the alginate experiment used wall darkness P90 to emphasize epithelial wall thickening.
+
+Fusion metrics were based on the premise that organoid fusion redistributes edge structure from object peripheries toward the interior of large integrated masses. For each instance, a normalized centrality field was computed from the distance transform:
+\[
+C_k(x)=\frac{\operatorname{dist}(x,\partial\Omega_k)}{\max_{y\in\Omega_k}\operatorname{dist}(y,\partial\Omega_k)}.
+\]
+Let \(E(x)\) denote the normalized internal edge or hybrid-signal edge field. Central and peripheral internal edge means were
+\[
+E_{\mathrm{cen}}=\frac{\sum_k\sum_{x\in\Omega_k}E(x)C_k(x)}{\sum_k\sum_{x\in\Omega_k}C_k(x)}, \qquad
+E_{\mathrm{per}}=\frac{\sum_k\sum_{x\in\Omega_k}E(x)(1-C_k(x))}{\sum_k\sum_{x\in\Omega_k}(1-C_k(x))}.
+\]
+The peripheral-to-central ratio was
+\[
+R_{\mathrm{per/cen}}=\frac{E_{\mathrm{per}}}{E_{\mathrm{cen}}},
+\]
+and was used for density and alginate experiments because it directly reports peripheral versus interior edge redistribution. For the Y-27632 experiment, the primary fusion readout was a center-weighted edge sum:
+\[
+S_{\mathrm{cw}}=\sum_{k=1}^{K}\sum_{x\in\Omega_k}E(x)\frac{\exp(5C_k(x))-1}{\exp(5)-1},
+\]
+which emphasizes internal edges in fused structures and was more suitable for ROCK-inhibition-induced structural integration.
+
+All final primary and auxiliary metrics were written at per-image resolution and then summarized by condition and date. App81 density outputs included 63 canonical images; App65 alginate outputs included 886 images; and App80 Y-27632 outputs included 646 images. The AAPS harness stored masks, random-color instance maps, overlays, signal images, metric JSON files, per-image CSV files, daily summaries, figure outputs, and manifests. This allowed large batches to be processed dynamically while preserving human-in-the-loop checkpoints for segmentation review, prompt-guided correction, metric selection, and final figure generation. Representative segmentation outputs for the density, alginate, and Y-27632 experiments are shown in Figures S5, S6, and S7, respectively, and the primary metric choices are summarized in Table S1.
 
 \textbf{Statistical analysis}
 
