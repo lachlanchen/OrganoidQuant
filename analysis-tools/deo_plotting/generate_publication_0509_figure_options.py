@@ -37,7 +37,7 @@ from generate_requested_0415_figures import (  # noqa: E402
     slug,
     summarize_metric,
 )
-from generate_guided_deo_figures import DatasetConfig, MetricSpec  # noqa: E402
+from generate_guided_deo_figures import DatasetConfig, FocusSpec, MetricSpec, pairwise_vs_control  # noqa: E402
 
 PROJECT_ROOT = Path('/home/lachlan/ProjectsLFS/Zhengyu')
 DEFAULT_ROOTS = (
@@ -45,6 +45,8 @@ DEFAULT_ROOTS = (
     PROJECT_ROOT / 'analysis-output/app65_alginate_v3_direct_brightfield',
     PROJECT_ROOT / 'analysis-output/app80_all_concentrations_multiscale_large_recovery',
 )
+REFERENCE_FIG2_PNG = PROJECT_ROOT / 'references/publication/aaps_agentic_analysis_figure2_generated_2026-04-29.png'
+REFERENCE_FIG2_PDF = PROJECT_ROOT / 'publication/aaps-organoid/figures/main_figure_02_aaps_agentic_analysis_workflow.pdf'
 DOCX_PATHS = (
     PROJECT_ROOT / 'publication/DEO_manuscript WZY 260509_2.docx',
     PROJECT_ROOT / 'publication/DEO+Supplementary+information+WZY+20260509.docx',
@@ -76,51 +78,34 @@ class ExportVariant:
 
 VARIANTS: tuple[ExportVariant, ...] = (
     ExportVariant(
-        key='option_1_docx_width_arial12',
-        description='Native DOCX-width export: 6.36-inch line-figure width with Arial-compatible 12 pt text.',
+        key='option_1_manual_svg_no_labels_keep_stars',
+        description='Manual editing export: full data geometry with no axis labels, no tick labels, and no legend, but with significance stars retained for focused/statistical panels.',
         base_font_pt=12.0,
-        main_figsize=(6.36, 2.85),
-        split_figsize=(2.35, 2.65),
-        figure2_figsize=(6.36, 3.25),
-        max_xticks=5,
-        xtick_rotation=50,
-        include_text=True,
-        include_legend=True,
-        include_stats_text=True,
-        line_width=1.45,
-        marker_size=4.3,
-        spine_width=0.95,
-        tick_length=3.2,
-    ),
-    ExportVariant(
-        key='option_2_scaled_down_3x_font',
-        description='Large-text export for downscaling: current-style wide plot with about 3x current font size so text remains readable after insertion into a DOCX-width figure.',
-        base_font_pt=27.0,
-        main_figsize=(14.45, 5.65),
-        split_figsize=(5.2, 4.9),
-        figure2_figsize=(14.45, 7.35),
-        max_xticks=5,
-        xtick_rotation=55,
-        include_text=True,
-        include_legend=True,
-        include_stats_text=True,
-        line_width=3.6,
-        marker_size=10.0,
-        spine_width=2.1,
-        tick_length=7.0,
-    ),
-    ExportVariant(
-        key='option_3_no_text_svg_manual_labels',
-        description='Text-free editable SVG/PDF/PNG export: data geometry, axes, lines, markers, and schematic shapes only; labels and legends can be added manually later.',
-        base_font_pt=12.0,
-        main_figsize=(6.36, 2.65),
-        split_figsize=(2.35, 2.35),
-        figure2_figsize=(6.36, 3.25),
+        main_figsize=(13.0, 4.8),
+        split_figsize=(5.8, 4.6),
+        figure2_figsize=(13.0, 6.5),
         max_xticks=0,
         xtick_rotation=0,
         include_text=False,
         include_legend=False,
-        include_stats_text=False,
+        include_stats_text=True,
+        line_width=1.9,
+        marker_size=5.5,
+        spine_width=0.95,
+        tick_length=3.0,
+    ),
+    ExportVariant(
+        key='option_2_arial12_reduced_date_labels',
+        description='Text-bearing reference export: all data points are retained, but only selected date labels are printed to avoid crowding; legend is exported separately.',
+        base_font_pt=12.0,
+        main_figsize=(13.0, 4.8),
+        split_figsize=(5.8, 4.6),
+        figure2_figsize=(13.0, 6.5),
+        max_xticks=5,
+        xtick_rotation=35,
+        include_text=True,
+        include_legend=True,
+        include_stats_text=True,
         line_width=1.45,
         marker_size=4.3,
         spine_width=0.95,
@@ -291,6 +276,36 @@ def style_axis(ax: plt.Axes, variant: ExportVariant, days: list[int], xpos: dict
     ax.set_facecolor('white')
 
 
+def metric_label(cfg: DatasetConfig, metric: str) -> str:
+    for spec in (*cfg.primary_metrics, *cfg.supportive_metrics, *cfg.full_metrics):
+        if spec.key == metric:
+            return spec.label
+    return metric.replace('_', ' ')
+
+
+def focused_days_for_cfg(cfg: DatasetConfig) -> tuple[FocusSpec, ...]:
+    if cfg.key == 'app65':
+        return (
+            FocusSpec(6, 'average_perimeter_px', 'Growth D6'),
+            FocusSpec(7, 'average_perimeter_px', 'Growth D7'),
+            FocusSpec(6, 'peripheral_over_central', 'Fusion D6'),
+            FocusSpec(8, 'peripheral_over_central', 'Fusion D8'),
+            FocusSpec(11, 'wall_darkness_p90', 'Differentiation D11'),
+            FocusSpec(13, 'wall_darkness_p90', 'Differentiation D13 reference'),
+        )
+    if cfg.key == 'app80':
+        return (
+            FocusSpec(5, 'average_area_px', 'Growth D5'),
+            FocusSpec(2, 'organoid_darkness_p90', 'Differentiation D2'),
+            FocusSpec(5, 'organoid_darkness_p90', 'Differentiation D5'),
+            FocusSpec(7, 'organoid_darkness_p90', 'Differentiation D7'),
+            FocusSpec(4, 'center_weighted_edge_sum', 'Fusion D4'),
+            FocusSpec(5, 'center_weighted_edge_sum', 'Fusion D5'),
+            FocusSpec(6, 'center_weighted_edge_sum', 'Fusion D6'),
+        )
+    return tuple(cfg.focused)
+
+
 def draw_series(ax: plt.Axes, cfg: DatasetConfig, group: str, sub: pd.DataFrame, x: list[int], with_errorbars: bool, variant: ExportVariant) -> None:
     common = dict(
         color=cfg.group_colors[group],
@@ -423,6 +438,102 @@ def plot_split(df: pd.DataFrame, cfg: DatasetConfig, variant: ExportVariant, out
     return rows
 
 
+def style_focus_axis(ax: plt.Axes, cfg: DatasetConfig, variant: ExportVariant, spec: FocusSpec) -> None:
+    ax.grid(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_linewidth(variant.spine_width)
+    ax.spines['bottom'].set_linewidth(variant.spine_width)
+    ax.tick_params(axis='both', width=variant.spine_width, length=variant.tick_length)
+    if variant.include_text:
+        ax.set_ylabel(metric_label(cfg, spec.metric))
+        rotation = 20 if len(cfg.group_order) > 3 else 0
+        ha = 'right' if len(cfg.group_order) > 3 else 'center'
+        ax.set_xticklabels([cfg.group_labels[g] for g in cfg.group_order], rotation=rotation, ha=ha)
+        maybe_sci(ax, spec.metric)
+    else:
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.set_ylabel('')
+        ax.set_xlabel('')
+        ax.yaxis.offsetText.set_visible(False)
+        ax.xaxis.offsetText.set_visible(False)
+
+
+def plot_focused_day(df: pd.DataFrame, cfg: DatasetConfig, spec: FocusSpec, variant: ExportVariant, out_dir: Path, suffix: str) -> dict[str, object]:
+    fig, ax = plt.subplots(1, 1, figsize=variant.split_figsize)
+    xpos = np.arange(1, len(cfg.group_order) + 1)
+    groups: list[np.ndarray] = []
+    maxima: list[float] = []
+    for group in cfg.group_order:
+        vals = df.loc[(df[cfg.group_field] == group) & (df['relative_day'] == spec.day), spec.metric].dropna().to_numpy(dtype=float)
+        groups.append(vals if vals.size else np.array([np.nan]))
+        maxima.extend(vals.tolist())
+    bp = ax.boxplot(
+        groups,
+        positions=xpos,
+        widths=0.58,
+        patch_artist=True,
+        showfliers=False,
+        medianprops={'color': 'black', 'linewidth': max(1.0, variant.line_width * 0.7)},
+        whiskerprops={'color': 'black', 'linewidth': max(0.8, variant.line_width * 0.55)},
+        capprops={'color': 'black', 'linewidth': max(0.8, variant.line_width * 0.55)},
+        boxprops={'linewidth': max(0.8, variant.line_width * 0.55), 'edgecolor': 'black'},
+    )
+    for patch, group in zip(bp['boxes'], cfg.group_order):
+        patch.set_facecolor(cfg.group_colors[group])
+        patch.set_alpha(0.55)
+    for idx, (group, vals) in enumerate(zip(cfg.group_order, groups), start=1):
+        vals = vals[~np.isnan(vals)]
+        if vals.size == 0:
+            continue
+        jitter = np.linspace(-0.08, 0.08, vals.size) if vals.size > 1 else np.array([0.0])
+        ax.scatter(np.full(vals.size, idx) + jitter, vals, s=max(18, variant.marker_size * 5), color=cfg.group_colors[group], alpha=0.82, zorder=3)
+
+    stats_rows = pairwise_vs_control(df, cfg, spec.metric, spec.day)
+    if cfg.show_plot_stats and variant.include_stats_text and stats_rows:
+        ymax = max(maxima) if maxima else 1.0
+        ymin = min(maxima) if maxima else 0.0
+        span = (ymax - ymin) if ymax > ymin else 1.0
+        level = ymax + 0.08 * span
+        step = 0.12 * span
+        for row, other_idx in zip(stats_rows, xpos[1:]):
+            if row.get('stars'):
+                ax.plot([xpos[0], xpos[0], other_idx, other_idx], [level, level + 0.03 * span, level + 0.03 * span, level], color='black', linewidth=max(1.0, variant.line_width * 0.6))
+                ax.text((xpos[0] + other_idx) / 2.0, level + 0.03 * span, row['stars'], ha='center', va='bottom', color='black', fontsize=variant.base_font_pt, fontweight='bold')
+                level += step
+
+    ax.set_xticks(xpos)
+    style_focus_axis(ax, cfg, variant, spec)
+    fig.tight_layout(pad=0.18 if variant.include_text else 0.12)
+    tag = f'd{spec.day}_{slug(spec.metric)}'
+    stem = out_dir / f'{cfg.key}_{tag}_{suffix}_{variant.key}'
+    outputs = save_all_formats(fig, stem)
+    plt.close(fig)
+    stats_path = out_dir / f'{cfg.key}_{tag}_pairwise_vs_control_{suffix}_{variant.key}.csv'
+    pd.DataFrame(stats_rows).to_csv(stats_path, index=False)
+    return {
+        'dataset': cfg.key,
+        'focus_label': spec.label,
+        'day': spec.day,
+        'metric': spec.metric,
+        'variant': variant.key,
+        'outputs': outputs,
+        'pairwise_stats_csv': str(stats_path),
+    }
+
+
+def plot_focused_days(df: pd.DataFrame, cfg: DatasetConfig, variant: ExportVariant, out_dir: Path, suffix: str) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for spec in focused_days_for_cfg(cfg):
+        if spec.metric not in df.columns:
+            continue
+        if df.loc[df['relative_day'] == spec.day].empty:
+            continue
+        rows.append(plot_focused_day(df, cfg, spec, variant, out_dir, suffix))
+    return rows
+
+
 def draw_figure2_workflow(variant: ExportVariant, out_dir: Path, suffix: str) -> dict[str, object]:
     colors = {
         'teal': '#0E6970',
@@ -518,7 +629,8 @@ def generate_for_root(root: Path, out_root: Path, suffix: str, variant: ExportVa
     with plt.rc_context(set_publication_rc(variant)):
         main = plot_primary(df, cfg, variant, ensure_dir(dataset_dir / 'main_primary_metrics'), suffix)
         split = plot_split(df, cfg, variant, ensure_dir(dataset_dir / 'split_primary_individual'), suffix)
-    return {'dataset': cfg.key, 'root': str(root), 'variant': variant.key, 'main': main, 'split': split}
+        focused = plot_focused_days(df, cfg, variant, ensure_dir(dataset_dir / 'focused_day_individual'), suffix)
+    return {'dataset': cfg.key, 'root': str(root), 'variant': variant.key, 'main': main, 'split': split, 'focused': focused}
 
 
 def generate_figure2(out_root: Path, suffix: str, variant: ExportVariant) -> dict[str, object]:
@@ -549,7 +661,31 @@ def main() -> None:
             'typical_existing_export_width_in': CURRENT_EXPORT_WIDTH_IN,
             'estimated_scale_existing_to_docx': round(ESTIMATED_SCALE_TO_DOCX, 3),
             'current_effective_tick_font_after_docx_scaling_pt': 'Existing tick labels around 8-10 pt become roughly 3.5-4.4 pt when a 14.45 in export is inserted at 6.36 in.',
-            'three_x_rationale': 'About 27 pt in the current wide export scales down to roughly 12 pt at DOCX figure width.',
+            'current_decision': 'Use a manual no-label SVG as the primary editable export; keep a separate Arial-compatible reference version with reduced date labels.',
+        },
+        'date_label_policy': {
+            'manual_svg_no_labels': 'All time points are retained as data, but text labels are removed for manual editing.',
+            'reduced_date_labels': 'All time points are retained as data; only five evenly spaced D labels are printed to avoid crowding.',
+        },
+        'focused_day_reference': {
+            'app65': [
+                {'day': 6, 'metric': 'average_perimeter_px', 'reason': 'growth D6 from latest 0415 config / notes'},
+                {'day': 7, 'metric': 'average_perimeter_px', 'reason': 'growth D7 from handwritten note'},
+                {'day': 6, 'metric': 'peripheral_over_central', 'reason': 'fusion D6 from latest 0415 config'},
+                {'day': 8, 'metric': 'peripheral_over_central', 'reason': 'fusion D8 from transcript / handwritten note'},
+                {'day': 11, 'metric': 'wall_darkness_p90', 'reason': 'differentiation D11 from transcript / handwritten note'},
+                {'day': 13, 'metric': 'wall_darkness_p90', 'reason': 'older representative date retained as reference'},
+            ],
+            'app80': [
+                {'day': 5, 'metric': 'average_area_px', 'reason': 'growth/area D5 from handwritten note'},
+                {'day': 2, 'metric': 'organoid_darkness_p90', 'reason': 'differentiation D2 from handwritten note'},
+                {'day': 5, 'metric': 'organoid_darkness_p90', 'reason': 'differentiation D5 from handwritten note'},
+                {'day': 7, 'metric': 'organoid_darkness_p90', 'reason': 'differentiation D7 from handwritten note'},
+                {'day': 4, 'metric': 'center_weighted_edge_sum', 'reason': 'fusion D4 from handwritten note'},
+                {'day': 5, 'metric': 'center_weighted_edge_sum', 'reason': 'fusion D5 from handwritten note'},
+                {'day': 6, 'metric': 'center_weighted_edge_sum', 'reason': 'fusion D6 from manuscript/reference note'},
+            ],
+            'app81': [],
         },
         'variants': [variant.__dict__ for variant in VARIANTS],
         'outputs': [],
@@ -568,15 +704,15 @@ def main() -> None:
     readme.write_text(
         '# Publication Figure Export Options\n\n'
         f'Suffix: `{args.suffix}`\n\n'
-        'This folder contains three export options for Figure 2 and the App81/App65/App80 primary quantitative figures.\n\n'
+        'This folder contains corrected SVG-oriented exports for Figure 2 and the App81/App65/App80 primary quantitative figures.\n\n'
         '## Options\n\n'
-        '- `option_1_docx_width_arial12`: native DOCX-width export with Arial-compatible 12 pt text.\n'
-        '- `option_2_scaled_down_3x_font`: wide export with approximately 3x current font size, intended for downscaling into the DOCX/manuscript figure width.\n'
-        '- `option_3_no_text_svg_manual_labels`: no text in the generated figure body, with SVG/PDF/PNG output for manual label editing.\n\n'
+        '- `option_1_manual_svg_no_labels_keep_stars`: no labels or legend, but significance stars/brackets are retained for manual SVG editing.\n'
+        '- `option_2_arial12_reduced_date_labels`: Arial-compatible 12 pt reference export with reduced date labels and a separate legend.\n\n'
         '## Notes\n\n'
         '- The current system resolves Arial to the Matplotlib font path recorded in the manifest.\n'
         '- App65 alginate labels are exported as `0.02%` and `0.05%`, not Low/High alginate.\n'
-        '- Main quantitative plots do not contain legends. Legend files are exported separately for text-bearing options.\n'
+        '- Main quantitative plots do not contain legends. Legend files are exported separately for the text-bearing option.\n'
+        '- Focused single-date panels are exported under `focused_day_individual`.\n'
         '- SVG text remains editable because `svg.fonttype` is set to `none`.\n',
         encoding='utf-8',
     )
