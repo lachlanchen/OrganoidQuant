@@ -1,0 +1,21 @@
+\begin{table}[p]
+\centering
+\small
+\caption{Proxy benchmarking against the final AAPS-selected mask. Dice and area ratio are computed after nearest-neighbour resizing to the final mask grid when required. These values are QC/proxy metrics, not manual ground-truth accuracy.}
+\begin{tabular}{llrrrrrr}
+\toprule
+Dataset & Method & n & Dice & Area ratio & $\Delta$ count & Small frag. & Edge touch \\
+\midrule
+App80 & Prompted watershed & 7 & 0.11 & 0.03 & -9 & 0.0\% & 0.0\% \\
+App80 & CPSAM & 7 & 0.07 & 0.03 & -7 & 0.0\% & 0.0\% \\
+App80 & Final multiscale & 7 & 1.00 & 1.00 & +0 & 0.0\% & 0.0\% \\
+App65 & Old multiscale & 6 & 0.75 & 1.26 & -6 & 0.0\% & 34.4\% \\
+App65 & Threshold-hinted Cellpose & 6 & 0.75 & 1.49 & -0 & 0.0\% & 94.8\% \\
+App65 & Final direct brightfield & 6 & 1.00 & 1.00 & +0 & 0.0\% & 9.9\% \\
+App81 & Threshold-hinted Cellpose & 5 & 0.36 & 0.67 & -2 & 0.0\% & 0.0\% \\
+App81 & Resized multiscale Cellpose & 5 & 0.26 & 0.92 & +0 & 0.0\% & 0.0\% \\
+App81 & Image-generation mask & 5 & 0.48 & 0.89 & +1 & 2.1\% & 0.0\% \\
+App81 & Final stitched hybrid & 5 & 1.00 & 1.00 & +0 & 0.0\% & 0.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}

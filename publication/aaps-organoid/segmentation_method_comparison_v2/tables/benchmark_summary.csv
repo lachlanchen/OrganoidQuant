@@ -1,0 +1,11 @@
+dataset,method,method_label,n_samples,mean_dice_to_final,median_area_ratio_to_final,median_instance_count_delta_vs_final,median_small_fragment_area_fraction,median_edge_touch_area_fraction,median_largest_object_fraction
+App80,prompted_watershed,Prompted watershed,7,0.10713281137031017,0.034741141178231016,-9.0,0.0,0.0,0.4001862775535548
+App80,cpsam,CPSAM,7,0.07435744600928199,0.02804446452733721,-7.0,0.0,0.0,0.5431414658288481
+App80,final_multiscale_large_recovery,Final multiscale,7,1.0,1.0,0.0,0.0,0.0,0.2166179900486203
+App65,old_multiscale_large_recovery,Old multiscale,6,0.7502178372238407,1.2598618057382116,-6.0,0.0,0.34379824067315246,0.923182186113474
+App65,threshold_hint_cellpose,Threshold-hinted Cellpose,6,0.7484568541309277,1.486505262712765,-0.5,1.2023910267000547e-07,0.9476652482182911,0.30997858152053925
+App65,final_direct_brightfield,Final direct brightfield,6,1.0,1.0,0.0,4.878256602151181e-07,0.09864868087726714,0.25324167783564794
+App81,threshold_hint_cellpose,Threshold-hinted Cellpose,5,0.36210560915665363,0.6650479788856162,-2.0,0.0,0.0,0.759293942156294
+App81,resized_multiscale_cellpose,Resized multiscale Cellpose,5,0.2649537572511155,0.9246353725919657,0.0,0.0,0.0,0.8852252246584907
+App81,image_generation,Image-generation mask,5,0.4753818093246912,0.8873142234279031,1.0,0.020991590859357905,0.0,0.4845258871436882
+App81,final_stitched_hybrid,Final stitched hybrid,5,1.0,1.0,0.0,0.0,0.0,0.450301140030114
