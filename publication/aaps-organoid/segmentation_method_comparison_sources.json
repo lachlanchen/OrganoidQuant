@@ -1,0 +1,441 @@
+{
+  "generated_by": "analysis-tools/deo_plotting/generate_segmentation_method_comparison_figures.py",
+  "figures": [
+    {
+      "key": "segmentation_method_comparison_app80_no_text",
+      "caption_short": "App80 Y-27632 segmentation method comparison",
+      "png": "/home/lachlan/ProjectsLFS/Zhengyu/publication/aaps-organoid/figures/segmentation_method_comparison_app80_no_text.png",
+      "pdf": "/home/lachlan/ProjectsLFS/Zhengyu/publication/aaps-organoid/figures/segmentation_method_comparison_app80_no_text.pdf",
+      "columns": [
+        "raw brightfield image",
+        "early prompted watershed",
+        "early CPSAM/SAM-style proposal",
+        "final AAPS multiscale large-recovery segmentation"
+      ],
+      "rows": [
+        {
+          "sample_id": "app80_10uM_2025-12-05_10x00",
+          "description": "App80, 10 uM Y-27632, 5 Dec 2025, 10x00"
+        },
+        {
+          "sample_id": "app80_10uM_2025-12-10_10x00",
+          "description": "App80, 10 uM Y-27632, 10 Dec 2025, 10x00"
+        },
+        {
+          "sample_id": "app80_10uM_2025-12-12_10x00",
+          "description": "App80, 10 uM Y-27632, 12 Dec 2025, 10x00"
+        }
+      ],
+      "sources": [
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "1",
+          "column": "1",
+          "sample_id": "app80_10uM_2025-12-05_10x00",
+          "description": "App80, 10 uM Y-27632, 5 Dec 2025, 10x00",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/05-十二月-2025/10x00.tif"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "1",
+          "column": "2",
+          "sample_id": "app80_10uM_2025-12-05_10x00",
+          "description": "App80, 10 uM Y-27632, 5 Dec 2025, 10x00",
+          "method": "prompted_watershed",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app80_10uM_first_replicate_prompted_watershed/05-十二月-2025__10x00/watershed_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "1",
+          "column": "3",
+          "sample_id": "app80_10uM_2025-12-05_10x00",
+          "description": "App80, 10 uM Y-27632, 5 Dec 2025, 10x00",
+          "method": "cpsam",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app80_10uM_first_replicate_cpsam/runs/05-十二月-2025__10x00/cpsam_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "1",
+          "column": "4",
+          "sample_id": "app80_10uM_2025-12-05_10x00",
+          "description": "App80, 10 uM Y-27632, 5 Dec 2025, 10x00",
+          "method": "final_multiscale_large_recovery",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/runs/10uM/05-十二月-2025/05-十二月-2025_10x00_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "2",
+          "column": "1",
+          "sample_id": "app80_10uM_2025-12-10_10x00",
+          "description": "App80, 10 uM Y-27632, 10 Dec 2025, 10x00",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/10-十二月-2025/10x00.tif"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "2",
+          "column": "2",
+          "sample_id": "app80_10uM_2025-12-10_10x00",
+          "description": "App80, 10 uM Y-27632, 10 Dec 2025, 10x00",
+          "method": "prompted_watershed",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app80_10uM_first_replicate_prompted_watershed/10-十二月-2025__10x00/watershed_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "2",
+          "column": "3",
+          "sample_id": "app80_10uM_2025-12-10_10x00",
+          "description": "App80, 10 uM Y-27632, 10 Dec 2025, 10x00",
+          "method": "cpsam",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app80_10uM_first_replicate_cpsam/runs/10-十二月-2025__10x00/cpsam_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "2",
+          "column": "4",
+          "sample_id": "app80_10uM_2025-12-10_10x00",
+          "description": "App80, 10 uM Y-27632, 10 Dec 2025, 10x00",
+          "method": "final_multiscale_large_recovery",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/runs/10uM/10-十二月-2025/10-十二月-2025_10x00_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "3",
+          "column": "1",
+          "sample_id": "app80_10uM_2025-12-12_10x00",
+          "description": "App80, 10 uM Y-27632, 12 Dec 2025, 10x00",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App80 DEO/10uM/12-十二月-2025/10x00.tif"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "3",
+          "column": "2",
+          "sample_id": "app80_10uM_2025-12-12_10x00",
+          "description": "App80, 10 uM Y-27632, 12 Dec 2025, 10x00",
+          "method": "prompted_watershed",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app80_10uM_first_replicate_prompted_watershed/12-十二月-2025__10x00/watershed_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "3",
+          "column": "3",
+          "sample_id": "app80_10uM_2025-12-12_10x00",
+          "description": "App80, 10 uM Y-27632, 12 Dec 2025, 10x00",
+          "method": "cpsam",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app80_10uM_first_replicate_cpsam/runs/12-十二月-2025__10x00/cpsam_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app80_no_text",
+          "row": "3",
+          "column": "4",
+          "sample_id": "app80_10uM_2025-12-12_10x00",
+          "description": "App80, 10 uM Y-27632, 12 Dec 2025, 10x00",
+          "method": "final_multiscale_large_recovery",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app80_all_concentrations_multiscale_large_recovery/runs/10uM/12-十二月-2025/12-十二月-2025_10x00_overlay.png"
+        }
+      ]
+    },
+    {
+      "key": "segmentation_method_comparison_app65_no_text",
+      "caption_short": "App65 alginate segmentation method comparison",
+      "png": "/home/lachlan/ProjectsLFS/Zhengyu/publication/aaps-organoid/figures/segmentation_method_comparison_app65_no_text.png",
+      "pdf": "/home/lachlan/ProjectsLFS/Zhengyu/publication/aaps-organoid/figures/segmentation_method_comparison_app65_no_text.pdf",
+      "columns": [
+        "raw brightfield image",
+        "old multiscale Cellpose recovery",
+        "threshold-hinted Cellpose test",
+        "final AAPS direct-brightfield segmentation"
+      ],
+      "rows": [
+        {
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x00",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x00"
+        },
+        {
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x14",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x14"
+        },
+        {
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x15",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x15"
+        }
+      ],
+      "sources": [
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "1",
+          "column": "1",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x00",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x00",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App65 DEO+Alginate/29-十一月-2025/0.02% Alginate 10x00.tif"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "1",
+          "column": "2",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x00",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x00",
+          "method": "old_multiscale_large_recovery",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app65_alginate_multiscale_large_recovery/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x00_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "1",
+          "column": "3",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x00",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x00",
+          "method": "threshold_hint_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app65_alginate/test_app65_alginate_custom_cellpose/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x00_threshold_hint_cellpose/step06_final/step52_final_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "1",
+          "column": "4",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x00",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x00",
+          "method": "final_direct_brightfield",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app65_alginate_v3_direct_brightfield/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x00_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "2",
+          "column": "1",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x14",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x14",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App65 DEO+Alginate/29-十一月-2025/0.02% Alginate 10x14.tif"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "2",
+          "column": "2",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x14",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x14",
+          "method": "old_multiscale_large_recovery",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app65_alginate_multiscale_large_recovery/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x14_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "2",
+          "column": "3",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x14",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x14",
+          "method": "threshold_hint_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app65_alginate/test_app65_alginate_custom_cellpose/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x14_threshold_hint_cellpose/step06_final/step52_final_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "2",
+          "column": "4",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x14",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x14",
+          "method": "final_direct_brightfield",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app65_alginate_v3_direct_brightfield/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x14_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "3",
+          "column": "1",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x15",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x15",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/DEO/App65 DEO+Alginate/29-十一月-2025/0.02% Alginate 10x15.tif"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "3",
+          "column": "2",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x15",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x15",
+          "method": "old_multiscale_large_recovery",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived-outputs/app65_alginate_multiscale_large_recovery/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x15_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "3",
+          "column": "3",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x15",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x15",
+          "method": "threshold_hint_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app65_alginate/test_app65_alginate_custom_cellpose/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x15_threshold_hint_cellpose/step06_final/step52_final_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app65_no_text",
+          "row": "3",
+          "column": "4",
+          "sample_id": "app65_0p02_alginate_2025-11-29_10x15",
+          "description": "App65, 0.02% alginate, 29 Nov 2025, 10x15",
+          "method": "final_direct_brightfield",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/app65_alginate_v3_direct_brightfield/runs/0.02% Alginate/29-十一月-2025/29-十一月-2025_0.02% Alginate 10x15_overlay.png"
+        }
+      ]
+    },
+    {
+      "key": "segmentation_method_comparison_app81_no_text",
+      "caption_short": "App81 density segmentation method-routing comparison",
+      "png": "/home/lachlan/ProjectsLFS/Zhengyu/publication/aaps-organoid/figures/segmentation_method_comparison_app81_no_text.png",
+      "pdf": "/home/lachlan/ProjectsLFS/Zhengyu/publication/aaps-organoid/figures/segmentation_method_comparison_app81_no_text.pdf",
+      "columns": [
+        "raw brightfield image",
+        "threshold-hinted Cellpose",
+        "resized multiscale Cellpose",
+        "image-generation-assisted mask",
+        "final stitched AAPS-selected hybrid"
+      ],
+      "rows": [
+        {
+          "sample_id": "app81_low_2025-10-14_10x_low",
+          "description": "App81, low density, 14 Oct 2025, 10X low"
+        },
+        {
+          "sample_id": "app81_low_2025-10-15_10x_low",
+          "description": "App81, low density, 15 Oct 2025, 10x low"
+        },
+        {
+          "sample_id": "app81_low_2025-10-16_10x_low",
+          "description": "App81, low density, 16 Oct 2025, 10x low"
+        }
+      ],
+      "sources": [
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "1",
+          "column": "1",
+          "sample_id": "app81_low_2025-10-14_10x_low",
+          "description": "App81, low density, 14 Oct 2025, 10X low",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app81/test_app81_grsai_clean_fill_v10_low_final_check/source_pngs/low/14-十月-2025_10X low_source.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "1",
+          "column": "2",
+          "sample_id": "app81_low_2025-10-14_10x_low",
+          "description": "App81, low density, 14 Oct 2025, 10X low",
+          "method": "threshold_hint_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_main_density/app81_main_density_custom_threshold_hint/runs/low/14-十月-2025/14-十月-2025_10X low_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "1",
+          "column": "3",
+          "sample_id": "app81_low_2025-10-14_10x_low",
+          "description": "App81, low density, 14 Oct 2025, 10X low",
+          "method": "resized_multiscale_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_main_density/app81_main_density_resized_multiscale_v1/runs/low/14-十月-2025/14-十月-2025_10X low_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "1",
+          "column": "4",
+          "sample_id": "app81_low_2025-10-14_10x_low",
+          "description": "App81, low density, 14 Oct 2025, 10X low",
+          "method": "nanobanana_image_generation",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app81/test_app81_grsai_clean_fill_v10_low_final_check/generated_masks/low/14-十月-2025/14-十月-2025_10X low/generated_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "1",
+          "column": "5",
+          "sample_id": "app81_low_2025-10-14_10x_low",
+          "description": "App81, low density, 14 Oct 2025, 10X low",
+          "method": "final_stitched_hybrid",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_density_stitched/app81_density_stitched_cellpose_v5_final_single_exports_v2/14-十月-2025/10X low/from_low_batch_2_replicate_01_10x_stitched/overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "2",
+          "column": "1",
+          "sample_id": "app81_low_2025-10-15_10x_low",
+          "description": "App81, low density, 15 Oct 2025, 10x low",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app81/test_app81_grsai_clean_fill_v10_low_final_check/source_pngs/low/15-十月-2025_10x low_source.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "2",
+          "column": "2",
+          "sample_id": "app81_low_2025-10-15_10x_low",
+          "description": "App81, low density, 15 Oct 2025, 10x low",
+          "method": "threshold_hint_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_main_density/app81_main_density_custom_threshold_hint/runs/low/15-十月-2025/15-十月-2025_10x low_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "2",
+          "column": "3",
+          "sample_id": "app81_low_2025-10-15_10x_low",
+          "description": "App81, low density, 15 Oct 2025, 10x low",
+          "method": "resized_multiscale_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_main_density/app81_main_density_resized_multiscale_v1/runs/low/15-十月-2025/15-十月-2025_10x low_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "2",
+          "column": "4",
+          "sample_id": "app81_low_2025-10-15_10x_low",
+          "description": "App81, low density, 15 Oct 2025, 10x low",
+          "method": "nanobanana_image_generation",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app81/test_app81_grsai_clean_fill_v10_low_final_check/generated_masks/low/15-十月-2025/15-十月-2025_10x low/generated_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "2",
+          "column": "5",
+          "sample_id": "app81_low_2025-10-15_10x_low",
+          "description": "App81, low density, 15 Oct 2025, 10x low",
+          "method": "final_stitched_hybrid",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_density_stitched/app81_density_stitched_cellpose_v5_final_single_exports_v2/15-十月-2025/10x low/from_low_batch_1_replicate_01_10x_stitched/overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "3",
+          "column": "1",
+          "sample_id": "app81_low_2025-10-16_10x_low",
+          "description": "App81, low density, 16 Oct 2025, 10x low",
+          "method": "raw",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app81/test_app81_grsai_clean_fill_v10_low_final_check/source_pngs/low/16-十月-2025_10x low_source.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "3",
+          "column": "2",
+          "sample_id": "app81_low_2025-10-16_10x_low",
+          "description": "App81, low density, 16 Oct 2025, 10x low",
+          "method": "threshold_hint_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_main_density/app81_main_density_custom_threshold_hint/runs/low/16-十月-2025/16-十月-2025_10x low_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "3",
+          "column": "3",
+          "sample_id": "app81_low_2025-10-16_10x_low",
+          "description": "App81, low density, 16 Oct 2025, 10x low",
+          "method": "resized_multiscale_cellpose",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_main_density/app81_main_density_resized_multiscale_v1/runs/low/16-十月-2025/16-十月-2025_10x low_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "3",
+          "column": "4",
+          "sample_id": "app81_low_2025-10-16_10x_low",
+          "description": "App81, low density, 16 Oct 2025, 10x low",
+          "method": "nanobanana_image_generation",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/test_app81/test_app81_grsai_clean_fill_v10_low_final_check/generated_masks/low/16-十月-2025/16-十月-2025_10x low/generated_overlay.png"
+        },
+        {
+          "figure": "segmentation_method_comparison_app81_no_text",
+          "row": "3",
+          "column": "5",
+          "sample_id": "app81_low_2025-10-16_10x_low",
+          "description": "App81, low density, 16 Oct 2025, 10x low",
+          "method": "final_stitched_hybrid",
+          "path": "/home/lachlan/ProjectsLFS/Zhengyu/analysis-output/archived/app81_density_stitched/app81_density_stitched_cellpose_v5_final_single_exports_v2/16-十月-2025/10x low/from_low_batch_2_replicate_01_10x_stitched/overlay.png"
+        }
+      ]
+    }
+  ]
+}
